@@ -1,15 +1,15 @@
 Neat & lite jQuery color picker with color stack & blends!
 ===============================
 TODO:
--minimal working version: 
+minimal working version: 
 +targets, 
--callbacks, 
++callbacks, 
 -layout, 
 -crossbrowsery, 
 -keyboards, 
 -saturation alternative, 
--tests page, 
--typer as submodule, 
++tests page, 
+-as submodule to typer, 
 -minification
 -my site download
 
@@ -42,9 +42,30 @@ You can use shortcuts to drive color picker:
 </dl>
 
 <h2>Events</h2>
-<table>
-	<tr><td>load</td><td>444</td>
-	</tr>
-</table>
+<p>Event callback obtains color picker controller as only argument.
+</p>
+<dl>
+	<dt><dfn>show(cp)</dfn></dt>
+	<dd>Called when color picker showed.</dd>
+
+	<dt><dfn>hide(cp)</dfn></dt>
+	<dd>Called when color picker hided.</dd>
+
+	<dt><dfn>dragStart(cp)</dfn></dt>
+	<dd>Called when some of pickers started to drag.</dd>
+
+	<dt><dfn>drag(cp)</dfn></dt>
+	<dd>Called on each step of dragging one of pickers.</dd>
+
+	<dt><dfn>dragStop(cp)</dfn></dt>
+	<dd>Called when dragging stopped.</dd>
+
+	<dt><dfn>resize(cp)</dfn></dt>
+	<dd>Called on each step of resizing.</dd>
+
+	<dt><dfn>change(cp)</dfn></dt>
+	<dd>Called on every changing of value in model, i.e. in target input.</dd>
+
+</dl>
 
 <h2>Methods</h2>
