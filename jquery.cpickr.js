@@ -523,7 +523,9 @@
       hide: function(t) {
 	 var self = this, o = self.options, el = self.element;
 
-	 t = t === 0 ? 0 : (t || o.hideTime);
+	 if (self.container.hasClass('cp-hidden')) return self;
+
+   	 t = t === 0 ? 0 : (t || o.hideTime);
 
 	 self.container.removeClass('cp-active')
 	 self.container.fadeOut(t, function(){
@@ -534,7 +536,7 @@
 
 	 $(document).off('mousedown'+self.evSuffix);
 
-	 return self.refresh();
+	 return self;
       },
 
       //Switch to the opposite state
@@ -552,7 +554,6 @@
       /*===========================================================================Rendering==================*/
       refresh: function() {
 	 var self = this, o = self.options, el = self.element;
-
 	 return self
 	 ._renderBigZone()
 	 ._renderSmallZone()

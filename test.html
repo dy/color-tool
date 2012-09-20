@@ -5,7 +5,14 @@
       display:inline-block;
       border-right:1px dashed lightgray;
       vertical-align: top;
-      padding:5%;
+      width: 24.5%;
+   }
+   .test-case code{
+      font-weight: 100;
+      font-size: .9em;
+      background: #ebefeb;
+      border: rgba(0,0,0,.15);
+      border-radius: 2px;
    }
 	.target-1{
 		width:200px;
@@ -23,19 +30,19 @@
 
 <!-- Case of <input type="color"/> -->
 <div class="test-case">
-	<h3><code><input type="color" value="green"/></code> case</h3>
+	<h3>Test of <br/><code>&lt;input type="color" value="green"/></code></h3>
 	<input type="color" value="green"/>
 </div>
 
 <!-- Case of <input type="text"/> -->
 <div class="test-case">
-	<h3><code><input type="text" class="color-picker" value="red"/></code> case</h3>
+	<h3>Test of<br/><code>&lt;input type="text" class="color-picker" value="red"/></code></h3>
 	<input type="color" value="green"/>
 </div>
 
 <!-- Case of <div> -->
 <div class="test-case">
-	<h3><code><div class="color-picker" data-color="blue"></div></code> test</h3>
+   <h3>Test of <br/><code>&lt;div class="color-picker" data-color="blue">&lt;/div></code></h3>
 	<div class="color-picker"></div>
 </div>
 
