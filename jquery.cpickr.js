@@ -640,7 +640,7 @@
 	 switch (o.mode){
 	    case 'hl':
 	       bLeft = o.colorObj.hue()/360*self.bigZone.width();
-	       //console.log('mx:'+self.mouseX+' right:'+(self.bigZone.offset().left + self.bigZone.width()));
+	       console.log('mx:'+self.mouseX+' right:'+(self.bigZone.offset().left + self.bigZone.width()));
 	       if (self.mouseX >= self.bigZone.offset().left + self.bigZone.width()){
 		  bLeft += self.bigZone.width();
 	       }
