@@ -287,7 +287,7 @@
       bigDragStart: function(e) {
 	 var self = this._captureMouse(e), o = self.options, el = self.element;
 
-	 self.container.addClass('cp-dragging');
+	 self.container.addClass('cp-dragging cp-big-picker-dragging');
 
 	 self.bigPickerTo(e.pageX, e.pageY);
 
@@ -308,12 +308,12 @@
 	 self.bigPickerTo(e.pageX,e.pageY);
 	 if (o.dragStop) o.dragStop(self);
 	 self.bigPicker.trigger('dragStop'+self.evSuffix);
-	 self.container.removeClass('cp-dragging');
+	 self.container.removeClass('cp-dragging cp-big-picker-dragging');
 	 return self;
       },
       smallDragStart: function(e) {
 	 var self = this._captureMouse(e), o = self.options, el = self.element;
-	 self.container.addClass('cp-dragging');
+	 self.container.addClass('cp-dragging cp-small-picker-dragging');
 	 self.smallPickerTo(e.pageX, e.pageY);
 	 if (o.dragStart) o.dragStart(self);
 	 self.smallPicker.trigger('dragStart'+self.evSuffix);
@@ -331,7 +331,7 @@
 	 self.smallPickerTo(e.pageX,e.pageY);
 	 if (o.dragStop) o.dragStop(self);
 	 self.smallPicker.trigger('dragStop'+self.evSuffix);
-	 self.container.removeClass('cp-dragging');
+	 self.container.removeClass('cp-dragging cp-small-picker-dragging');
 	 return self;
       },
 
@@ -645,7 +645,7 @@
 	 switch (o.mode){
 	    case 'hl':
 	       bLeft = o.colorObj.hue()/360*self.bigZone.width();
-	       if ((self.mouseX >= self.bigZone.offset().left + self.bigZone.width()) && self.container.hasClass('cp-dragging')){
+	       if ((self.mouseX >= self.bigZone.offset().left + self.bigZone.width()) && self.container.hasClass('cp-big-picker-dragging')){
 		  bLeft += self.bigZone.width(); //when dragging to the right
 	       }
 	       bTop = (1-o.colorObj.lightness())*self.bigZone.height();
