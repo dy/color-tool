@@ -18,13 +18,23 @@
  - transparency optional
  - saturation alternative mode
  - marks of used colors
-
- - fsm refactoring
-
    -targets overlapping correct
-- caret showing correct
+- caret showing correct (eol)
 
--place off-targets
+- placement with no overlapping of targets
+
+- hover on color in stack shows guides
+
+MINIMAL:
+- kbd parse & change
+- targets overlapping
+- resize
+- color stack
+- recheck format of color oninput
+- demo page to my site
+
+
+
 
  */
 (function($){
@@ -61,7 +71,6 @@
 	 'position':'absolute',
 	 'width':'300px',
 	 'height':'200px',
-	 'resize':'both',
 	 'cursor':'default',
 	 'user-select':'none',
 	 'font-family':'sans-serif'
@@ -71,22 +80,16 @@
 	 'position':'relative',
 	 'height':'80%'
       }).appendTo(cp.container);
-      cp.layer1 = $('<div class="cp-layer-1"></div>')
-      .css({
+      var layerCss = {
 	 'top':0,
 	 'left':0,
 	 'height':'100%',
 	 'width':'100%',
 	 'position':'absolute'
-      }).appendTo(cp.bigZone);
-      cp.layer2 = $('<div class="cp-layer-2"></div>')
-      .css({
-	 'top':0,
-	 'left':0,
-	 'height':'100%',
-	 'width':'100%',
-	 'position':'absolute'
-      }).appendTo(cp.bigZone);
+      };
+      cp.layer1 = $('<div class="cp-layer-1"></div>').css(layerCss).appendTo(cp.bigZone);
+      cp.layer2 = $('<div class="cp-layer-2"></div>').css(layerCss).appendTo(cp.bigZone);
+      cp.bigZoneGuides = $('<div class="cp-big-zone-guides"></div>').css(layerCss).appendTo(cp.bigZone);
       cp.smallZone = $('<div class="cp-small-zone"></div>')
       .css({
 	 'height':'20%',
@@ -94,6 +97,7 @@
 	 'border-bottom-left-radius':'6px',
 	 'border-bottom-right-radius':'6px'
       }).appendTo(cp.container);
+      cp.smallZoneGuides = $('<div class="cp-small-zone-guides"></div>').css(layerCss).appendTo(cp.bigZone);
       var pickerCss = {
 	 'height':10,
 	 'width':10,
@@ -250,14 +254,25 @@
 	    self._renderBigZone();
 	 });
 
-	 el.keypress(function(e){
-	    console.log(e.which)
+	 el.on('keydown', function(e){
 	    switch(e.which){
-	       case 13://Enter
+	       case 13:
 		  self.toggle();
+		  break;
+	       case 38://TODO: up
+		  e.preventDefault();
+		  break;
+	       case 40://TODO: down
+		  e.preventDefault();
 		  break;
 	    }
 	 });
+
+	 el.on('keyup', function(e){console.log(o.targets)
+	    //Reparse format
+	    self.loadColor(el.val());
+	 })
+
 	 /*el.blur(function(){
 	    self.hide();
 	 });*/
@@ -282,6 +297,14 @@
       getOption: function(key) {
 	 var self = this, o = self.options, el = self.element;
 	 return o[key];
+      },
+
+      //Just capture coords
+      _captureMouse: function(e) {
+	 var self = this;
+	 self.mouseX = e.pageX;
+	 self.mouseY = e.pageY;
+	 return self;
       },
       /*========================================================================Actions====================*/
       bigDragStart: function(e) {
@@ -335,16 +358,8 @@
 	 return self;
       },
 
-      //Just capture coords
-      _captureMouse: function(e) {
-	 var self = this;
-	 self.mouseX = e.pageX;
-	 self.mouseY = e.pageY;
-	 return self;
-      },
 
-
-      /*=========================================================================API - uncertainly changes model=====*/
+      /*=========================================================================API - uncertainly changes model===================================================================================================================================*/
       //Move picker & make correct color. x & y are pageX & pageY
       bigPickerTo: function(x, y) {
 	 var self = this, o = self.options, el = self.element;
@@ -559,7 +574,7 @@
 	 return self;
       },
 
-      /*===========================================================================Rendering==================*/
+      /*===========================================================================Rendering==========================================================================================================================================================*/
       refresh: function() {
 	 var self = this, o = self.options, el = self.element;
 	 return self
@@ -776,6 +791,17 @@
 	 return self;
       },
 
+      _renderGuides: function() {
+	 var self = this, o = self.options, el = self.element;
+
+	 switch (o.mode){
+	    case 'hl':
+	       self.bigZoneGuides
+	 }
+
+	 return self;
+      },
+
    /*================================Helpers================================*/
 
 
@@ -794,10 +820,4 @@
    };
 
 
-/*Auto bg prefixes fix*/
-
-
 })(jQuery)
-
-
-
