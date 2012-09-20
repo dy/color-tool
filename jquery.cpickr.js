@@ -8,12 +8,22 @@
 /*TODO:
  *- load last used colorlist and init color from local storage
  *- make tip position precisely to the caret
- *- standart replacer for input type=color element.
+ *- standart replacer for input mode=color element.
  *- press-release habrahabr, vkontakte, smashing etc: Own color picker with toys & beauties. List of concurent features.
  *- lab
  *- screen color picker (WTF? HOW?). Behaviour maybe is simple dragging out of picker zone.
  *- color stack is neat & lite, not pesky: just shows last used colors. Maybe group colors by similarity?
  *- read data-attributes additional to options
+
+ - transparency optional
+ - saturation alternative mode
+ - marks of used colors
+
+ - fsm refactoring
+
+   -targets overlapping correct
+- caret showing correct
+
  */
 (function($){
    $.cpickr = $.cpickr || {};
@@ -22,9 +32,12 @@
    $.cpickr.preinit = function(){
       var cp = $.cpickr;
       cp.defaults = {//Default for every picker options.
-	 type:'hl',//'sl','sh'
-	 alpha:false,
+	 mode:'hl',//'sl','sh'
+	 symmetricSaturation:false, //To make a symmetric saturation gauge
+	 transparency:false,
+	 defaultColor:'gray',
 	 bw:true,
+	 usedColorsMarks:true,
 	 format:'rgb',//rgba,hsl,hsla,hex,text
 	 colorStack:[{
 	    'rgba(0,0,0,1)':'permanent', //value is number of usages
@@ -40,8 +53,8 @@
       cp.container = $('<div class="cpickr"></div>')
       .css({
 	 'z-index':9999,
-      	'border-bottom-left-radius':'6px',
-      	'border-bottom-right-radius':'6px',
+	 'border-bottom-left-radius':'6px',
+	 'border-bottom-right-radius':'6px',
 	 'box-shadow':'rgba(0, 20, 40, 0.5) 0px 1px 3px 0px, rgba(0, 20, 40, 0.3) 0px 3px 12px 0px',
 	 'position':'absolute',
 	 'width':'300px',
@@ -76,8 +89,8 @@
       .css({
 	 'height':'20%',
 	 'position':'relative',
-      	'border-bottom-left-radius':'6px',
-      	'border-bottom-right-radius':'6px'
+	 'border-bottom-left-radius':'6px',
+	 'border-bottom-right-radius':'6px'
       }).appendTo(cp.container);
       var pickerCss = {
 	 'height':10,
@@ -127,6 +140,7 @@
       cp.evSuffix='.cpickr';
       //drag big zone
       cp.bigZone.mousedown(function(e){
+	 e.stopImmediatePropagation();
 	 var caller = cp.container.data('cp-caller');
 	 if (!caller) return;
 	 caller.bigDragStart(e);
@@ -142,6 +156,7 @@
 
       //drag smallzone
       cp.smallZone.mousedown(function(e){
+	 e.stopImmediatePropagation(); //To prevent disabling
 	 var caller = cp.container.data('cp-caller');
 	 if (!caller) return;
 	 caller.smallDragStart(e);
@@ -152,7 +167,7 @@
 	 .on('mouseup'+cp.evSuffix, function(e){
 	    $(document).off('mousemove'+cp.evSuffix).off('mouseup'+cp.evSuffix);
 	    caller.smallDragStop(e);
-	 });
+	 })
       });
 
       //TODO: Click behaviour
@@ -164,11 +179,11 @@
 
    //Cpickr class is controller of cpickr example
    function Cpickr(target, opts){
-   	var self = this;
+      var self = this;
       self.element = $(target);
       self.options = {
 	 targets:null,//List of targets to apply value
-	 colorObj:$.Color('hsla(0,80%,50%,1)'),//Color object
+	 colorObj:null,//Color object
 	 show:null,
 	 hide:null,
 	 dragStart:null,
@@ -187,21 +202,21 @@
       create: function() {
 	 var self = this, o = self.options, el = self.element;
 	 if (el[0].tagName.toLowerCase() == 'input'){
-	 	var sp = 4; //gaps
-	 	self.colorPreview = $('<div class="cp-color-preview"/>').css({
-		 		'height':el.innerHeight() - sp*.5,
-		 		'width':el.innerHeight() - sp*.5,
-		 		'max-height':40,
-		 		'max-width':40,
-		 		'background':'transparent',
-		 		'position':'absolute',
-		 		'top':el.position().top + parseInt(el.css('padding-top')) + parseInt(el.css('margin-top')) + sp*.5,
-		 		'left':el.position().left + parseInt(el.css('padding-left')) + parseInt(el.css('margin-left')) + sp*.7
-		 	}).insertAfter(el);
-	 	o.targets.push(self.colorPreview);
-	 	el.css({
-	 		'padding-left':self.colorPreview.height() + sp
-	 	})
+	    var sp = 4; //gaps
+	    self.colorPreview = $('<div class="cp-color-preview"/>').css({
+	       'height':el.innerHeight() - sp*.5,
+	       'width':el.innerHeight() - sp*.5,
+	       'max-height':40,
+	       'max-width':40,
+	       'background':'transparent',
+	       'position':'absolute',
+	       'top':el.position().top + parseInt(el.css('padding-top')) + parseInt(el.css('margin-top')) + sp*.5,
+	       'left':el.position().left + parseInt(el.css('padding-left')) + parseInt(el.css('margin-left')) + sp*.7
+	    }).insertAfter(el);
+	    o.targets.push(self.colorPreview);
+	    el.css({
+	       'padding-left':self.colorPreview.height() + sp
+	    })
 	 }
 
 	 self = $.extend(self, $.cpickr);
@@ -215,14 +230,18 @@
       init: function(e) {
 	 var self = this, o = self.options, el = self.element;
 
+	 self.loadColor(el.val() || el.data('color') || el.html());
+
 	 self.tipTo('left');
 	 self.refresh();
 	 self.container.trigger('cpickr.init');
 
-	 //------------------------------------------------Events
+	 //----------------------------------------------------------------------Events--------------------
 	 el.click(function(e){
+	    if (self.container.hasClass('cp-active')) {
+	       return;
+	    }
 	    self.hide().relocate().show();
-	 //self._renderBigZone();
 	 });
 	 el.change(function(){
 	    self._renderBigZone();
@@ -263,67 +282,56 @@
       },
       /*========================================================================Actions====================*/
       bigDragStart: function(e) {
-	 var self = this, o = self.options, el = self.element;
+	 var self = this._captureMouse(e), o = self.options, el = self.element;
 
-	 self.constraints = {
-	    top: self.bigZone.offset().top,
-	    right: self.bigZone.offset().left + self.bigZone.width(),
-	    bottom: self.bigZone.offset().top + self.bigZone.height(),
-	    left: self.bigZone.offset().left
-	 }
-
-	 self.dragStartPageX = e.pageX;
-	 self.dragStartPageY = e.pageY;
 	 self.bigPickerTo(e.pageX, e.pageY);
 
-	    if (o.dragStart) o.dragStart(self);
-	    self.bigPicker.trigger('dragStart'+self.evSuffix);
+	 if (o.dragStart) o.dragStart(self);
+	 self.bigPicker.trigger('dragStart'+self.evSuffix);
 
 	 return self;
       },
       bigDrag: function(e) {
-	 var self = this, o = self.options, el = self.element;
+	 var self = this._captureMouse(e), o = self.options, el = self.element;
 	 self.bigPickerTo(e.pageX, e.pageY);
 	 if (o.dragging) o.dragging(self);
-	    self.bigPicker.trigger('dragging'+self.evSuffix);
+	 self.bigPicker.trigger('dragging'+self.evSuffix);
 	 return self;
       },
       bigDragStop: function(e) {
-	 var self = this, o = self.options, el = self.element;
+	 var self = this._captureMouse(e), o = self.options, el = self.element;
 	 self.bigPickerTo(e.pageX,e.pageY);
 	 if (o.dragStop) o.dragStop(self);
-	    self.bigPicker.trigger('dragStop'+self.evSuffix);
+	 self.bigPicker.trigger('dragStop'+self.evSuffix);
 	 return self;
       },
       smallDragStart: function(e) {
-	 var self = this, o = self.options, el = self.element;
-
-	 self.constraints = {
-	    top: self.smallZone.offset().top,
-	    right: self.smallZone.offset().left + self.smallZone.width(),
-	    bottom: self.smallZone.offset().top + self.smallZone.height(),
-	    left: self.smallZone.offset().left
-	 }
-
-	 self.dragStartPageX = e.pageX;
-	 self.dragStartPageY = e.pageY;
+	 var self = this._captureMouse(e), o = self.options, el = self.element;
 	 self.smallPickerTo(e.pageX, e.pageY);
 	 if (o.dragStart) o.dragStart(self);
-	    self.smallPicker.trigger('dragStart'+self.evSuffix);
+	 self.smallPicker.trigger('dragStart'+self.evSuffix);
 	 return self;
       },
       smallDrag: function(e) {
-	 var self = this, o = self.options, el = self.element;
+	 var self = this._captureMouse(e), o = self.options, el = self.element;
 	 self.smallPickerTo(e.pageX, e.pageY);
 	 if (o.dragging) o.dragging(self);
-	    self.smallPicker.trigger('dragging'+self.evSuffix);
+	 self.smallPicker.trigger('dragging'+self.evSuffix);
 	 return self;
       },
       smallDragStop: function(e) {
-	 var self = this, o = self.options, el = self.element;
+	 var self = this._captureMouse(e), o = self.options, el = self.element;
 	 self.smallPickerTo(e.pageX,e.pageY);
 	 if (o.dragStop) o.dragStop(self);
-	    self.smallPicker.trigger('dragStop'+self.evSuffix);
+	 self.smallPicker.trigger('dragStop'+self.evSuffix);
+	 return self;
+      },
+
+      //Just capture coords
+      _captureMouse: function(e) {
+	 var self = this;
+	 self.mouseX = e.pageX;
+	 self.mouseY = e.pageY;
 	 return self;
       },
 
@@ -331,17 +339,24 @@
       /*=========================================================================API - uncertainly changes model=====*/
       //Move picker & make correct color. x & y are pageX & pageY
       bigPickerTo: function(x, y) {
-	 var self = this, o = self.options, el = self.element,
+	 var self = this, o = self.options, el = self.element;
 
-	 leftOffset = Math.max(self.constraints.left, Math.min(self.constraints.right , x))-self.bigZone.offset().left,
-	 topOffset = Math.max(self.constraints.top , Math.min(self.constraints.bottom , y))-self.bigZone.offset().top;
+	 var constraints = {
+	    top: self.bigZone.offset().top,
+	    right: self.bigZone.offset().left + self.bigZone.width(),
+	    bottom: self.bigZone.offset().top + self.bigZone.height(),
+	    left: self.bigZone.offset().left
+	 }
 
-	 self.bigPicker.css({
+	 var leftOffset = Math.max(constraints.left, Math.min(constraints.right , x))-self.bigZone.offset().left,
+	 topOffset = Math.max(constraints.top , Math.min(constraints.bottom , y))-self.bigZone.offset().top;
+
+	 /*self.bigPicker.css({
 	    left: leftOffset,
 	    top: topOffset
-	 });
+	 });*/
 
-	 switch (o.type){
+	 switch (o.mode){
 	    case 'hl':
 	       var l = 1-topOffset/self.bigZone.height(),
 	       h = leftOffset/self.bigZone.width()*360;
@@ -349,24 +364,36 @@
 	       break;
 	    default:
 	 }
-	 self._renderSmallZone()._renderPickers()._updateTargets()._updateTip();
+	 self._renderSmallZone()._updatePickers()._updateTargets()._updateTip();
 
 	 return self;
       },
 
       //x & y are pageX & pageY
       smallPickerTo: function(x, y) {
-	 var self = this, o = self.options, el = self.element,
-	 leftOffset = Math.max(self.constraints.left, Math.min(self.constraints.right , x))-self.smallZone.offset().left,
-	 topOffset = Math.max(self.constraints.top , Math.min(self.constraints.bottom , y))-self.smallZone.offset().top;
-	 self.smallPicker.css({
+	 var self = this, o = self.options, el = self.element;
+
+	 var constraints = {
+	    top: self.smallZone.offset().top,
+	    right: self.smallZone.offset().left + self.smallZone.width(),
+	    bottom: self.smallZone.offset().top + self.smallZone.height(),
+	    left: self.smallZone.offset().left
+	 }
+
+	 var leftOffset = Math.max(constraints.left, Math.min(constraints.right , x))-self.smallZone.offset().left,
+	 topOffset = Math.max(constraints.top , Math.min(constraints.bottom , y))-self.smallZone.offset().top;
+	 /*self.smallPicker.css({
 	    left: leftOffset,
 	    top: topOffset
-	 });
+	 });*/
 
-	 switch (o.type){
+	 switch (o.mode){
 	    case 'hl':
-	       var s = (leftOffset/self.smallZone.width() - .5) * 2;
+	       if (o.symmetricSaturation){
+		  var s = (leftOffset/self.smallZone.width() - .5) * 2;
+	       } else {
+		  var s = leftOffset/self.smallZone.width();
+	       }
 	       o.colorObj = o.colorObj.saturation(Math.abs(s));
 	       if (s<0 && !self.invertedHue) {
 		  o.colorObj = o.colorObj.hue(o.colorObj.hue()+180)
@@ -380,16 +407,34 @@
 	    default:
 	 }
 
-	 self._renderBigZone()._renderPickers()._updateTargets()._updateTip();
+	 self._renderBigZone()._updatePickers()._updateTargets()._updateTip();
 
 	 return self;
       },
 
+      //Changes model & moves pickers
       loadColor: function(str) {
 	 var self = this, o = self.options, el = self.element;
 
-	 o.colorObj.parse(str);
+	 o.colorObj = $.Color(str);
 
+	 var bLeft, bTop, sLeft, sTop;
+
+	 self._updatePickers();
+
+	 if(/rgba/.test(str)){
+	    o.format = 'rgba'
+	 } else if (/rgb[^a]/.test(str)) {
+	    o.format = 'rgb'
+	 } else if (/hsla/.test(str)){
+	    o.format = 'hsla'
+	 } else if (/hsl[^a]/.test(str)){
+	    o.format = 'hsl'
+	 } else if (/#/.test(str)){
+	    o.format = 'hex'
+	 } else {
+	    o.format = 'color'
+	 }
 	 return self;
       },
 
@@ -457,7 +502,12 @@
 	    self.container.trigger('show'+self.evSuffix);
 	 });
 
-	 return self;
+	 $(document).on('mousedown'+self.evSuffix, function(e){
+	    if (e.target == el[0]) return;
+	    self.hide();
+	 });
+
+	 return self.refresh();
       },
 
       //Hide after t ms.
@@ -482,7 +532,9 @@
 	    self.container.trigger('hide'+self.evSuffix);
 	 });
 
-	 return self;
+	 $(document).off('mousedown'+self.evSuffix);
+
+	 return self.refresh();
       },
 
       //Switch to the opposite state
@@ -504,6 +556,7 @@
 	 return self
 	 ._renderBigZone()
 	 ._renderSmallZone()
+	 ._updatePickers()
 	 ._updateTargets();
       },
 
@@ -511,7 +564,7 @@
 	 var self = this, o = self.options, el = self.element;
 	 var l1 = self.layer1, l2 = self.layer2;
 
-	 switch(o.type){
+	 switch(o.mode){
 	    case 'hl':
 	       //Layer 1
 	       var grSteps = 12, //6,12,24,36, 72 is optimal. 6 is better.
@@ -543,14 +596,20 @@
       _renderSmallZone: function() {
 	 var self = this, o = self.options, el = self.element;
 
-	 switch (o.type){
+	 switch (o.mode){
 	    case 'hl':
 	       var l = (o.colorObj.lightness()*100);
-	       var h = o.colorObj.hue() + (self.invertedHue? 180 : 0);
-	       var sStr = 'linear-gradient(right, '+
-	       'hsla(' + h + ', 100%, ' + l + '%, '+ o.colorObj.alpha()+') 0%, '+
-	       'hsla(' + h + ', 0%, ' + l + '%, '+ o.colorObj.alpha()+') 50%, '+
-	       'hsla(' + ((h+180) % 360) + ', 100%, ' + l + '%, ' + o.colorObj.alpha() + ') 100%' +')';
+	       var h = o.colorObj.hue();
+	       var sStr = 'linear-gradient(right, '
+	       if (o.symmetricSaturation){
+		  //TODO: symmetric saturation
+		  sStr += 'hsla(' + h + ', 100%, ' + l + '%, '+ o.colorObj.alpha()+') 0%, '+
+		  'hsla(' + h + ', 0%, ' + l + '%, '+ o.colorObj.alpha()+') 50%, '+
+		  'hsla(' + ((h+180) % 360) + ', 100%, ' + l + '%, ' + o.colorObj.alpha() + ') 100%' +')';
+	       } else {
+		  sStr += 'hsla(' + h + ', 100%, ' + l + '%, '+ o.colorObj.alpha()+') 0%, '+
+		  'hsla(' + h + ', 0%, ' + l + '%, '+ o.colorObj.alpha()+') 100%) ';
+	       }
 	       self.smallZone.css('background', '-webkit-'+sStr)
 	       .css('background', '-ie-'+sStr)
 	       .css('background', '-o-'+sStr)
@@ -566,17 +625,39 @@
 	 return self;
       },
 
-      _renderPickers: function() {
+      //Moves & updates pickers in accordance with model
+      _updatePickers: function() {
 	 var self = this, o = self.options, el = self.element;
 
+	 if (self.container.hasClass('cp-hidden')) return self;
+
+	 var bLeft, bTop, sLeft, sTop;
+
+	 switch (o.mode){
+	    case 'hl':
+	       bLeft = o.colorObj.hue()/360*self.bigZone.width();
+	       if (self.mouseX >= self.bigZone.offset().left + self.bigZone.width()){
+		  bLeft += self.bigZone.width();
+	       }
+	       bTop = (1-o.colorObj.lightness())*self.bigZone.height();
+	       sLeft = o.colorObj.saturation()*self.smallZone.width();
+	    case 'sl':
+	    case 'sh':
+	    default:
+	 }
+
 	 self.smallPicker.css({
-	    'background':o.colorObj.toHslaString()
-	 });
-	 self.bigPicker.css({
-	    'background':o.colorObj.toHslaString()
+	    'background':o.colorObj.toHslaString(),
+	    'left':sLeft
 	 });
 
-	 self.bigPickerInfo.html('H:&thinsp;'+o.colorObj.hue()+'&deg; L:&thinsp;'+(o.colorObj.lightness()*100).toFixed(0)+'%')
+	 self.bigPicker.css({
+	    'background':o.colorObj.toHslaString(),
+	    'top':bTop,
+	    'left':bLeft
+	 });
+
+	 self.bigPickerInfo.html('H:&thinsp;'+o.colorObj.hue()+'&deg; L:&thinsp;'+(o.colorObj.lightness()*100).toFixed(0)+'%');
 	 self.smallPickerInfo.html('S:&thinsp;'+(o.colorObj.saturation()*100).toFixed(0)+'%');
 
 	 return self;
@@ -642,26 +723,46 @@
 
       //Just updates color of tip
       _updateTip: function(){
-      	var self = this, o = self.options;
-      	//TODO: make tip colouring
-      	//var top = (self.tip.offset().top - self.container.offset().top) / self.container.outerHeight();
-      	//var left = (self.tip.offset().left - self.container.offset.left) / self.container.outerWidth();
-      	//var c = $.Color().hsla()
-      	//self.tip.css('color','white')
+	 var self = this, o = self.options;
+      //TODO: make tip colouring
+      //var top = (self.tip.offset().top - self.container.offset().top) / self.container.outerHeight();
+      //var left = (self.tip.offset().left - self.container.offset.left) / self.container.outerWidth();
+      //var c = $.Color().hsla()
+      //self.tip.css('color','white')
       },
 
       //Update values of all targets
       _updateTargets: function() {
 	 var self = this, o = self.options, el = self.element;
 
-	 	o.targets.each(function(i,e){
-	 		var target = $(e);
-	 		var props = (target.data('color-change') || 'background').split(',');
-			for(var i = props.length; i--;){
-				target.css(props[i].trim(), o.colorObj.toHslaString());
-			}
-	 	})
+	 o.targets.each(function(i,e){
+	    var target = $(e);
+	    var props = (target.data('color-change') || 'background').split(',');
+	    for(var i = props.length; i--;){
+	       target.css(props[i].trim(), o.colorObj.toHslaString());
+	    }
+	 });
 
+	 var val = '';
+	 switch (o.format){
+	    case "rgb":
+	    case "rgba":
+	       val = o.colorObj.toRgbaString();
+	       break;
+	    case "hsl":
+	    case "hsla":
+	       val = o.colorObj.toHslaString();
+	       break;
+	    case "hex":
+	       val = o.colorObj.toHexString();
+	       break;
+	    case "color":
+	       //TODO: nearest colors
+	       val = o.colorObj.toHexString();
+	    default:
+	 }
+	 if (el[0].tagName.toLowerCase() == "input" ) el.val(val);
+	 else el.html(val);
 
 	 return self;
       },

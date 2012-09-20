@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <title>Cpickr - neat & lite color picker. Demo page</title>
 <style>
+   .test-case{
+      display:inline-block;
+      border-right:1px dashed lightgray;
+      vertical-align: top;
+      padding:5%;
+   }
 	.target-1{
 		width:200px;
 		height:100px;
@@ -36,7 +42,7 @@
 <!-- Case targets -->
 <div class="test-case">
 	<h3>Targets test</h3>
-	<input type="text" class="color-picker-3" value="cyan" data-targets=".target-1, .target-2"/>
+	<input type="text" class="color-picker-3" value="aqua" data-targets=".target-1, .target-2"/>
 	<div class="target-1">Target 1</div>
 	<span class="target-2" data-color-change="color">Target 2</span>
 	<div class="target-3" data-color-change="border-top, border-bottom">Target 3</div>
@@ -48,7 +54,7 @@
 <script>
 
 $(document).ready(function(){
-	$('[type=color]').cpickr();
+	//$('[type=color]').cpickr();
 
 	$('.color-picker').cpickr();
 
