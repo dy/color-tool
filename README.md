@@ -1,17 +1,17 @@
-Neat & lite jQuery color picker with color stack & blends!
+[dev] Neat & lite jQuery color picker with color stack & blends!
 ===============================
 TODO:
-minimal working version: 
-+targets, 
-+callbacks, 
--layout, 
--crossbrowsery, 
--keyboards, 
--saturation alternative, 
-+tests page, 
--as submodule to typer, 
+minimal working version:
++targets,
++callbacks,
++layout,
+-crossbrowsery,
+-keyboards,
++saturation alternative,
++tests page,
++as submodule to typer,
 -minification
--my site download
+-upload to my site
 
 Minimalistic color picker jQuery plugin. Intended to use in <a href="https://github.com/dfcreative/typer">Typer</a> - typographic prototyping in-browser application. Based on <a href="https://github.com/jquery/jquery-color">jquery.color</a> plugin.
 <img src="/none"/>

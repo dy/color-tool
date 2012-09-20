@@ -78,7 +78,7 @@ MINIMAL:
       cp.bigZone = $('<div class="cp-big-zone"></div>')
       .css({
 	 'position':'relative',
-	 'height':'80%'
+	 'height':'80%',
       }).appendTo(cp.container);
       var layerCss = {
 	 'top':0,
@@ -268,8 +268,8 @@ MINIMAL:
 	    }
 	 });
 
-	 el.on('keyup', function(e){console.log(o.targets)
-	    //Reparse format
+	 el.on('keyup', function(e){
+	    //Reparse format when key pressed
 	    self.loadColor(el.val());
 	 })
 
@@ -443,8 +443,6 @@ MINIMAL:
 
 	 var bLeft, bTop, sLeft, sTop;
 
-	 self._updatePickers();
-
 	 if(/rgba/.test(str)){
 	    o.format = 'rgba'
 	 } else if (/rgb[^a]/.test(str)) {
@@ -458,7 +456,7 @@ MINIMAL:
 	 } else {
 	    o.format = 'color'
 	 }
-	 return self;
+	 return self.refresh();
       },
 
       //Move to the element
@@ -605,7 +603,7 @@ MINIMAL:
 	       .css('background','-ie-'+grStr)
 	       .css('background', grStr);
 	       //Layer 2
-	       var lStr = 'linear-gradient(top, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 50%, rgba(0,0,0,0) 50%, rgba(0,0,0,1) 100%)';
+	       var lStr = 'linear-gradient(top, rgba(255,255,255,'+o.colorObj.alpha()+') 0%, rgba(255,255,255,0) 50%, rgba(0,0,0,0) 50%, rgba(0,0,0,'+o.colorObj.alpha()+') 100%)';
 	       l2.css('background','-webkit-'+lStr)
 	       .css('background','-o-'+lStr)
 	       .css('background','-moz-'+lStr)
@@ -785,7 +783,7 @@ MINIMAL:
 	       val = o.colorObj.toHexString();
 	    default:
 	 }
-	 if (el[0].tagName.toLowerCase() == "input" ) el.val(val);
+	 if (el[0].tagName.toLowerCase() == "input" && !el.is(':focus')) el.val(val);
 	 else el.html(val);
 
 	 return self;
