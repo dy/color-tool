@@ -1,4 +1,4 @@
-[dev] Neat & lite jQuery color picker with color stack & blends!
+[dev] Neat & lite jQuery color picker with color stack & visual helpers
 ===============================
 TODO:
 minimal working version:
