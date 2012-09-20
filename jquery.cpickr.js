@@ -24,6 +24,8 @@
    -targets overlapping correct
 - caret showing correct
 
+-place off-targets
+
  */
 (function($){
    $.cpickr = $.cpickr || {};
@@ -241,6 +243,7 @@
 	    if (self.container.hasClass('cp-active')) {
 	       return;
 	    }
+	    self._captureMouse(e);
 	    self.hide().relocate().show();
 	 });
 	 el.change(function(){
@@ -525,7 +528,7 @@
 
 	 if (self.container.hasClass('cp-hidden')) return self;
 
-   	 t = t === 0 ? 0 : (t || o.hideTime);
+	 t = t === 0 ? 0 : (t || o.hideTime);
 
 	 self.container.removeClass('cp-active')
 	 self.container.fadeOut(t, function(){
@@ -637,6 +640,7 @@
 	 switch (o.mode){
 	    case 'hl':
 	       bLeft = o.colorObj.hue()/360*self.bigZone.width();
+	       //console.log('mx:'+self.mouseX+' right:'+(self.bigZone.offset().left + self.bigZone.width()));
 	       if (self.mouseX >= self.bigZone.offset().left + self.bigZone.width()){
 		  bLeft += self.bigZone.width();
 	       }
