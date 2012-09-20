@@ -305,10 +305,10 @@
       },
       bigDragStop: function(e) {
 	 var self = this._captureMouse(e), o = self.options, el = self.element;
-	 self.container.removeClass('cp-dragging');
 	 self.bigPickerTo(e.pageX,e.pageY);
 	 if (o.dragStop) o.dragStop(self);
 	 self.bigPicker.trigger('dragStop'+self.evSuffix);
+	 self.container.removeClass('cp-dragging');
 	 return self;
       },
       smallDragStart: function(e) {
@@ -328,10 +328,10 @@
       },
       smallDragStop: function(e) {
 	 var self = this._captureMouse(e), o = self.options, el = self.element;
-	 self.container.removeClass('cp-dragging');
 	 self.smallPickerTo(e.pageX,e.pageY);
 	 if (o.dragStop) o.dragStop(self);
 	 self.smallPicker.trigger('dragStop'+self.evSuffix);
+	 self.container.removeClass('cp-dragging');
 	 return self;
       },
 
