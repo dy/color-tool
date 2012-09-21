@@ -34,6 +34,9 @@ MINIMAL:
 - demo page to my site
 - set transparency in accordance with format, not separate property
 
+-[type=color]
+
+-Onenter close
 
 
  */
@@ -255,7 +258,7 @@ MINIMAL:
 
 
 	 //----------------------------------------------------------------------Events--------------------
-	 el.click(function(e){
+	 el.mousedown(function(e){
 
 	    if (self.container.hasClass('cp-active')) {
 	       return;
@@ -542,7 +545,13 @@ MINIMAL:
 	 $(document).on('mousedown'+self.evSuffix, function(e){
 	    if (e.target == el[0]) return;
 	    self.hide();
-	 });
+	 }).on('keypress'+self.evSuffix, function(e){
+	    switch(e.which){
+	       case 13:
+		  self.hide();
+		  break;
+	    }
+	 })
 
 	 return self.refresh();
       },
@@ -573,7 +582,8 @@ MINIMAL:
 	    self.container.trigger('hide'+self.evSuffix);
 	 });
 
-	 $(document).off('mousedown'+self.evSuffix);
+	 $(document).off('mousedown'+self.evSuffix)
+	 .off('keypress'+self.evSuffix);
 
 	 return self;
       },
