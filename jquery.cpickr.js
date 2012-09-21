@@ -25,6 +25,8 @@
 
 - hover on color in stack shows guides
 
+- !!! think about way to adjust any page of design only with cpickr = what to edit -> edit!!!!!
+
 MINIMAL:
 - kbd parse & change
 + targets overlapping
