@@ -205,19 +205,18 @@ MINIMAL:
       }
       //Main options sset through the $.cpickr.defaults
       self.options = $.extend(self.options, opts);
-      self.options.targets = self.options.targets || self.element;
 
       self.create().init();
-
    }
 
    $.extend(Cpickr.prototype, {
       /*========================================================================TECHNICAL======*/
       create: function() {
 	 var self = this, o = self.options, el = self.element;
-	 if (el[0].tagName.toLowerCase() == 'input'){
+
+     	 if (el[0].tagName.toLowerCase() == 'input'){
 	    var sp = 4; //gaps
-	    self.colorPreview = $('<div class="cp-color-preview"/>').css({
+	    self.colorPreview = $('<div class="cp-color-preview"></div>').css({
 	       'height':el.innerHeight() - sp*.5,
 	       'width':el.innerHeight() - sp*.5,
 	       'max-height':40,
@@ -226,18 +225,22 @@ MINIMAL:
 	       'position':'absolute',
 	       'top':el.position().top + parseInt(el.css('padding-top')) + parseInt(el.css('margin-top')) + sp*.5,
 	       'left':el.position().left + parseInt(el.css('padding-left')) + parseInt(el.css('margin-left')) + sp*.7
-	    }).insertAfter(el);
-	    o.targets.push(self.colorPreview);
+	    })
+	    el.after(self.colorPreview);
+
+	    o.targets = o.targets ? o.targets.add(self.colorPreview) : self.colorPreview;
+
 	    el.css({
 	       'padding-left':self.colorPreview.height() + sp
 	    });
 
 	    if (el.is('[type=color]')){
 	       el.click(function(e){
-		  console.log(true)
 		  e.preventDefault()
 	       })
 	    }
+	 } else {
+	    o.targets = o.targets || el; //default way of make targets
 	 }
 
 	 self = $.extend(self, $.cpickr);
@@ -811,7 +814,8 @@ MINIMAL:
 	       val = o.colorObj.toHexString();
 	    default:
 	 }
-	 if (el[0].tagName.toLowerCase() == "input" && !el.is('[type=color]') && !el.is(':focus')) el.val(val);
+	 console.log(o.targets)
+	 if (el[0].tagName.toLowerCase() == "input" && !el.is(':focus')) el.val(val);
 	 else el.html(val);
 
 	 return self;
