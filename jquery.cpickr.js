@@ -36,9 +36,6 @@ MINIMAL:
 
 -[type=color]
 
--Onenter close
-
-
  */
 (function($){
    $.cpickr = $.cpickr || {};
@@ -121,7 +118,7 @@ MINIMAL:
 	 'line-height':'12px',
 	 'top':'-5px',
 	 'padding':'2px 4px',
-	 'font-size':'9px',
+	 'font-size':'11px',
 	 'border-radius':'3px',
 	 'white-space':'nowrap'
       }
