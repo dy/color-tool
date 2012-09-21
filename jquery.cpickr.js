@@ -228,6 +228,13 @@ MINIMAL:
 	    el.css({
 	       'padding-left':self.colorPreview.height() + sp
 	    });
+
+	    if (el.is('[type=color]')){
+	       el.click(function(e){
+		  console.log(true)
+		  e.preventDefault()
+	       })
+	    }
 	 }
 
 	 self = $.extend(self, $.cpickr);
@@ -794,7 +801,7 @@ MINIMAL:
 	       val = o.colorObj.toHexString();
 	    default:
 	 }
-	 if (el[0].tagName.toLowerCase() == "input" && !el.is(':focus')) el.val(val);
+	 if (el[0].tagName.toLowerCase() == "input" && !el.is('[type=color]') && !el.is(':focus')) el.val(val);
 	 else el.html(val);
 
 	 return self;
