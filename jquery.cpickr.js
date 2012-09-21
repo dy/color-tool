@@ -27,12 +27,12 @@
 
 MINIMAL:
 - kbd parse & change
-- targets overlapping
++ targets overlapping
 - resize
 - color stack
-- recheck format of color oninput
++ recheck format of color oninput
 - demo page to my site
-
+- set transparency in accordance with format, not separate property
 
 
 
@@ -46,19 +46,13 @@ MINIMAL:
       cp.defaults = {//Default for every picker options.
 	 mode:'hl',//'sl','sh'
 	 symmetricSaturation:false, //To make a symmetric saturation gauge
-	 transparency:false,
-	 defaultColor:'gray',
-	 bw:true,
-	 usedColorsMarks:true,
-	 format:'rgb',//rgba,hsl,hsla,hex,text
-	 colorStack:[{
+	 colorStack:[{ //TODO: make if colorstack exists, render it
 	    'rgba(0,0,0,1)':'permanent', //value is number of usages
 	    'rgba(255,255,255,1)':'permanent'
 	 }],
 	 hideIntentDelay:1000,
 	 showTime:100,
 	 hideTime:100,
-	 placementStrategy:'horizontal',// or 'vertical'
 	 snap:false, //Snap to grid
 	 showGrid: false //Show visual helpers
       };
@@ -78,7 +72,7 @@ MINIMAL:
       cp.bigZone = $('<div class="cp-big-zone"></div>')
       .css({
 	 'position':'relative',
-	 'height':'80%',
+	 'height':'80%'
       }).appendTo(cp.container);
       var layerCss = {
 	 'top':0,
@@ -147,8 +141,10 @@ MINIMAL:
       //drag big zone
       cp.bigZone.mousedown(function(e){
 	 e.stopImmediatePropagation();
+	 //TODO: change caller correctly
 	 var caller = cp.container.data('cp-caller');
 	 if (!caller) return;
+
 	 caller.bigDragStart(e);
 	 $(document)
 	 .on('mousemove'+cp.evSuffix, function(e){
@@ -165,6 +161,7 @@ MINIMAL:
 	 e.stopImmediatePropagation(); //To prevent disabling
 	 var caller = cp.container.data('cp-caller');
 	 if (!caller) return;
+
 	 caller.smallDragStart(e);
 	 $(document)
 	 .on('mousemove'+cp.evSuffix, function(e){
@@ -187,7 +184,10 @@ MINIMAL:
    function Cpickr(target, opts){
       var self = this;
       self.element = $(target);
+      //TODO: Make refactoring of default options
+
       self.options = {
+	 defaults:$.cpickr.defaults,
 	 targets:null,//List of targets to apply value
 	 colorObj:null,//Color object
 	 show:null,
@@ -196,11 +196,16 @@ MINIMAL:
 	 dragging:null,
 	 dragStop:null,
 	 resize:null,
-	 change:null
+	 change:null,
+	 format:'rgb',//rgba,hsl,hsla,hex,text //TODO: make if format with alpha, render transparency regulator
+	 placementStrategy:'horizontal'// or 'vertical'
       }
-      self.options = $.extend($.cpickr.defaults, self.options, opts);
+      //Main options sset through the $.cpickr.defaults
+      self.options = $.extend(self.options, opts);
       self.options.targets = self.options.targets || self.element;
+
       self.create().init();
+
    }
 
    $.extend(Cpickr.prototype, {
@@ -222,7 +227,7 @@ MINIMAL:
 	    o.targets.push(self.colorPreview);
 	    el.css({
 	       'padding-left':self.colorPreview.height() + sp
-	    })
+	    });
 	 }
 
 	 self = $.extend(self, $.cpickr);
@@ -239,14 +244,16 @@ MINIMAL:
 	 self.loadColor(el.val() || el.data('color') || el.html());
 
 	 self.tipTo('left');
-	 self.refresh();
 	 self.container.trigger('cpickr.init');
+
 
 	 //----------------------------------------------------------------------Events--------------------
 	 el.click(function(e){
+
 	    if (self.container.hasClass('cp-active')) {
 	       return;
 	    }
+
 	    self._captureMouse(e);
 	    self.hide().relocate().show();
 	 });
@@ -271,12 +278,7 @@ MINIMAL:
 	 el.on('keyup', function(e){
 	    //Reparse format when key pressed
 	    self.loadColor(el.val());
-	 })
-
-	 /*el.blur(function(){
-	    self.hide();
-	 });*/
-	 self.container.data('cp-caller',self);
+	 });
 
 	 return self;
       },
@@ -286,6 +288,7 @@ MINIMAL:
 
 	 return self;
       },
+
       setOption: function(newOptions) {
 	 var self = this, o = self.options, el = self.element;
 	 for(var key in newOptions){
@@ -294,6 +297,7 @@ MINIMAL:
 	 }
 	 return self;
       },
+
       getOption: function(key) {
 	 var self = this, o = self.options, el = self.element;
 	 return o[key];
@@ -306,6 +310,7 @@ MINIMAL:
 	 self.mouseY = e.pageY;
 	 return self;
       },
+
       /*========================================================================Actions====================*/
       bigDragStart: function(e) {
 	 var self = this._captureMouse(e), o = self.options, el = self.element;
@@ -379,7 +384,7 @@ MINIMAL:
 	    top: topOffset
 	 });*/
 
-	 switch (o.mode){
+	 switch (o.defaults.mode){
 	    case 'hl':
 	       var l = 1-topOffset/self.bigZone.height(),
 	       h = leftOffset/self.bigZone.width()*360;
@@ -410,9 +415,9 @@ MINIMAL:
 	    top: topOffset
 	 });*/
 
-	 switch (o.mode){
+	 switch (o.defaults.mode){
 	    case 'hl':
-	       if (o.symmetricSaturation){
+	       if (o.defaults.symmetricSaturation){
 		  var s = (leftOffset/self.smallZone.width() - .5) * 2;
 	       } else {
 		  var s = leftOffset/self.smallZone.width();
@@ -514,7 +519,11 @@ MINIMAL:
       show: function(t) {
 	 var self = this, o = self.options, el = self.element;
 
-	 t = t === 0 ? 0 : (t || o.showTime);
+	 if (self.container.hasClass('cp-active')) return self;
+
+	 t = t === 0 ? 0 : (t || o.defaults.showTime);
+
+	 self.container.data('cp-caller',self);
 
 	 self.container.removeClass('cp-hidden');
 	 self.container.fadeIn(t, function(){
@@ -535,7 +544,7 @@ MINIMAL:
       intentHide: function(t) {
 	 var self = this, o = self.options, el = self.element;
 
-	 t = t === 0 ? 0 : (t || o.hideIntentDelay);
+	 t = t === 0 ? 0 : (t || o.defaults.hideIntentDelay);
 
 	 return self;
       },
@@ -546,7 +555,9 @@ MINIMAL:
 
 	 if (self.container.hasClass('cp-hidden')) return self;
 
-	 t = t === 0 ? 0 : (t || o.hideTime);
+	 self.container.data('cp-caller',null);
+
+	 t = t === 0 ? 0 : (t || o.defaults.hideTime);
 
 	 self.container.removeClass('cp-active')
 	 self.container.fadeOut(t, function(){
@@ -586,7 +597,7 @@ MINIMAL:
 	 var self = this, o = self.options, el = self.element;
 	 var l1 = self.layer1, l2 = self.layer2;
 
-	 switch(o.mode){
+	 switch(o.defaults.mode){
 	    case 'hl':
 	       //Layer 1
 	       var grSteps = 12, //6,12,24,36, 72 is optimal. 6 is better.
@@ -618,12 +629,12 @@ MINIMAL:
       _renderSmallZone: function() {
 	 var self = this, o = self.options, el = self.element;
 
-	 switch (o.mode){
+	 switch (o.defaults.mode){
 	    case 'hl':
 	       var l = (o.colorObj.lightness()*100);
 	       var h = o.colorObj.hue();
 	       var sStr = 'linear-gradient(right, '
-	       if (o.symmetricSaturation){
+	       if (o.defaults.symmetricSaturation){
 		  //TODO: symmetric saturation
 		  sStr += 'hsla(' + h + ', 100%, ' + l + '%, '+ o.colorObj.alpha()+') 0%, '+
 		  'hsla(' + h + ', 0%, ' + l + '%, '+ o.colorObj.alpha()+') 50%, '+
@@ -655,7 +666,7 @@ MINIMAL:
 
 	 var bLeft, bTop, sLeft, sTop;
 
-	 switch (o.mode){
+	 switch (o.defaults.mode){
 	    case 'hl':
 	       bLeft = o.colorObj.hue()/360*self.bigZone.width();
 	       if ((self.mouseX >= self.bigZone.offset().left + self.bigZone.width()) && self.container.hasClass('cp-big-picker-dragging')){
@@ -792,7 +803,7 @@ MINIMAL:
       _renderGuides: function() {
 	 var self = this, o = self.options, el = self.element;
 
-	 switch (o.mode){
+	 switch (o.defaults.mode){
 	    case 'hl':
 	       self.bigZoneGuides
 	 }
@@ -813,6 +824,7 @@ MINIMAL:
 	 return console.log('Cpickr: no elements passed.')
       else
 	 return this.each(function(i,e){
+	    if ($(e).data('cpickr')) return;
 	    $(e).data('cpickr', new Cpickr(e, opts));
 	 });
    };

@@ -43,16 +43,16 @@
 <!-- Case of <div> -->
 <div class="test-case">
    <h3>Test of <br/><code>&lt;div class="color-picker" data-color="blue">&lt;/div></code></h3>
-	<div class="color-picker"></div>
+	<div class="color-picker-1"></div>
 </div>
 
 <!-- Case targets -->
 <div class="test-case">
 	<h3>Targets test</h3>
-	<input type="text" class="color-picker-3" value="aqua" data-targets=".target-1, .target-2"/>
+	<input type="text" class="color-picker-2" value="aqua" data-targets=".target-1, .target-2"/>
 	<div class="target-1">Target 1</div>
 	<span class="target-2" data-color-change="color">Target 2</span>
-	<div class="target-3" data-color-change="border-top, border-bottom">Target 3</div>
+	<div class="target-3" data-color-change="border-top-color, border-bottom-color">Target 3</div>
 </div>
 
 <script src="lib/jquery.js"></script>
@@ -62,12 +62,12 @@
 
 $(document).ready(function(){
 	//$('[type=color]').cpickr();
+	$('.color-picker-1').cpickr();
 
-	$('.color-picker').cpickr();
-
-	$('.color-picker-3').cpickr({
-		targets:$('.target-1, .target-2')
+	$('.color-picker-2').cpickr({
+		targets:$('.target-1, .target-2, .target-3')
 	});
+
 
 })
 
