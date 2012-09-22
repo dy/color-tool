@@ -27,6 +27,10 @@
 
 - !!! think about way to adjust any page of design only with cpickr = what to edit -> edit!!!!!
 
+- click = select all value in field
+
+- find a way to convert value from hex, for ex, to rgba, in input field
+
 MINIMAL:
 - kbd parse & change
 + targets overlapping
@@ -58,7 +62,7 @@ MINIMAL:
 	 snap:false, //Snap to grid
 	 showGrid: false //Show visual helpers
       };
-      cp.container = $('<div class="cpickr"></div>')
+      cp.container = $('<div class="cpickr cp-hidden"></div>')
       .css({
 	 'z-index':9999,
 	 'border-bottom-left-radius':'6px',
@@ -273,10 +277,12 @@ MINIMAL:
 	    self._renderBigZone();
 	 });
 
-	 el.on('keydown', function(e){
+	 el.on('keypress', function(e){
+	    e.stopPropagation();
 	    switch(e.which){
 	       case 13:
 		  self.toggle();
+		  return false;
 		  break;
 	       case 38://TODO: up
 		  e.preventDefault();
@@ -585,7 +591,7 @@ MINIMAL:
 	 });
 
 	 $(document).off('mousedown'+self.evSuffix)
-	 .off('keypress'+self.evSuffix);
+	 .off('keyup'+self.evSuffix);
 
 	 return self;
       },
@@ -597,7 +603,7 @@ MINIMAL:
 	 if (self.container.hasClass('cp-active')){
 	    self.hide(t);
 	 } else {
-	    self.show();
+	    self.show(t);
 	 }
 	 return self;
       },
@@ -813,7 +819,6 @@ MINIMAL:
 	       val = o.colorObj.toHexString();
 	    default:
 	 }
-	 console.log(o.targets)
 	 if (el[0].tagName.toLowerCase() == "input" && !el.is(':focus')) el.val(val);
 	 else el.html(val);
 
