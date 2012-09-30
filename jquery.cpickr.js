@@ -60,7 +60,8 @@ MINIMAL:
 	 showTime:100,
 	 hideTime:100,
 	 snap:false, //Snap to grid
-	 showGrid: false //Show visual helpers
+	 showGrid: false, //Show visual helpers
+	 placementStrategy:'horizontal'// or 'vertical'
       };
       cp.container = $('<div class="cpickr cp-hidden"></div>')
       .css({
@@ -203,8 +204,7 @@ MINIMAL:
 	 dragStop:null,
 	 resize:null,
 	 change:null,
-	 format:'rgb',//rgba,hsl,hsla,hex,text //TODO: make if format with alpha, render transparency regulator
-	 placementStrategy:'horizontal'// or 'vertical'
+	 format:'rgb'//rgba,hsl,hsla,hex,text //TODO: make if format with alpha, render transparency regulator
       }
       //Main options sset through the $.cpickr.defaults
       self.options = $.extend(self.options, opts);
@@ -488,7 +488,7 @@ MINIMAL:
 	 var $doc = $(document), $w = $(window),
 	 top = 0, left = 0;
 
-	 if (o.placementStrategy == 'horizontal'){
+	 if (o.defaults.placementStrategy == 'horizontal'){
 	    var tipTop = 0;
 	    //Simple method of clipping by height, aligning horizontally.
 	    top = Math.max(
