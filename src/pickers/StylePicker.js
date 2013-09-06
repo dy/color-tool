@@ -1,62 +1,65 @@
 /*
-Generic picker interface
+Picker for the simple kinds of inputs:
+textarea, input[type=text]
 */
-
-function InputPicker(){
+function StylePicker(){
 	this.create.apply(this, arguments);
 }
 
-InputPicker.prototype = {
+pickers.StylePicker = StylePicker;
+
+StylePicker.prototype = extend({}, Picker.prototype, {
 	options: {
-		threshold: 3, //minimal number of symbols to ignore raising events
-		format: "hsla", //format used to [de]serialize color model
-		//TODO: are these two below really needed?
-		toValue: function(){
-			var o = this.options;
-			return o.color[o.format]();
-		},
-		//
-		fromValue: function(value){
-			var o = this.options;
-			o.color = o.color[o.format](value)
-		},
-
-
-		//callback when picker updated
-		change: null
+		style: null //set of style-properties to change
 	},
 
-	create: function(el, options){
+	create: function(el, manager, color){
 		this.el = el;
+		this.manager = manager;
+
+		this.color = color; //model of this picker is the only color
+
+		this.makeOptions();
+
+		//ensure list of properties to change
+		if (typeof this.options.style == "string"){
+			this.styles = this.options.style.split(",");
+		} else if (this.options.style && typeof this.options.style == "object" && this.options.style.length) {
+			this.styles = this.options.style;
+		}
+
+		this.bindEvents();
 	},
 
-	_bindEvents: function(){
+	bindEvents: function(){
 		var o = this.options,
 			el = this.el,
 			self = this;
 
 		this.el.addEventListener("keyup", function(e){
-			var value = el.value;
-			if (value.length >= o.threshold) {
-				self.change(value);
-			}
+			//var value = el.value;
+			//if (value.length >= o.threshold) {
+			//	self.change(value);
+			//}
 		})
-	},
 
-	keyPressed: function(){
-
+		this.el.addEventListener("change", function(e){
+		})
 	},
 
 	//Picker interface
 	//sets up representation based on the color passed
 	set: function(color){
 		var o = this.options;
-		this.el.value = o.toValue();
+		this.color = color;
+		
+		for (var i = 0, l = this.styles.length; i<l; i++){
+			this.el.style[this.styles[i]] = color.toRgbaString();
+		}
 	},
 
 	//returns color based on the current state
 	get: function(){
-		var o = this.options;
-		o.fromValue();
+		console.log("why do you need get style method?")
 	}
-}
+})

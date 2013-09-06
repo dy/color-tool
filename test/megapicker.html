@@ -1,4 +1,4 @@
-<body class="color-bind" data-target="background">
+<body class="color-bind" data-picker-type="StylePicker" data-picker-params='{"style": "background-color"}'>
 <style type="text/css">
 	*, *:after, *:before {
 		-webkit-box-sizing: border-box;
@@ -40,10 +40,10 @@
 			<dd>
 				<input class="color-bind" 
 					placeholder="rgba input" 
-					data-picker-options='{"format": "rgba"}'></input>
+					data-picker-params='{"format": "rgba"}'></input>
 			</dd>
 			<dt>textarea</dt>
-			<dd><input class="color-bind" data-picker-options='{"format": "hsla"}'></input></dd>
+			<dd><input class="color-bind" data-picker-params='{"format": "hsla"}'></input></dd>
 			<dt>input type=color</dt>
 			<dd><input class="color-bind" type="color" placeholder="hsl input format" data-format="hsl"></input></dd>
 			<dt>input type=range</dt>
@@ -112,6 +112,7 @@
 <script src="../src/Manager.js"></script>
 <script src="../src/Picker.js"></script>
 <script src="../src/pickers/TextInputPicker.js"></script>
+<script src="../src/pickers/StylePicker.js"></script>
 <!--<script src="../src/pickers/HuePicker.js"></script>
 <script src="../src/pickers/SaturationPicker.js"></script>
 <script src="../src/pickers/LightnessPicker.js"></script>-->

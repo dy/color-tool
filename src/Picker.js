@@ -30,7 +30,7 @@ Picker.prototype = {
 
 	//creates options, extends from the element’s attributes
 	makeOptions: function(){
-		this.options = extend({}, this.options, JSON.parse(this.el.getAttribute("data-picker-options")));		
+		this.options = extend({}, this.options, JSON.parse(this.el.getAttribute("data-picker-params")));		
 	},
 
 	//sets up representation based on the color passed

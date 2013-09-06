@@ -63,13 +63,14 @@ TextInputPicker.prototype = extend({}, Picker.prototype, {
 	//Picker interface
 	//sets up representation based on the color passed
 	set: function(color){
-		var o = this.options;
+		this.color = color;
 		this.el.value = color[this.options.format]();
 	},
 
 	//returns color based on the current state
 	get: function(){
 		var o = this.options;
+		console.log("get of input")
 		return this.color[o.format](o.parseValue(this.el.value))
 	}
 })

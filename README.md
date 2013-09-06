@@ -69,6 +69,8 @@ Look & feel on <a href="http://dmitry-ivanov.me/playground/cpickr">demo page</a>
 
 * It should work jquery-independent.
 
+* How to pass functions to options of a specific picker
+
 ## Features
 * Convenient way of picking
 * Multitude of targets

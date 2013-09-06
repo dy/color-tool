@@ -107,14 +107,14 @@ Manager.prototype = {
 
 	//hooks up new picker
 	addPicker: function(el){
-		var pickerClass = el.getAttribute("data-picker") || this.detectPickerType(el);
+		var pickerClass = el.getAttribute("data-picker-type") || this.detectPickerType(el);
 
-		if (!pickerClass) return false;
+		if (!pickerClass || !pickers[pickerClass]) return false;
 
 		this.pickers.push(new pickers[pickerClass](el, this, this.color));
 	},
 
-	//returns picker class based on the type of node
+	//returns picker class based on the type of node.
 	detectPickerType: function(node){
 		//simple text
 		if (node.nodeType === 3) {
@@ -126,7 +126,7 @@ Manager.prototype = {
 			var type = node.getAttribute("type")
 			if (node.getAttribute("type") === "color"){
 				//special color input
-
+				return "ColorInputPicker"
 			} else if (node.getAttribute("type") === "text" || !node.getAttribute("type")) {
 				//simple text input
 				return "TextInputPicker"
@@ -138,7 +138,7 @@ Manager.prototype = {
 			return "TextInputPicker"
 		}
 
-		//any other area-like input
+		//any other area picker or undefined picker
 		if (node.nodeType === 1){
 			//TODO: init slide-area
 		}
