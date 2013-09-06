@@ -1,0 +1,134 @@
+<body class="color-bind" data-target="background">
+<style type="text/css">
+	*, *:after, *:before {
+		-webkit-box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		box-sizing: border-box;
+	}
+	body{
+		font-family: sans-serif;
+		line-height: 1.3;
+		font-size: 16px;
+	}
+	.item{
+		max-width: 100%;
+		color: white;
+		text-align: left;
+		border-radius: 1px;
+		min-height: 120px;
+		margin:5px 5px;
+		font-weight: bold;
+		font-size: 20px;
+		line-height: 40px;
+		border: 2px solid #444546;
+		background: #737679;
+		/*-webkit-transition: .5s ease-in-out;*/
+	}
+	.container{
+		width: 90%;
+		margin: 0 auto;
+		outline: 2px dashed #f3f3f3;
+		padding: 10px;
+	}
+</style>
+
+<div class="container waterfall" data-width="120">
+	<div class="item sources" data-span="2">
+		<h2>Sources</h2>
+		<dl>
+			<dt>input</dt>
+			<dd>
+				<input class="color-bind" 
+					placeholder="rgba input" 
+					data-picker-options='{"format": "rgba"}'></input>
+			</dd>
+			<dt>textarea</dt>
+			<dd><input class="color-bind" data-picker-options='{"format": "hsla"}'></input></dd>
+			<dt>input type=color</dt>
+			<dd><input class="color-bind" type="color" placeholder="hsl input format" data-format="hsl"></input></dd>
+			<dt>input type=range</dt>
+			<dd><input class="color-bind" type="range" min="0" max="1" value="0" step="0.01" data-component=""></input></dd>
+			<dt>input type=number</dt>
+			<dd><input class="color-bind" type="number" min="0" max="1" step="0.01" value=""></input></dd>
+		</dl>		
+	</div>
+
+	<div class="item" data-area="h"><h2>Hue: <span class="color-bind" data-color-bind='{"text": "{{hue}}"}'>Not set</span></h2></div>
+	<div class="item" data-area="s"><h2>Saturation: <span class="color-bind" data-color-bind='{"text": "{{hue}}"}'>Not set</span></h2></div>
+	<div class="item" data-area="l"><h2>Lightness: <span class="color-bind" data-color-bind='{"text": "{{hue}}"}'>Not set</span></h2></div>
+	<div class="item" data-area="r"><h2>Red: <span class="color-bind" data-color-bind='{"text": "{{hue}}"}'>Not set</span></h2></div>
+	<div class="item" data-area="g"><h2>Green: <span class="color-bind" data-color-bind='{"text": "{{hue}}"}'>Not set</span></h2></div>
+	<div class="item" data-area="b"><h2>Blue: <span class="color-bind" data-color-bind='{"text": "{{hue}}"}'>Not set</span></h2></div>
+	<div class="item" data-area="a"><h2>Alpha: <span class="color-bind" data-color-bind='{"text": "{{hue}}"}'>Not set</span></h2></div>
+	<div class="item" data-area="hl"><h2>Hue/Lightness: <span class="color-bind" data-color-bind='{"text": "{{hue}}"}'>Not set</span></h2></div>
+	<div class="item" data-area="hs"><h2>Hue/Saturation: <span class="color-bind" data-color-bind='{"text": "{{hue}}"}'>Not set</span></h2></div>
+	<div class="item" data-area="ha"><h2>Hue/Alpha: <span class="color-bind" data-color-bind='{"text": "{{hue}}"}'>Not set</span></h2></div>
+	<div class="item" data-area="sl"><h2>Saturation/Lightness: <span class="color-bind" data-color-bind='{"text": "{{hue}}"}'>Not set</span></h2></div>
+	<div class="item" data-area="sh"><h2>Saturation/Hue: <span class="color-bind" data-color-bind='{"text": "{{hue}}"}'>Not set</span></h2></div>
+	<div class="item" data-area="sa"><h2>Saturation/Lightness: <span class="color-bind" data-color-bind='{"text": "{{hue}}"}'>Not set</span></h2></div>
+	<div class="item" data-area="lh"></div>
+	<div class="item" data-area="ls"></div>
+	<div class="item" data-area="la"></div>
+	<div class="item" data-area="rg"></div>
+	<div class="item" data-area="rb"></div>
+	<div class="item" data-area="ra"></div>
+	<div class="item" data-area="gr"></div>
+	<div class="item" data-area="gb"></div>
+	<div class="item" data-area="ga"></div>
+	<div class="item" data-area="bg"></div>
+	<div class="item" data-area="br"></div>
+	<div class="item" data-area="ba"></div>
+	<div class="item" data-area="palette"><h2>Palette: <span class="color-bind" data-color-bind='{"text": "{{hue}}"}'>Not set</span></h2></div>
+	<div class="item" data-area="h" data-shape="circle"><h2>Circular hue: <span class="color-bind" data-target="text" data-format="hue">Not set</span></h2></div>
+	<div class="item"></div>
+
+	<div class="item color-bind" data-target="background" data-format="hsla"></div>
+	<div class="item color-bind" data-target="border-color" data-format="hex"></div>
+	<div class="item color-bind" data-target="box-shadow" data-format="rgba"></div>
+	<div class="item color-bind" data-target="text-shadow" data-format="rgb">TODO</div>
+	<div class="item color-bind" data-target="text-shadow" data-format="color">TODO: closest color</div>
+	<div class="item color-bind" data-target="text-shadow" data-format="color">TODO: last used colors</div>
+	<div class="item color-bind" data-target="text-shadow" data-format="color">TODO: last used colors</div>
+	<div class="item results">
+		<h2>Results</h2>
+		<dl>
+			<dt>hsla</dt>
+			<dd class="color-bind" data-target="text" data-format="hsla">Not set</dd>
+			<dt>rgba</dt>
+			<dd class="color-bind" data-target="text" data-format="rgba">Not set</dd>
+			<dt>hex</dt>
+			<dd class="color-bind" data-target="text" data-format="hex">Not set</dd>
+			<dt>rgb</dt>
+			<dd class="color-bind" data-target="text" data-format="rgb">Not set</dd>
+			<dt>hsl</dt>
+			<dd class="color-bind" data-target="text" data-format="hsl">Not set</dd>
+		</dl>
+	</div>
+</div>
+
+<script src="../js/jquery.js"></script>
+<script src="../js/jquery.waterfall.js"></script>
+<script src="../js/jquery.color.js"></script>
+<script src="../src/Manager.js"></script>
+<script src="../src/Picker.js"></script>
+<script src="../src/pickers/TextInputPicker.js"></script>
+<!--<script src="../src/pickers/HuePicker.js"></script>
+<script src="../src/pickers/SaturationPicker.js"></script>
+<script src="../src/pickers/LightnessPicker.js"></script>-->
+
+<script>
+//jquery-less way of launching cpickr
+var cpickr = new Manager(document.body, {
+	color: "red",
+	pickers: document.querySelectorAll(".color-bind")
+})
+
+//jquery-full way of launching cpickr
+/*$(function(){
+	$("body").cpickr({
+		pickers: $(".color-bind");
+	})
+})*/
+
+</script>
+</body>

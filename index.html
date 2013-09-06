@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="description" content="jQuery.cpickr — alternate color picker. Documented demo page.">
+<meta name="viewport" content="width=device-width">
+
+<link rel="stylesheet" href="css/jquery.slide-area.css">
+<link rel="stylesheet" href="jquery.cpicker.css">
+<link rel="stylesheet" href="css/jquery.popupper.css">
+<title>jQuery.cpickr — alternate color picker. Documented demo page.</title>
+<style>
+header, section{
+	width: 60%;
+	min-height: 40px;
+	margin:10px auto;
+	border: 2px dashed #f3f3f3;
+}
+</style>
+
+
+<header>
+<h1>jQuery.cpickr<small> — universal color picker.</small></h1>
+</header>
+
+<section id="demo">
+	<div class="cpicker main-cpicker" data-mode="hl"></div>
+</section>
+
+<section>
+	<h2>Getting started</h2>
+	<ol>
+		<li>
+			Supposed that you have jquery or zepto connected.
+		</li>
+		<li>
+			Include any color library (<a href="#supported-color-libs">list of supported color libraries</a>)
+			and jquery.cpickr itself.
+			<textarea>
+				<script src="Color.js"></script>
+				<script src="jquery.cpickr.js"></script>
+			</textarea>
+		</li>
+		<li>
+			Any element which has class <code>.cpickr</code> will become a color picker instance.
+			<textarea>
+				<div class="cpickr">Here will be cpickr placed</div>
+			</textarea>
+		</li>
+	</ol>
+	<aside>
+		<div class="cpickr">There will cpickr appear.</div>
+	</aside>
+</section>
+
+<section>
+	<h2>Use with popupr</h2>
+	<p>
+		It’s easy to make popupped cpickr, as all of us get used to.
+		<textarea>
+			<!-- Where scripts connected -->
+			<script src="jquery.popupper.js"></script>
+			<script src="jquery.color.js"></script>
+			<script src="jquery.slide-area.js"></script>
+			<script src="jquery.cpickr.js"></script>
+
+			<!-- Target element -->
+			<input class="popupr" data-content="#cpickr" placeholder="pick color..."></input>
+
+			<!-- Cpickr -->
+			<div class="cpickr" id="cpickr" hidden></div>
+		</textarea>
+	</p>
+
+	<aside>
+		<!-- Target element -->
+		<input class="popupr" data-content="#cpickr" placeholder="pick color..."></input>
+
+		<!-- Cpickr -->
+		<div class="cpickr" id="cpickr" hidden></div>
+	</aside>
+</section>
+
+
+<section>
+	<h2>List of supported color libraries</h2>
+</section>
+
+<script src="js/jquery.js"><\/script>
+<script src="js/jquery.popupper.js"></script>
+<script src="js/jquery.Color.js"></script>
+<!--<script src="js/Core.js"></script>
+<script src="js/Color/Color.js"></script>
+<script src="js/Color/ColorFormat.js"></script>
+<script src="js/Color/ColorSpace.js"></script>-->
+<script src="js/jquery.slide-area.js"></script>
+<script src="jquery.cpicker.js"></script>
+<script>
+
+$(document).ready(function(){
+	//$('[type=color]').cpickr();
+
+	//$('.color-picker-1').cpickr();
+
+	/*$('.color-picker-2').cpickr({
+		targets:$('.target-1, .target-2, .target-3')
+	});*/
+
+
+})
+
+</script>
