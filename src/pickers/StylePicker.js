@@ -35,16 +35,6 @@ StylePicker.prototype = extend({}, Picker.prototype, {
 		var o = this.options,
 			el = this.el,
 			self = this;
-
-		this.el.addEventListener("keyup", function(e){
-			//var value = el.value;
-			//if (value.length >= o.threshold) {
-			//	self.change(value);
-			//}
-		})
-
-		this.el.addEventListener("change", function(e){
-		})
 	},
 
 	//Picker interface

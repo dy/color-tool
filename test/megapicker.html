@@ -1,4 +1,4 @@
-<body class="color-bind" data-picker-type="StylePicker" data-picker-params='{"style": "background-color"}'>
+<link rel="stylesheet" type="text/css" href="../css/normalize.css"/>
 <style type="text/css">
 	*, *:after, *:before {
 		-webkit-box-sizing: border-box;
@@ -10,19 +10,26 @@
 		line-height: 1.3;
 		font-size: 16px;
 	}
+	h1, h2, h3, h4, h5, h6{
+		margin: 0;
+		padding: 0;
+	}
 	.item{
 		max-width: 100%;
 		color: white;
 		text-align: left;
-		border-radius: 1px;
+		border-radius: 4px;
+		box-shadow: 0 1px 10px rgba(0,0,0,.2), 0 1px 3px rgba(0,0,0,.4);
 		min-height: 120px;
 		margin:5px 5px;
 		font-weight: bold;
 		font-size: 20px;
 		line-height: 40px;
-		border: 2px solid #444546;
 		background: #737679;
 		/*-webkit-transition: .5s ease-in-out;*/
+	}
+	.item h2{
+		font-size: 24px;
 	}
 	.container{
 		width: 90%;
@@ -31,7 +38,9 @@
 		padding: 10px;
 	}
 </style>
+<script src="../src/lib/modernizr.js"></script>
 
+<body class="color-bind" data-picker-type="StylePicker" data-picker-params='{"style": "background-color"}'>
 <div class="container waterfall" data-width="120">
 	<div class="item sources" data-span="2">
 		<h2>Sources</h2>
@@ -53,7 +62,7 @@
 		</dl>		
 	</div>
 
-	<div class="item" data-area="h"><h2>Hue: <span class="color-bind" data-color-bind='{"text": "{{hue}}"}'>Not set</span></h2></div>
+	<div class="item color-bind" data-picker-type="HuePicker" data-picker-params='{"":""}' data-span="2"><h2>Hue: <span class="color-bind" data-picker-params='{"text": ""}'>Not set</span></h2></div>
 	<div class="item" data-area="s"><h2>Saturation: <span class="color-bind" data-color-bind='{"text": "{{hue}}"}'>Not set</span></h2></div>
 	<div class="item" data-area="l"><h2>Lightness: <span class="color-bind" data-color-bind='{"text": "{{hue}}"}'>Not set</span></h2></div>
 	<div class="item" data-area="r"><h2>Red: <span class="color-bind" data-color-bind='{"text": "{{hue}}"}'>Not set</span></h2></div>
@@ -106,15 +115,18 @@
 	</div>
 </div>
 
-<script src="../js/jquery.js"></script>
-<script src="../js/jquery.waterfall.js"></script>
-<script src="../js/jquery.color.js"></script>
+<script src="../src/lib/jquery.js"></script>
+<script src="../src/lib/jquery.waterfall.js"></script>
+<script src="../src/lib/jquery.color.js"></script>
+<script src="../src/utils.js"></script>
 <script src="../src/Manager.js"></script>
 <script src="../src/Picker.js"></script>
 <script src="../src/pickers/TextInputPicker.js"></script>
 <script src="../src/pickers/StylePicker.js"></script>
-<!--<script src="../src/pickers/HuePicker.js"></script>
-<script src="../src/pickers/SaturationPicker.js"></script>
+<script src="../src/slide-area.js"></script>
+<script src="../src/pickers/AreaPicker.js"></script>
+<script src="../src/pickers/HuePicker.js"></script>
+<!--<script src="../src/pickers/SaturationPicker.js"></script>
 <script src="../src/pickers/LightnessPicker.js"></script>-->
 
 <script>

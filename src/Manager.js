@@ -1,24 +1,6 @@
 /*
 Manager - glue for pickers.
 */
-
-
-/* ---------------- utils --------------------*/
-//extends a with the tail passed
-function extend(a){
-	for (var i = 1, l = arguments.length; i<l; i++){
-		var b = arguments[i];
-		for (var k in b){
-			a[k] = b[k]
-		}	
-	}
-	return a
-}
-
-var ignoreTags = 'APPLET BASE BASEFONT BODY FRAME FRAMESET HEAD HTML ISINDEX LINK META NOFRAMES NOSCRIPT OBJECT PARAM SCRIPT STYLE TITLE'.split( ' ' )
-
-
-/* ---------------- Class ----------------------*/
 //define Color class - one of the jQuery, Graphics or any other
 var Color = jQuery.Color || G.Color || Color;
 
@@ -110,6 +92,8 @@ Manager.prototype = {
 		var pickerClass = el.getAttribute("data-picker-type") || this.detectPickerType(el);
 
 		if (!pickerClass || !pickers[pickerClass]) return false;
+
+		//el.addEventListener("changecolor", this.changecolor, false)
 
 		this.pickers.push(new pickers[pickerClass](el, this, this.color));
 	},

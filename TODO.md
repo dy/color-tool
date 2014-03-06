@@ -1,3 +1,19 @@
+* Make simple slidy picker work
+* Make x-slidy tag
+* Make polymer-slidy component
+* Make slidy jquery plugin
+* Make vanilla es3 slidy
+* Make slidy demo page
+* Add donate button to the slidy’s demo page
+* Make slidy readme outlines
+* Fulfill readme with technical badges
+
+
+
+--------------other things
+
+* Wrap to the closure through grunt
+
 * Implement test page
 	* predefined areas
 	* predefined targets

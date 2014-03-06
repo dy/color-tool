@@ -51,13 +51,7 @@ TextInputPicker.prototype = extend({}, Picker.prototype, {
 			//}
 		})
 
-		this.el.addEventListener("change", function(e){
-			self.change(self.get());
-		})
-	},
-
-	keyPressed: function(){
-
+		this.el.addEventListener("change", this.change.bind(self))
 	},
 
 	//Picker interface
@@ -70,7 +64,6 @@ TextInputPicker.prototype = extend({}, Picker.prototype, {
 	//returns color based on the current state
 	get: function(){
 		var o = this.options;
-		console.log("get of input")
 		return this.color[o.format](o.parseValue(this.el.value))
 	}
 })

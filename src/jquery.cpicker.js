@@ -1,6 +1,8 @@
 /*
  * Jquery color picker plugin.
- * Depends on whether jquery.color or jquery.color-like API color object (Color.js form graphics.js)  
+ * Used as convenient creator of color picker (easy interface for Manager.js).
+ * Besides, creates jquery-plugin.
+ * Depends on whether jquery.color or jquery.color-like API color object (Color.js form graphics.js)
  * Author: Ivanov Dmitry.
  * Copyright: sep 2012.
  * License: MIT.
@@ -170,16 +172,9 @@
 	ColorPicker.prototype = {		
 		options: {
 			color:null,//Color object
-			//colorStack:['none', 'white', 'black', 'rgba(0,0,0,0)'],//TODO
-			//areas: [],
-			//set of area-defining options
-			areas: {
-				"hl": {},
-				"s": {},
-				"a": {}
-			},
-			//TODO: think of defining targets right on elements, like <a href="" data-cpicker-target="value, backgorund"></a>
-			//targets: null, //List of targets to apply value: [{ css: "background", el:selector }]
+			colorStack:['none', 'white', 'black', 'rgba(0,0,0,0)'],//TODO - stack of usedColors
+			mode: "hl", //simple list of modes to automatically implement
+			targets: null, //List of targets to apply value
 
 			//Callbacks
 			show:null,

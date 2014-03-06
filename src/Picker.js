@@ -43,16 +43,17 @@ Picker.prototype = {
 
 	},
 
-	//simple change event trigger
-	change: function(newColor){
-		//notify manager
-		this.manager.color = newColor;
+	//simple change event trigger (inner needs)
+	change: function(){
+		var color = this.get();
+
+		//it’s much faster to notify manager straightforward than to catch event
+		this.manager.color = color;
 
 		//Trigger		
-		var evt = new CustomEvent("changeColor");
-		//TODO: find out how to pass correct options to the browser event
-
-		if (this.options.change) this.options.change(newColor, this);
+		var evt = new CustomEvent("changecolor", { detail: {color: color}});
 		this.el.dispatchEvent(evt);
+
+		if (this.options.change) this.options.change(color, this);
 	}
 }
