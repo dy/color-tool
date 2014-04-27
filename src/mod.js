@@ -630,123 +630,6 @@ function err(str){
 	//TODO: recognize typed errors passed
 	throw new Error(str);
 }
-/**
-* Data-binding util
-*/
-//TODO: merge this with imagine.js parser & data-source
-
-var propRe = /\{\{\s([a-zA-Z_$]\w*)\s\}\}/;
-var propsRe = /\{\{\s[a-zA-Z_$]\w*\s\}\}/g;
-
-
-//Look up for all possible bindings within target, add found particles to dataListeners
-function findElementData(target, listeners){
-	//look through attributes
-	for (var i = 0; i < target.attributes.length; i++){
-		var attr = target.attributes[i];
-		findAttributeData(target, attr, listeners);
-	}
-
-	//Gather children
-	var children = target.childNodes,
-		l = children.length;
-
-	for (var i = 0; i < l; i++){
-		var child = children[i];
-		if (child.nodeType === 3){
-			//Text nodes
-			findTextNodeData(child, listeners)
-		} else if (child.nodeType === 1){
-			//Elements
-			findElementData(child, listeners);
-		}
-	}
-}
-
-//find data to bind within attribute node
-function findAttributeData(target, srcAttr, listeners){
-	var text = srcAttr.textContent,
-		attrName = srcAttr.name,
-		match,
-		propName,
-		attr = srcAttr;
-
-	//correct name
-	if (attrName.slice(0,5) === "bind-"){
-		target.removeAttribute(attrName);
-		attrName = attrName.slice(5);
-		target.setAttribute(attrName, text);
-		attr = target.attributes[attrName];
-	}
-
-	//Find properties list
-	var propList = text.match(propsRe),
-		propNames = [];
-
-	if (!propList) return;
-
-	//Normalize props tpl
-	for (var i = 0; i < propList.length; i++){
-		var propName = propList[i].match(propRe)[1];
-		propNames[i] = propName;
-
-		text = text.replace(propList[i], "{{" + propName + "}}");
-	}
-	attr.textContent = text;
-
-	//Add every property found to listeners
-	addDataListener(listeners, attr, text, propNames)
-}
-
-//Find data within text node, split it on parts
-function findTextNodeData(node, listeners){
-	var text = node.textContent,
-		match,
-		propName;
-
-	//Find properties list
-	var propList = text.match(propsRe),
-		propNames = [];
-
-	if (!propList) return;
-
-	//Get prop names
-	for (var i = 0; i < propList.length; i++){
-		var propName = propList[i].match(propRe)[1];
-		propNames[i] = propName;
-	}
-
-	//Seal text fragments with data
-	var dataNode, rest = node, text;
-	for (var i = 0; i < propList.length; i++){
-		dataNode = rest.splitText(rest.textContent.indexOf(propList[i]));
-		rest = dataNode.splitText(propList[i].length);
-
-		//normalize datanode value
-		var text = "{{" + propNames[i] + "}}";
-		dataNode.textContent = text;
-
-		//add listener for every sealed fragment
-		addDataListener(listeners, dataNode, text, [propNames[i]]);
-	}
-}
-
-//add data listener to the set
-//e.g. addDataListener(listenersList, attributeNode, initialTextContent, ["a", "b", "c"])
-function addDataListener(listeners, node, tpl, dataRequired){
-	for (var i = dataRequired.length; i--;){
-		var prop = dataRequired[i];
-		if (!listeners[prop]) listeners[prop] = [];
-		listeners[prop].push({
-			target: node,
-			text: tpl,
-			dataRequired: dataRequired
-		})
-	}
-
-	//TODO: listen to the source change
-
-}
 //→
 /**
 * Controller on elements
@@ -813,18 +696,59 @@ function Mod($el, opts){
 	var initCb =  CurrentMod.properties.init;
 	var createdCb = CurrentMod.properties.created;
 
+
+	//save predefined element properties, as well as other defined properties
+	var preinit = {};
+	for (var propName in CurrentMod.properties) {
+		if (propName[0] === "_") continue;
+
+		//read element property
+		if (propName in $el) preinit[propName] = $el[propName];
+
+		//if no preset value defined - read value from attributes
+		else {
+			var propValue = getPropDesc(CurrentMod.properties[propName]).value
+
+			var attr = $el.attributes[propName] || $el.attributes["data-" + propName];
+			if (attr) {
+				if (propName.slice(0,2) === "on") preinit[propName] = new Function(attr.value);
+				else preinit[propName] = parseTypedAttr(attr.value, propValue);
+			}
+		}
+	}
+	opts = extend(preinit, opts);
+
+
 	//call init
 	on($el, "init:one", initCb);
-	opts && on($el, "init:one", opts.init)
+	on($el, "init:one", opts.init)
 	fire($el, "init");
 
 	//enter default state (1st level attributes)
 	$el.__stateRedirectCount = 0;
-	enterState($el, "create", CurrentMod.properties, opts);
+	enterState($el, "create", CurrentMod.properties);
+
+	//init passed options
+	for (var prop in opts){
+		var value = opts[prop];
+		if (value === undefined || /^(?:created|init)$/.test(prop)) {
+			continue;
+		}
+
+		//additional callback
+		if (isFn(value)) {
+			on($el, prop, value.bind($el));
+		}
+
+		//additional property
+		else {
+			$el[prop] = value;
+		}
+	}
 
 	//call created
 	on($el, "created:one", createdCb);
-	opts && on($el, "created:one", opts.created)
+	on($el, "created:one", opts.created)
 	fire($el, "created");
 
 	return $el;
@@ -836,17 +760,17 @@ function Mod($el, opts){
 */
 //TODO: optimize after-initialization (now double code)
 //TODO: merge methods definition with properties definition (actually they’re very similar)
-function enterState($el, stateKey, props, initValues){
+function enterState($el, stateKey, props){
 	if (!props) return;
 
-	LOG && console.group("to state:", stateKey, "initValues:", initValues)
+	// LOG && console.group("to state:", stateKey)
 
 	//init state bound events
 	var activeEvents = $el['__' + stateKey] = [];
 
 	//sort properties
 	var orderedProps = Object.keys(props).filter(function(a){
-		return !(/^(created|init|before|after)$/.test(a))
+		return !(/^(?:init|before|after|created)$/.test(a))
 	}).sort(function(a,b){
 		return (getPropOrder(a, props[a]) > getPropOrder(a, props[b]) ? 1 : -1)
 	})
@@ -865,15 +789,15 @@ function enterState($el, stateKey, props, initValues){
 
 		//define method
 		else if (isFn(propValue) || isFn(props[propValue]) || isFn($el[propValue])){
-			// LOG && console.log("define method", propName, 'in state', stateKey)
+			// console.log("define method", propName, 'in state', stateKey)
 
 			var cb;
 
 			//recognize stringy method
 			if (isFn(propValue)) {
 				//bind method
-				$el[propName] = propValue.bind($el);
 				cb = propValue.bind($el);
+				$el[propName] = cb.bind($el);
 			} else {
 				//bind stringy method (prop.value cannot be method reference, so prop is surely string)
 				cb = props[propValue];
@@ -891,45 +815,21 @@ function enterState($el, stateKey, props, initValues){
 			if ($el._mod.displayName){
 				on(doc, $el._mod.displayName + ":" + propName, cb);
 			}
-
-			//add callback passed
-			initValues && initValues[propName] && on($el, propName, initValues[propName].bind($el));
-
 		}
 
 		//define property
-		else {
+		else if (!(propName in $el)){
 			// LOG && console.log("define prop", propName, 'in state', stateKey)
 
-			//read value passed through options
-			initValue = initValues ? initValues[propName] : undefined
-
-			if (stateKey === "create") {
-				//if no option passed - read value preset on element already
-				if (initValue === undefined) initValue = $el[propName];
-
-				//if no preset value defined - read value from attributes
-				// console.log("propdesc", prop, getPropDesc(prop))
-				if (initValue === undefined) {
-					var attr = $el.attributes[propName] || $el.attributes["data-" + propName];
-					if (attr) {
-						if (propName.slice(0,2) === "on") initValue = new Function(attr.value);
-						else initValue = parseTypedAttr(attr.value, propValue);
-					}
-				}
-			}
-
-			//if no attr parsing sufficed - cast to default
-			if (initValue === undefined) {
-				initValue = propValue
-			};
+			//init default value
+			initValue = propValue
+			var _propName = '_' + propName;
 
 			//TODO: detect native properties
 
 			//do not define twice
-			if (!(propName in $el)){
+			if (!(_propName in $el)){
 				//make private value (replace)
-				var _propName = '_' + propName;
 
 				//define instance getters/setters
 				Object.defineProperty($el, propName, {
@@ -1076,7 +976,6 @@ function enterState($el, stateKey, props, initValues){
 		beforeResult = props.before.call($el);
 	}
 
-	// console.log(activeEvents.after)
 	// LOG && console.groupEnd()
 
 	return beforeResult
@@ -1204,53 +1103,7 @@ Mod.register = function(name, settings){
 
 
 
-
-/**
-* Document observer & data-bindings
-*/
-//Storage of data-listeners to keep updated
-//keyed by param name particles to update
-var dataListeners = {};
-//most actual data
-var	dataSource = {};
-
-//Parse document data requirements
-findElementData(root, dataListeners);
-
-
-//Observe exposed data-changes
-//update every binding depending on name passed, if any, and update all, if none.
-//TODO: throttle properly
-var _dataSourceChangeTimeout = undefined;
-function dataSourceChanged(name){
-	// LOG && console.log("Data source changed", name)
-
-	var listeners = dataListeners[name];
-	if (!listeners) return;
-	// LOG && console.log(dataSource)
-
-	//for name changed update listener depending on that name
-	for (var i = 0; i < listeners.length; i++){
-		var listener = listeners[i];
-		var result = listener.text;
-
-		//render resulting textContent
-		for (var j = 0; j < listener.dataRequired.length; j++){
-			result = result.replace("{{" + listener.dataRequired[j] + "}}",
-				dataSource[listener.dataRequired[j]]);
-		}
-
-		listener.target.textContent = result;
-		//TODO: trouble in dataResult
-		// LOG && console.log(dataSource)
-	}
-}
-
-
-//Observe DOM changes to
-// 1. detect new data bindings
-// 2. detect new elements to autoinit
-// 3. keep track of lifecycle events
+//Observe DOM changes
 if (MO) {
 	var docObserver = new MO(function(mutations) {
 		mutations.forEach(function(mutation){
@@ -1279,9 +1132,6 @@ if (MO) {
 				}
 
 				//TODO: engage new data to update
-				//TODO: call lifecycle append
-			} else {
-				//TODO: Trigger insertion methods on elements (change state to ready)
 			}
 		})
 	});
@@ -1297,7 +1147,9 @@ if (MO) {
 
 
 
-//---------------- Utils
+/**
+* helpers
+*/
 
 //go by elements, init mods
 function autoinit(mod, parent){
@@ -1317,37 +1169,6 @@ function autoinit(mod, parent){
 		fire(targets[i], "attached");
 	}
 }
-
-
-//expose self data
-//TODO get rid of
-function initExposure($el){
-	//init expose if there is a name attribute and unless it is clearly off
-	if ($el.expose === false || !$el.getAttribute("name")) return;
-
-	_valueChanged( $el );
-
-	on($el, "valueChanged", function(e){_valueChanged(e.currentTarget)});
-}
-
-//exposable element value changing callback
-function _valueChanged($el){
-	var name = parseAttr($el.getAttribute("name"))
-
-	// LOG && console.log("valueChanged",name, $el.value)
-	if (!name) err("The name attribute to expose value is not defined")
-
-	if (name instanceof Array){
-		for (var i = 0; i < name.length; i++){
-			dataSource[name[i]] = $el.value[i];
-			dataSourceChanged(name[i]);
-		}
-	} else {
-		dataSource[name] = $el.value;
-		dataSourceChanged(name);
-	}
-}
-
 
 
 //reflect passed value in attribute

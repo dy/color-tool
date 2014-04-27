@@ -1,5 +1,5 @@
 ﻿//TODO: make ghost insteadof moving self
-Mod.extend({
+var Draggable = Mod.extend({
 	init: function(){
 	},
 

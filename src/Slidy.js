@@ -1,7 +1,61 @@
 ﻿/**
-* Range input on steroids
+* Range input mod
 */
 Mod.extend({
+	init: function(){
+		// console.log("init slidy")
+	},
+
+	created: function(){
+		var self = this;
+
+		//watch for input element
+		if (this.tagName === "INPUT") {
+			this.isInput = true;
+			on(this, "change", function(){
+				console.log("slidy-input change", this.value)
+			})
+		}
+
+		//create pickers according to the settings
+		this.picker = new Draggable({
+			within: this,
+
+			attached: function(e){
+				//correct pin (centrize based on width of picker)
+				this.pin = [this._offsets.width / 2, this._offsets.height / 2];
+				//set initial position
+				// console.log("picker ready", this.threshold)
+				self.updatePosition();
+			},
+
+			dragstart: function(e){
+				//console.log("dstart")
+				disableSelection(document.documentElement);
+				css(document.documentElement, {"cursor": "none"});
+			},
+			drag: function(e){
+				//console.log("drag")
+				handleDrag(self, e)
+			},
+			dragend: function(e){
+				//console.log("dend")
+				enableSelection(document.documentElement);
+				css(document.documentElement, {"cursor": null});
+			},
+
+			native: false
+		});
+
+		//additional picker init
+		this.picker.axis = (this.dimensions === 2 ? null : (this.vertical ? 'y' : 'x'));
+		this.appendChild(this.picker);
+		this.picker.updateLimits();
+	},
+
+	attached: function(){
+	},
+
 	//HTML5 things
 	value: {
 		value: 50,
@@ -43,9 +97,7 @@ Mod.extend({
 				this.horizontal = true;
 			},
 
-			//TODO: any else - go back to 1/2
 			_: function(){
-				//TODO: return false prevents entering state
 				return false;
 			}
 		}
@@ -53,7 +105,6 @@ Mod.extend({
 
 	//Orientation
 	//? multidimensinal
-	//dragdealer way
 	vertical: {
 		value: false,
 		values: {
@@ -77,12 +128,6 @@ Mod.extend({
 		}
 	},
 
-	//TODO: make name work not-interfering with native input
-	name: {
-		value: "",
-		attribute: false
-	},
-
 	min: 0,
 	max: 100,
 	step: {
@@ -103,42 +148,43 @@ Mod.extend({
 		}
 	},
 
-	//whether to expose self data to document’s scope
+	//TODO whether to expose self data to document’s scope
 	//for declarative bindings
 	expose: true,
 
-	//Range
+	//TODO Range
 	//jquery-way
 	range: true, //min, max
 
-	//Multiple values
+	//TODO Multiple values
 	//? multidimensional multivalues?
 	//jqueryui
 	//NO: use just value as array
 	//values: [a,b],
 
-	//snapping function: rigid/loose
+	//TODO snapping function: rigid/loose
 	snap: false,
 	//?or precision?
 
-	//focusable, controllable
+	//TODO: focusable, controllable
 	keyboard: true,
 
+	//TODO
 	readonly: false,
 
-	//whether to repeat either by one axis if one dimension or by both axis or one pointed if two dimensions
+	//TODO whether to repeat either by one axis if one dimension or by both axis or one pointed if two dimensions
 	//false, true, [bool, bool]
 	repeat: {
 		value: false,
 		change: function(repeat){
-			this.picker.repeat = repeat;
+			if (this.picker) this.picker.repeat = repeat;
 		}
 	},
 
-	mode: {
-		value: 'slider',
+	isInput: {
+		value: false,
 		values: {
-			slider: {
+			false: {
 				before: function(){
 				},
 				mousedown: function(e){
@@ -151,7 +197,7 @@ Mod.extend({
 				}
 			},
 
-			input: {
+			true: {
 				before: function(){
 					console.log("input mode")
 				},
@@ -164,59 +210,6 @@ Mod.extend({
 		}
 	},
 
-	init: function(){
-		// console.log("init slidy")
-
-		//basic picker init
-		var self = this;
-
-		//watch for input element
-		if (this.tagName === "INPUT") {
-			this.on("change", function(){
-				console.log("slidy-input change", this.value)
-			})
-		}
-
-		this.picker = new Component.registry.Draggable({
-			within: this,
-
-			attached: function(e){
-				//console.log("picker attached")
-				//correct pin (centrize based on width of picker)
-				this.pin = [this.offsets.width / 2, this.offsets.height / 2];
-				//set initial position
-				//console.log("picker ready", this.threshold)
-				self.updatePosition();
-			},
-
-			//TODO: make it be last listener in listeners stack to be preventable within own component states
-			dragstart: function(e){
-				//console.log("dstart")
-				disableSelection(document.documentElement);
-				css(document.documentElement, {"cursor": "none"});
-			},
-			drag: function(e){
-				//console.log("drag")
-				handleDrag(self, e)
-			},
-			dragend: function(e){
-				//console.log("dend")
-				enableSelection(document.documentElement);
-				css(document.documentElement, {"cursor": null});
-			},
-
-			native: false
-		});
-
-		if (this.tagName === "INPUT") this.state = "input";
-
-		//additional picker init
-		this.picker.axis = (this.dimensions === 2 ? null : (this.vertical ? 'y' : 'x'));
-		this.appendChild(this.picker);
-		this.picker.updateLimits();
-		this.picker.fire("attached");
-	},
-
 	//moves picker accordind to the value
 	updatePosition: function(){
 		var	$el = this,
@@ -224,7 +217,7 @@ Mod.extend({
 			x = 0,
 			y = 0,
 			picker = $el.picker,
-			lim = picker.limits,
+			lim = picker._limits,
 			hScope = (lim.right - lim.left),
 			vScope = (lim.bottom - lim.top)
 
@@ -257,9 +250,9 @@ function handleDrag($el, e){
 	//console.log("drag observed", e.target.dragstate);
 	var thumb = e.currentTarget,
 		d = thumb.dragstate,
-		lim = thumb.limits,
-		thumbW = thumb.offsets.width,
-		thumbH = thumb.offsets.height,
+		lim = thumb._limits,
+		thumbW = thumb._offsets.width,
+		thumbH = thumb._offsets.height,
 		//scope sizes
 		hScope = (lim.right - lim.left),
 		vScope = (lim.bottom - lim.top)
@@ -283,5 +276,5 @@ function handleDrag($el, e){
 	}
 
 	//trigger onchange
-	$el.fire("change")
+	fire($el,"change")
 };

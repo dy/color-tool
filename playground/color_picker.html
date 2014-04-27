@@ -8,7 +8,7 @@
 		font-family: sans-serif;
 	}
 
-	[slidy]{
+	.slidy{
 		background: rgba(120,130,140,.5);
 		min-width: 7vw;
 		min-height: 10vh;
@@ -16,7 +16,7 @@
 		/*padding: 5px;*/
 		margin-right: 8vw;
 	}
-	[slidy] > .draggable{
+	.slidy > .draggable{
 		width: 20px;
 		height: 20px;
 		/*background: white;*/
@@ -39,9 +39,9 @@
 
 	<h1>Simple three-component picker</h1>
 
-	<div id="alpha" slidy vertical min="0" max="1" value="1" name="alpha"></div>
+	<div id="alpha" class="slidy" vertical min="0" max="1" value="1" name="alpha"></div>
 
-	<div id="hue-lightness" slidy
+	<div id="hue-lightness" class="slidy"
 		min="0,0" max="360,100" value="50,50"
 		repeat="x" snap="both"
 		name="hue,lightness"
@@ -62,7 +62,7 @@
 			hsl(360, {{ saturation }}% ,50%) 100%)"
 	></div>
 
-	<div id="saturation" slidy min="0" max="100" snap value="50" name="saturation"
+	<div id="saturation" class="slidy" min="0" max="100" snap value="50" name="saturation"
 		onchange=""
 		bind-style="background:
 			linear-gradient(to right,
@@ -74,9 +74,7 @@
 </body>
 
 
-<!-- <script src='../dist/component.min.js'></script> -->
-<script src='../src/util.js'></script>
-<script src='../src/databind.js'></script>
-<script src='../src/Mod.js'></script>
-<script src='../mods/Draggable.js'></script>
-<script src='../mods/Slidy.js'></script>
+<script src='../src/no.js'></script>
+<script src='../src/mod.js'></script>
+<script src='../src/Draggable.js'></script>
+<script src='../src/Slidy.js'></script>
