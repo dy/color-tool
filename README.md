@@ -1,7 +1,6 @@
 <img src="https://raw.githubusercontent.com/dfcreative/picky/design/logo.png" alt="picky.js"/>
 
-# Picky.js
-<small>&alpha; release</small>
+<small>WIP</small>
 
 Universal color-picker.
 Built upon [slidy](), which is built upon [component]().
