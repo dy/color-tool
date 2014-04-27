@@ -120,7 +120,7 @@ function deepExtend(a){
 }
 
 function isObject(a){
-	return (a && a !== null && typeof a === "object" && !(a instanceof Array ))
+	return (a && a !== null && typeof a === "object" && !(a instanceof Array ) && !(a.nodeType))
 }
 
 function isFn(a){
@@ -753,39 +753,6 @@ function addDataListener(listeners, node, tpl, dataRequired){
 
 //logging needs
 var LOG = false;
-
-//TODO: cope with multimodes
-//TODO: think how should it work within mods group, like active tab
-//TODO: private methods (_+...) should be hidden on instances
-//TODO: handle disabled property at start
-//TODO: add lifecycle events
-//TODO: passing `ondrag` to option causes native unpreventable events fire
-//TODO: bind event-attributes like so: ondrag="{{ handleDrag }}"
-//TODO: enteredView, leftView callbacks
-//TODO: check correctness of option notation (default exists)
-//TODO: make `throttle` method to call something not more often than Nms
-//TODO: make `async` method to defer calling
-//TODO: make promises: promise to call some method when some event occurs
-
-//TODO: add custom methods to options objects
-//TODO: pass constructor to the mod instance
-
-//TODO: make attr reflection custom function
-
-//TODO: handle Mutation events with mutationobserver: insert, remove
-//TODO: make able to build with events, not the states (to build simplier mods)
-
-//TODO: add straightforward CustomElement callbacks: attached, detached, attributeChanged
-
-//TODO: pass `extends` directive to mod to extend behavior
-
-//TODO: pass function instead of name as the first argument to the constructor
-//TODO: Pass elements list to the constructor
-
-//TODO: think about tracking global ids
-
-//TODO: detect overriding states/events definition
-//TODO: handle lifecycle events
 
 
 /**

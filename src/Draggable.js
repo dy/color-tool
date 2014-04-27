@@ -19,15 +19,15 @@ Mod.extend({
 
 	//null is no restrictions
 	within: {
-		value: '@parentNode',
+		value: root,
 		change: function(within){
-			// console.log("within change", this.parentNode.id, within )
+			console.log("within change", this.parentNode.id, within )
 			if (within instanceof Element){
 				this.within = within
 			} else if (typeof within === "string"){
 				this.within = parseTarget(this,within)
 			} else {
-				this.within = document.documentElement
+				this.within = root
 			}
 		},
 		order: 0
@@ -55,11 +55,13 @@ Mod.extend({
 		}
 	},
 
+	//TODO: draggable/droppable match identifier
 	group: null,
 
+	//TODO: clone object for dragging
 	ghost: false,
 
-	//use translate3d method or position displacement
+	//TODO: use translate3d method or position displacement
 	translate3d: true,
 
 	//to what extent round position
@@ -68,7 +70,7 @@ Mod.extend({
 	//slow down movement by pressing ctrl
 	sniper: true,
 
-	//how much slower is sniper drag
+	//how much slower sniper drag is
 	sniperSpeed: .15,
 
 	//false, 'x', 'y'
@@ -76,29 +78,31 @@ Mod.extend({
 
 	//repeat position by one of axis
 	repeat: {
-		value: null,
-		change: function(repeat){
-			//straight value passed - ok
-			if (repeat === "both" || repeat === "x" || repeat === "y") return;
+		values: {
+			undefined: null,
+			both: null,
+			x: null,
+			y: null,
+			_: function(){
+				//vector passed
+				if (this.repeat instanceof Array){
+					if (this.repeat.length){
+						if (this.repeat[0] && this.repeat[1])
+							return "both";
+						else if (this.repeat[0])
+							return "x";
+						else if (this.repeat[1])
+							return "y";
+					}
 
-			//vector passed
-			if (repeat instanceof Array){
-				if (repeat.length){
-					if (repeat[0] && repeat[1])
-						this.repeat = "both";
-					else if (repeat[0])
-						this.repeat = "x";
-					else if (repeat[1])
-						this.repeat = "y";
+				//just repeat any possible way
+				} else if (this.repeat === true){
+					return this.axis ? this.axis : "both"
+
+				//unrecognized value passed
+				} else {
+					return undefined;
 				}
-
-			//just repeat any possible way
-			} else if (repeat === true){
-				this.repeat = this.axis ? this.axis : "both"
-
-			//unrecognized value passed
-			} else {
-				this.repeat = false;
 			}
 		}
 	},
@@ -107,18 +111,19 @@ Mod.extend({
 	x: {
 		value: 0,
 		change: function(value, old){
+			console.log("set x", value, old)
 			if (this.repeat === 'both' || this.repeat === 'x'){
 				//mind repeat
-				if (value < this.limits.left){
-					value += this.limits.right - this.limits.left;
-				} else if (value > this.limits.right){
-					value -= this.limits.right - this.limits.left;
+				if (value < this._limits.left){
+					value += this._limits.right - this._limits.left;
+				} else if (value > this._limits.right){
+					value -= this._limits.right - this._limits.left;
 				}
 			} else if (!this.axis || this.axis === "x"){
 				//mind axis
 				value = between(value,
-					this.limits.left,
-					this.limits.right);
+					this._limits.left,
+					this._limits.right);
 			} else {
 				//ignore change
 				this.x = old;
@@ -134,16 +139,16 @@ Mod.extend({
 		change: function(value, old){
 			if (this.repeat === 'both' || this.repeat === 'y'){
 				//mind repeat
-				if (value < this.limits.top){
-					value += this.limits.bottom - this.limits.top;
-				} else if (value > this.limits.bottom){
-					value -= this.limits.bottom - this.limits.top;
+				if (value < this._limits.top){
+					value += this._limits.bottom - this._limits.top;
+				} else if (value > this._limits.bottom){
+					value -= this._limits.bottom - this._limits.top;
 				}
 			} else if (!this.axis || this.axis === "y"){
 				//mind axis
 				value = between(value,
-					this.limits.top,
-					this.limits.bottom);
+					this._limits.top,
+					this._limits.bottom);
 			} else {
 				//ignore change
 				this.y = old;
@@ -156,17 +161,6 @@ Mod.extend({
 		}
 	},
 
-	//movement restrictions
-	limits: {
-		value: {
-			top: 0,
-			left: 0,
-			bottom: 0,
-			right: 0
-		},
-		order: 0
-	},
-
 	//use native drag
 	native: {
 		//is native drag supported
@@ -176,7 +170,7 @@ Mod.extend({
 			return isNativeSupported
 		})() && false,
 		change: function(value, oldValue){
-			console.log("set native to", value, oldValue)
+			// console.log("set native to", value, oldValue)
 			if (value === false && this.dragstate === "native"){
 				this.dragstate = "idle";
 			} else if (value === true && this.dragstate !== "init") {
@@ -190,7 +184,6 @@ Mod.extend({
 	//main draggable state reflector
 	dragstate: {
 		value: "idle",
-
 		values: {
 			//non-native drag
 			idle: {
@@ -256,9 +249,11 @@ Mod.extend({
 				}
 			},
 
+			//when scrolled to the edge of the screen
 			scroll: {
 
 			},
+			//when hovered on technical elements
 			tech: {
 
 			},
@@ -322,11 +317,8 @@ Mod.extend({
 		//define limits
 		this.updateLimits();
 
-		var d;
+		var d = this._dragparams;
 
-		//if event is outside the self area
-		//move self to that area
-		//make offsets half of width
 		var offsetX, offsetY,
 			//event absolute coords
 			eAbsoluteX = e.clientX + window.pageXOffset,
@@ -337,10 +329,11 @@ Mod.extend({
 			!isBetween(eAbsoluteX, this._offsets.left, this._offsets.right) ||
 			!isBetween(eAbsoluteY, this._offsets.top, this._offsets.bottom)
 		) {
+			//?d is always undefined here
 			if (d) {
 				//if threshold crossed outside self
-				offsetX = d.offsetX + e.clientX - d.initX
-				offsetY = d.offsetY + e.clientY - d.initY
+				// offsetX = d.offsetX + e.clientX - d.initX
+				// offsetY = d.offsetY + e.clientY - d.initY
 			} else {
 				//no threshold state (drag started from outside)
 				//pretend as if offsets within self are ideal
@@ -404,9 +397,9 @@ Mod.extend({
 		//capture dragstate
 		d.isCtrl = e.ctrlKey;
 		if (e.ctrlKey && this.sniper) {
-			if (isBetween(this.x, this.limits.left, this.limits.right))
+			if (isBetween(this.x, this._limits.left, this._limits.right))
 				d.sniperRunX += difX * (1 - this.sniperSpeed)
-			if (isBetween(this.y, this.limits.top, this.limits.bottom))
+			if (isBetween(this.y, this._limits.top, this._limits.bottom))
 				d.sniperRunY += difY * (1 - this.sniperSpeed)
 		}
 		d.x = e.clientX + window.pageXOffset - this.oX;
@@ -444,14 +437,22 @@ Mod.extend({
 		var pin = this.pin;
 
 		//pinArea-including version
-		this.limits.top = limOffsets.top - this.oY + selfPads.top - pin[1];
+		this._limits.top = limOffsets.top - this.oY + selfPads.top - pin[1];
 
-		this.limits.bottom = limOffsets.bottom - this.oY - this._offsets.height - selfPads.bottom + (this._offsets.height - pin[3]);
+		this._limits.bottom = limOffsets.bottom - this.oY - this._offsets.height - selfPads.bottom + (this._offsets.height - pin[3]);
 
-		this.limits.left = limOffsets.left - this.oX + selfPads.left - pin[0];
+		this._limits.left = limOffsets.left - this.oX + selfPads.left - pin[0];
 
-		this.limits.right = limOffsets.right - this.oX - this._offsets.width - selfPads.right + (this._offsets.width - pin[2]);
+		this._limits.right = limOffsets.right - this.oX - this._offsets.width - selfPads.right + (this._offsets.width - pin[2]);
 
+	},
+
+	//movement restrictions
+	_limits: {
+		top: 0,
+		left: 0,
+		bottom: 0,
+		right: 0
 	}
 }).register("draggable");
 
