@@ -1,7 +1,6 @@
 ﻿//TODO: make ghost insteadof moving self
 Mod.extend({
 	init: function(){
-
 	},
 
 	created: function(){
@@ -21,7 +20,7 @@ Mod.extend({
 	within: {
 		value: root,
 		change: function(within){
-			console.log("within change", this.parentNode.id, within )
+			// console.log("within change", this.parentNode.id, within )
 			if (within instanceof Element){
 				this.within = within
 			} else if (typeof within === "string"){
@@ -48,6 +47,7 @@ Mod.extend({
 			} catch (e){
 				value = [0,0,this.offsetWidth, this.offsetHeight]
 			}
+			// console.log(value)
 
 			this.pin = value;
 
@@ -111,7 +111,7 @@ Mod.extend({
 	x: {
 		value: 0,
 		change: function(value, old){
-			console.log("set x", value, old)
+			// console.log("set x", value, old)
 			if (this.repeat === 'both' || this.repeat === 'x'){
 				//mind repeat
 				if (value < this._limits.left){
@@ -126,8 +126,7 @@ Mod.extend({
 					this._limits.right);
 			} else {
 				//ignore change
-				this.x = old;
-				return;
+				return 0;
 			}
 			this.x = round(value, this.precision)
 
@@ -151,8 +150,7 @@ Mod.extend({
 					this._limits.bottom);
 			} else {
 				//ignore change
-				this.y = old;
-				return;
+				return 0;
 			}
 
 			this.y = round(value, this.precision)
@@ -464,6 +462,7 @@ Mod.extend({
 //set displacement according to the x & y
 function updatePosition($el){
 	css($el, "transform", ["translate3d(", $el.x, "px,", $el.y, "px, 0)"].join(""));
+	// console.log(["translate3d(", $el.x, "px,", $el.y, "px, 0)"].join(""))
 }
 
 //native-drag helper

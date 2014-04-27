@@ -444,7 +444,9 @@ function parseTarget($el, str){
 		return win;
 	} else if (str === 'root') {
 		return root
-	}else if (str[0] === '@') {
+	}  else if (str === 'parent') {
+		return $el.parentNode
+	} else if (str[0] === '@') {
 		//`this` reference
 		return $el[str.slice(1)]
 	} else if (/^[.#[]/.test(str)) {
@@ -948,12 +950,12 @@ function enterState($el, stateKey, props, initValues){
 							var oldValue = self[_key];
 
 							//pass initial set, ignore same value
-							if (_key in self){
+							if (_key in self) {
 								if (self[ _key ] === value) return;
 
 								//count redirects
 								self.__stateRedirectCount++;
-								if (self.__stateRedirectCount >= Mod._maxRedirects) err("Too many redirects");
+								if (self.__stateRedirectCount >= Mod._maxRedirects) err("Too many redirects in " + key);
 
 								//leave state routines
 								if (desc.values) {

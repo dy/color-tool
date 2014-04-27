@@ -130,7 +130,7 @@
 	<pre>
 &lt;div class="draggable" within=&quot;parent&quot;&gt;
 &lt;/div&gt;</pre>
-	<div class="draggable">Drag within parent</div>
+	<div class="draggable" within="parent">Drag within parent</div>
 </article>
 
 <article id="pin-area">
@@ -138,7 +138,7 @@
 &lt;div class="draggable" within=&quot;parent&quot;
 	pin=&quot;[50,50,100,100]&quot;&gt;
 &lt;/div&gt;</pre>
-	<div class="draggable" pin="[20,20,40,40]">Pin area</div>
+	<div class="draggable" within="parent" pin="[20,20,40,40]">Pin area</div>
 </article>
 
 <article id="point-picker">
@@ -146,7 +146,7 @@
 &lt;div class="draggable" within=&quot;parent&quot;
 	pin=&quot;30,30&quot;
 	threshold=&quot;0&quot;&gt;&lt;/div&gt;</pre>
-	<div class="picker" class="draggable" pin="30,30" threshold="0">Point picker</div>
+	<div class="draggable picker" pin="30,30" within="parent" threshold="0">Point picker</div>
 </article>
 
 <article id="repeat">
@@ -157,10 +157,10 @@
 	axis=&quot;x&quot;&gt;&lt;/div&gt;
 
 	</pre>
-	<div class="draggable" pin="30,30" repeat="x" axis="x">Repeat by x</div>
+	<div class="draggable" pin="30,30" within="parent" repeat="x" axis="x">Repeat by x</div>
 </article>
 
-<article id="handle">
+<!-- <article id="handle">
 	<pre></pre>
 	<div class="draggable"><span class="handle">Handle</span></div>
 </article>
@@ -178,7 +178,7 @@
 <article id="drop-areas">
 	<pre></pre>
 	<div class="draggable">Loose restrictions</div>
-</article>
+</article> -->
 
 <h2>Also check out</h2>
 <ul>
