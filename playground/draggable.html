@@ -1,0 +1,348 @@
+<!doctype html>
+
+<style>
+	html, body{
+		width: 100%;
+		overflow-x: hidden;
+	}
+	body{
+		font-family: sans-serif;
+		padding: 20px 40px;
+		margin: 0;
+	}
+	* {
+		box-sizing: border-box;
+	}
+	[hidden]{
+		display: none;
+	}
+	h1{
+		display: inline-block;
+	}
+	nav{
+		display: inline-block;
+		line-height: 60px;
+		/*width: 60px;*/
+		float: right;
+		/*background: rgba(120,120,120,.3);*/
+		right: 0;
+		top: 0;
+		z-index: 999;
+		padding: 10px;
+		/*color: white;*/
+		font-size: 13px;
+	}
+	label{
+		display: inline-block;
+		vertical-align: top;
+		margin-left: 10px;
+	}
+	input{
+		margin: 0;
+	}
+
+	.draggable{
+		background: rgba(120,130,140,1);
+		width: 10vh;
+		height: 10vh;
+		color: white;
+		font-size: 13px;
+		padding: 1vh 1vw;
+		text-align: center;
+		position: relative;
+		cursor: move;
+	}
+
+	article{
+		/*position: relative;*/
+		padding:2vh 2vw;
+		background: #f3f3f3;
+		/*min-height: 300px;*/
+		margin: 2vh 0;
+		position: relative;
+	}
+	pre{
+		margin: 0 0 0 50%;
+		height: 100%;
+		margin-top: -15px;
+		padding: 15px;
+		border-left: 1px dotted rgba(10,20,30,.1);
+		color: rgb(120,130,140);
+		position: absolute;
+		white-space: pre-wrap;
+		tab-size: 5;
+	}
+
+	/* Interactions painter layer*/
+	canvas{
+		position: absolute;
+		top: 0;
+		left: 0;
+		z-index: 999;
+		pointer-events: none;
+	}
+
+	.picker{
+		width: 60px;
+		height: 60px;
+		border-radius: 50px;
+		background: white;
+		font-size: 12px;
+		color: #345;
+		padding: 13px;
+		text-align: center;
+		border: 2px solid #e3e4e5;
+	}
+	.handle{
+		background: rgba(255,255,255,.2);
+		padding: 5px 10px;
+	}
+	h2{
+		margin: 20px 0 0;
+	}
+	ul{
+		margin-top:5px;
+		padding-left: 18px;
+	}
+</style>
+
+<canvas></canvas>
+
+<h1>Draggable</h1>
+
+<nav class="options">
+	<label for="native-drag">
+		<input type="checkbox" id="native-drag"/> Native drag
+	</label>
+	<label for="render-helpers">
+		<input type="checkbox" id="render-helpers"/> Render helpers
+	</label>
+</nav>
+
+<article id="simple-case" title="Simple case">
+	<pre>
+&lt;div class="draggable"&gt;
+&lt;/div&gt;</pre>
+	<div class="draggable">Just drag</div>
+</article>
+
+<article id="within-parent">
+	<pre>
+&lt;div class="draggable" within=&quot;parent&quot;&gt;
+&lt;/div&gt;</pre>
+	<div class="draggable">Drag within parent</div>
+</article>
+
+<article id="pin-area">
+	<pre>
+&lt;div class="draggable" within=&quot;parent&quot;
+	pin=&quot;[50,50,100,100]&quot;&gt;
+&lt;/div&gt;</pre>
+	<div class="draggable" pin="[20,20,40,40]">Pin area</div>
+</article>
+
+<article id="point-picker">
+	<pre>
+&lt;div class="draggable" within=&quot;parent&quot;
+	pin=&quot;30,30&quot;
+	threshold=&quot;0&quot;&gt;&lt;/div&gt;</pre>
+	<div class="picker" class="draggable" pin="30,30" threshold="0">Point picker</div>
+</article>
+
+<article id="repeat">
+	<pre>
+&lt;div class="draggable" within=&quot;parent&quot;
+	pin=&quot;30,30&quot;
+	repeat=&quot;x&quot;
+	axis=&quot;x&quot;&gt;&lt;/div&gt;
+
+	</pre>
+	<div class="draggable" pin="30,30" repeat="x" axis="x">Repeat by x</div>
+</article>
+
+<article id="handle">
+	<pre></pre>
+	<div class="draggable"><span class="handle">Handle</span></div>
+</article>
+
+<article id="ghost">
+	<pre></pre>
+	<div class="draggable">Ghost</div>
+</article>
+
+<article id="drop-areas">
+	<pre></pre>
+	<div class="draggable">Drop areas</div>
+</article>
+
+<article id="drop-areas">
+	<pre></pre>
+	<div class="draggable">Loose restrictions</div>
+</article>
+
+<h2>Also check out</h2>
+<ul>
+	<li>Sniper mode (press <kbd>Ctrl</kbd>)</li>
+	<li>Autoscroll (drag off the screen)</li>
+</ul>
+
+
+<script src='../src/mod.js'></script>
+<script src='../src/Draggable.js'></script>
+
+<script>
+	//------------Make native drag optional
+	var $nativeDrag = document.getElementById('native-drag')
+	$nativeDrag.addEventListener("change", function(e){
+		//TODO: sort out why this doesnt work
+		var evt = document.createEvent("CustomEvent");
+		if (e.target.checked === true){
+			evt.initCustomEvent("draggable:native", false, false, {value: true});
+		} else {
+			evt.initCustomEvent("draggable:native", false, false, {value: false});
+		}
+		document.dispatchEvent(evt);
+	})
+	$nativeDrag.checked = false;
+	var evt = document.createEvent("CustomEvent");
+	evt.initCustomEvent("change", false, false, null);
+	$nativeDrag.dispatchEvent(evt);
+
+	//------------Canvas visualizers
+	var canvas = document.querySelector("canvas");
+	var ctx = canvas.getContext("2d");
+	canvas.width  = window.innerWidth;
+	canvas.height = document.body.parentNode.offsetHeight;
+
+	var items = document.querySelectorAll('.draggable');
+	var $renderCb = document.getElementById('render-helpers')
+
+	$renderCb.addEventListener("change", function(e){
+		if (e.target.checked === true){
+			setRendering();
+		} else {
+			unsetRendering();
+		}
+	})
+	$renderCb.checked = true;
+	var evt = document.createEvent("CustomEvent");
+	evt.initCustomEvent("change", false, false,null);
+	$renderCb.dispatchEvent(evt);
+	//turn rendering on
+	function setRendering(){
+		Array.prototype.forEach.call(items, function (item) {
+			on(item, 'threshold', paintThreshold)
+			on(item, 'dragstart', renderHelpers)
+			on(item, 'drag', renderHelpers)
+			on(item, 'dragend', clear)
+			on(item, 'dragstateIdle', clear)
+		});
+	}
+
+
+	//turn rendering off
+	function unsetRendering(){
+		Array.prototype.forEach.call(items, function (item) {
+			off(item, 'threshold', paintThreshold)
+			off(item, 'dragstart', renderHelpers)
+			off(item, 'drag', renderHelpers)
+			off(item, 'dragend', clear)
+			off(item, 'idle', clear)
+		});
+	}
+
+	function renderHelpers(){
+		clear();
+		try{
+			ctx.setLineDash([7,4]);
+		} catch (e){}
+		paintRestrictionArea(this);
+		paintPinRect(this);
+	}
+
+	//canvas painters
+	function paintRestrictionArea($el){
+		var $within = $el.within;
+		var pos = offsets($within),
+			pads = paddings($within);
+
+		ctx.strokeStyle = 'rgba(60,60,60,1)';
+		ctx.lineWidth = 1;
+
+		ctx.beginPath();
+		ctx.moveTo(pos.left + pads.left, pos.top + pads.top);
+		ctx.lineTo(pos.right - pads.right, pos.top + pads.top);
+		ctx.lineTo(pos.right - pads.right, pos.bottom - pads.bottom);
+		ctx.lineTo(pos.left + pads.left, pos.bottom - pads.bottom);
+		ctx.lineTo(pos.left + pads.left, pos.top + pads.top);
+		ctx.stroke();
+	}
+
+
+	function paintThreshold(e){
+		var $el = e.currentTarget;
+
+		clear();
+
+		var rect = $el.threshold,
+			d = $el._dragparams,
+			offsetX = d.offsetX,
+			offsetY = d.offsetY;
+
+		if (typeof rect === "number"){
+			//number
+			rect = [-rect*.5, -rect*.5, rect*.5, rect*.5]
+		} else if (rect.length === 2){
+			//Array(w,h)
+			rect = [-rect[0] *.5, -rect[1] *.5, rect[0] *.5, rect[1] *.5]
+		} else if(rect.length === 4){
+			//Array(x1,y1,x2,y2)
+			rect = rect.slice();
+		} else if (typeof rect === "function"){
+			//custom rect funciton
+			return;
+		}
+
+		rect[2] += 1
+		rect[3] += 1
+
+		var pos = offsets($el);
+
+		ctx.strokeStyle = 'rgba(60,180,250,1)';
+		ctx.lineWidth = 2;
+
+		ctx.beginPath();
+		ctx.moveTo(pos.left + offsetX + rect[0], pos.top + offsetY + rect[1]);
+		ctx.lineTo(pos.left + offsetX + rect[2], pos.top + offsetY + rect[1]);
+		ctx.lineTo(pos.left + offsetX + rect[2], pos.top + offsetY + rect[3]);
+		ctx.lineTo(pos.left + offsetX + rect[0], pos.top + offsetY + rect[3]);
+		ctx.lineTo(pos.left + offsetX + rect[0], pos.top + offsetY + rect[1]);
+		ctx.stroke();
+	}
+
+	function paintPinRect($el){
+		var pin = $el.pin.slice();
+		pin[2] += 1
+		pin[3] += 1
+
+		var pos = offsets($el);
+
+		ctx.strokeStyle = 'rgba(60,250,60,1)';
+		ctx.lineWidth = 2;
+
+		ctx.beginPath();
+		ctx.moveTo(pos.left + pin[0], pos.top + pin[1]);
+		ctx.lineTo(pos.left + pin[2], pos.top + pin[1]);
+		ctx.lineTo(pos.left + pin[2], pos.top + pin[3]);
+		ctx.lineTo(pos.left + pin[0], pos.top + pin[3]);
+		ctx.lineTo(pos.left + pin[0], pos.top + pin[1]);
+		ctx.stroke();
+	}
+
+	function clear(){
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+	}
+
+
+
+</script>

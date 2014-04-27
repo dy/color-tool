@@ -1,62 +1,45 @@
-/*
-Utilizes slide-areas
-*/
-
-//Do not change the way of defining picker classes. Extend in Picker won’t give correct name for class.
-function HuePicker(){
-	this.create.apply(this, arguments);
-}
-
-pickers.HuePicker = HuePicker;
-
-HuePicker.prototype = extend({}, AreaPicker.prototype, {
-	options: {
-		direction: "left", //what direction of hue
+Mod.register("HuePicker", Picker.extend({
+	min: 0,
+	max: 360,
+	value: 0,
+	'ready, input': {
+		change: function(){
+			this.picky.color.hue = this.value;
+		},
+		'@picky change': function(){
+			//console.log("picky changed")
+			this.value = this.picky.color.hue
+		}
 	},
+	//API
+	render: function(){
+		//console.log("hue render", color)
 
-	create: function(el, manager, color){
-		this.el = el;
-		this.manager = manager;
+		//render visuals
+		if (this.state !== "ready") return;
 
-		this.color = color; //model of this picker is the only color
+		this.updatePosition();
 
-		this.makeOptions();
+		//model
+		var color = this.picky.color;
+		var s = color.saturation + "%",
+			h = color.hue,
+			b = color.lightness + "%";
 
-		this.bindEvents();
-	},
+		//TODO: direction
+		//var direction = this.
 
-	bindEvents: function(){
-		var o = this.options,
-			el = this.el,
-			self = this;
-	},
+		//hue
+		var direction = this.vertical ? "top" : "right";
+		var bg = ["linear-gradient(to " + direction + ",",
+			"hsl(0," + s + "," + b + "%) 0%,",
+			"hsl(60," + s + "," + b + "%) 16.666%,",
+			"hsl(120," + s + "," + b + "%) 33.333%,",
+			"hsl(180," + s + "," + b + "%) 50%,",
+			"hsl(240," + s + "," + b + "%) 66.666%,",
+			"hsl(300," + s + "," + b + "%) 83.333%,",
+			"hsl(360," + s + "," + b + "%) 100%)"].join("");
 
-	//Picker interface
-	//sets up representation based on the color passed
-	set: function(color){
-		var o = this.options;
-		this.color = color;
-		
-		//render area
-		var grSteps = 6, //6,12,24,36, 72 is optimal. 6 is better.
-			gradient = [], 
-			hueStep = 360/grSteps,
-			sat = (color.saturation()*100) + '%',
-			al = color.alpha();
-
-		for (var i = 0; i<= grSteps; i++){
-			gradient.push( 'hsla(', 
-							(hueStep*i).toFixed(4), ',', 
-							sat, ', 50%, ', 
-							al, ') ',
-							((100/grSteps*i)).toFixed(2), (i == grSteps ? '%' : '%, ')
-						)
-		};
-
-		this.el.style.background = cssGradient + '(' + o.direction + ', ' + gradient.join('') + ')';
-	},
-
-	//returns color based on the current state
-	get: function(){
+		this.style.background = bg;
 	}
-})
+}));

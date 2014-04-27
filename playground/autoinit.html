@@ -1,0 +1,63 @@
+<!doctype html>
+
+<style type="text/css">
+	[mody]{
+		background: #f3f3f3;
+		height: 30px;
+		display: inline-block;
+		margin-right: 5px;
+		min-width: 30px;
+	}
+	.mody{
+		height: 30px;
+		display: inline-block;
+		margin-right: 5px;
+		min-width: 30px;
+		background: #878787;
+	}
+</style>
+
+<script src='../src/util.js'></script>
+<script src='../src/databind.js'></script>
+<script src='../src/Mod.js'></script>
+<script type="text/javascript">
+	Mod.register("mody", Mod.extend({
+		init: function(){
+			// console.log("init")
+		}
+	}))
+</script>
+
+<h1>Check autoinit</h1>
+
+<div>
+	<div class="container">
+		<div mody></div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	var $container = document.querySelector(".container")
+	var el = document.createElement("div");
+	el.setAttribute('mody', '');
+
+	document.body.appendChild(el.cloneNode())
+
+	var df = document.createDocumentFragment();
+	for (var i = 0; i < 10; i++){
+		df.appendChild(el.cloneNode())
+	}
+	document.body.appendChild(df);
+
+	var df = document.createDocumentFragment();
+	for (var i = 0; i < 10; i++){
+		var el = document.createElement('div');
+		df.appendChild(el)
+	}
+	var cn = df.childNodes;
+	$container.appendChild(df);
+	for (var i = 1; i <= 10; i++){
+		$container.childNodes[$container.childNodes.length - i].classList.add("mody")
+	}
+
+</script>

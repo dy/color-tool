@@ -18,7 +18,10 @@
 * Color glue
 * Gay
 * Fairy
-* Picky
+* ✔ Picky
+	* Associates with color-picker
+	* Short
+	* Other sense (haughty)
 
 ## Notes
 * Source/Target concept.

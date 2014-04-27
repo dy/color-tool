@@ -1,0 +1,128 @@
+﻿<!doctype html>
+
+<style>
+	body{
+		padding: 0;
+		margin: 0;
+	}
+
+	section{
+		margin-top: 20px;
+		margin-left: 20px;
+		display: inline-block;
+		width: 40vw;
+		height: 40vh;
+		position: relative;
+		vertical-align: top;
+	}
+
+	.area{
+		display: inline-block;
+		outline: 1px dashed gray;
+		height: 40vh;
+		position: relative;
+	}
+	.big-area{
+		width: 75%;
+	}
+	.small-area{
+		width: 20%;
+	}
+
+	.input-group{
+		width: 50%;
+		margin-bottom: 10px;
+		outline: 1px dotted red;
+	}
+
+	.input-group input{
+		max-width: 90px;
+	}
+
+	.input-group label{
+		width: 40px;
+		display: inline-block;
+	}
+
+	.preview{
+		width: 40px;
+		height: 40px;
+		box-shadow: 0 0 0 2px black;
+		margin-bottom: 10px;
+	}
+
+	.draggable{
+		box-shadow: 0 1px 1px black, inset 0 1px 1px white;
+		position: absolute;
+		width: 20px;
+		height: 20px;
+	}
+
+
+</style>
+
+<div picky name="color">
+	<section class="areas">
+		<div class="area big-area" sl-picker></div>
+		<div class="area small-area" hue-picker vertical></div>
+	</section>
+
+	<section class="inputs">
+		<div class="preview" bind-style="background-color: {{ color }};"></div>
+
+		<div class="input-group">
+			<label for="hue"><input id="hue" type="radio" name="mode" checked />H:</label><input hue-picker/>°<br/>
+
+			<label for="saturation"><input id="saturation" type="radio" name="mode" />S:</label><input saturation-picker />%<br/>
+
+			<label for="lightness"><input id="lightness" type="radio" name="mode" />L:
+			</label><input lightness-picker/>%
+		</div>
+
+		<!--<div class="input-group">
+			<label for="red"><input id="red" type="radio" name="mode" />R:</label><input picker="input" /><br/>
+
+			<label for="green"><input id="green" type="radio" name="mode" />G:</label><input picker="input" /><br/>
+
+			<label for="blue"><input id="blue" type="radio" name="mode" />B:</label><input picker="input" /><br/>
+		</div>
+
+		<div class="input-group" title="TODO: make that enhanced-picker">
+			<label for="hex">#</label><input id="hex" picker="input" />
+		</div>
+
+		<div class="input-group">
+			<label for="L"><input id="L" type="radio" name="mode" />L:</label><input picker="input" /><br/>
+
+			<label for="a"><input id="a" type="radio" name="mode" />a:</label><input picker="input" /><br/>
+
+			<label for="b"><input id="b" type="radio" name="mode" />b:</label><input picker="input" /><br/>
+		</div>
+
+		<div class="input-group">
+			<label for="C"><input id="C" type="radio" name="mode" />C:</label><input picker="input" /><br/>
+
+			<label for="M"><input id="M" type="radio" name="mode" />M:</label><input picker="input" /><br/>
+
+			<label for="Y"><input id="Y" type="radio" name="mode" />Y:</label><input picker="input" /><br/>
+
+			<label for="K"><input id="K" type="radio" name="mode" />K:</label><input picker="input" /><br/>
+		</div> -->
+	</section>
+</div>
+
+<script src="../src/util.js"></script>
+<script src="../src/databind.js"></script>
+<script src="../src/Component.js"></script>
+<script src="../components/Draggable.js"></script>
+<script src="../components/Slidy.js"></script>
+<script src="../components/pickers/Picker.js"></script>
+<script src="../components/pickers/HuePicker.js"></script>
+<script src="../components/pickers/SaturationPicker.js"></script>
+<script src="../components/pickers/LightnessPicker.js"></script>
+<script src="../components/pickers/SLPicker.js"></script>
+<script src="../components/Picky.js"></script>
+
+<script>
+	//Customize modes switching
+</script>

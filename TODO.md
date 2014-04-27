@@ -1,18 +1,17 @@
-* Make simple slidy picker work
-* Make x-slidy tag
-* Make polymer-slidy component
-* Make slidy jquery plugin
-* Make vanilla es3 slidy
+* fix draggable - draggable.html
+* fix slidy - color_picker.html
+* write ideal pickers code - photoshop.html
+* write megapickers code
+
+
 * Make slidy demo page
 * Add donate button to the slidy’s demo page
-* Make slidy readme outlines
+* Make slidy readme
 * Fulfill readme with technical badges
 
 
 
 --------------other things
-
-* Wrap to the closure through grunt
 
 * Implement test page
 	* predefined areas
@@ -29,15 +28,13 @@
 * Init on any kind of input
 * Test on different color objects: jquery.color, Color.ls, etc
 
-* minification
-* Make as component
 * trigger change of input on change
 * load last used colorlist and init color from local storage
 * make tip position precisely to the caret
 * standart replacer for input mode=color element.
 * press-release habrahabr, vkontakte, smashing etc: Own color picker with toys & beauties. List of concurent features.
 * lab
-* screen color picker (WTF? HOW?). Behaviour maybe is simple drag out of picker zone.
+* any page object color picker (WTF? HOW?).
 * color stack is neat & lite, not pesky: just shows last used colors. Maybe group colors by similarity?
 * read data-attributes additional to options
 

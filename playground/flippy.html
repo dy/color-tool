@@ -1,0 +1,42 @@
+<!doctype html>
+
+<style>
+	*{
+		box-sizing: border-box;
+	}
+	body{
+		font-family: sans-serif;
+	}
+
+	[flippy]{
+		background: rgba(120,130,140,.5);
+		width: 500px;
+		height: 400px;
+		position: relative;
+		outline: 1px solid gray;
+	}
+	[flippy] img{
+		max-width: 100%;
+		position: absolute;
+		top: 0;
+		left: 0;
+	}
+
+	[flippy].animating{
+		opacity: .5;
+	}
+</style>
+
+<div flippy slides="
+http://www.npausa.com/news/2010grandnationalchamps/Ice%20Pigeon%20YC619%20Bob%20Heal.jpg,
+http://upload.wikimedia.org/wikipedia/commons/b/b4/Frillback_pigeon.jpg,
+http://www.npausa.com/news/2010grandnationalchamps/Hungarian%20Giant%20House%20Pigeon%20CH%20OC622%20Bob%20Nolan%20Kathie%20Johnson.jpg, dsf"></div>
+<div flippy slides="
+http://www.npausa.com/news/2010grandnationalchamps/Ice%20Pigeon%20YC619%20Bob%20Heal.jpg,
+http://upload.wikimedia.org/wikipedia/commons/b/b4/Frillback_pigeon.jpg,
+http://www.npausa.com/news/2010grandnationalchamps/Hungarian%20Giant%20House%20Pigeon%20CH%20OC622%20Bob%20Nolan%20Kathie%20Johnson.jpg, dsf"></div>
+
+<script src='../src/util.js'></script>
+<script src='../src/databind.js'></script>
+<script src='../src/Component.js'></script>
+<script src='../components/Flippy.js'></script>

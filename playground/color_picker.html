@@ -1,0 +1,82 @@
+<!doctype html>
+
+<style>
+	*{
+		box-sizing: border-box;
+	}
+	body{
+		font-family: sans-serif;
+	}
+
+	[slidy]{
+		background: rgba(120,130,140,.5);
+		min-width: 7vw;
+		min-height: 10vh;
+		margin-top: 1vh;
+		/*padding: 5px;*/
+		margin-right: 8vw;
+	}
+	[slidy] > .draggable{
+		width: 20px;
+		height: 20px;
+		/*background: white;*/
+		border-radius: 10px;
+		box-shadow: inset 0 0 1px 1px rgba(240,250,255,.5), 0 0 1px 1px rgba(0,10,20,.25);
+		position: relative;
+	}
+	#hue-lightness{
+		height: 40vh;
+	}
+	#alpha{
+		float: right;
+		height: 51vh;
+		margin-top: 0;
+		margin-right: 0;
+	}
+</style>
+
+<body bind-style="background: hsla({{ hue }}, {{ saturation }}%, {{ lightness }}%, {{ alpha }})">
+
+	<h1>Simple three-component picker</h1>
+
+	<div id="alpha" slidy vertical min="0" max="1" value="1" name="alpha"></div>
+
+	<div id="hue-lightness" slidy
+		min="0,0" max="360,100" value="50,50"
+		repeat="x" snap="both"
+		name="hue,lightness"
+		bind-style="background:
+			linear-gradient(to bottom,
+			hsla(0,0%,100%,1) 0%,
+			hsla(0,0%,100%,0) 50%,
+			hsla(0,0%,0%,0) 50%,
+			hsla(0,0%,0%,1) 100%),
+
+			linear-gradient(to right,
+			hsl(0, {{ saturation }}% ,50%) 0%,
+			hsl(60, {{ saturation }}% ,50%) 16.666%,
+			hsl(120, {{ saturation }}% ,50%) 33.333%,
+			hsl(180, {{ saturation }}% ,50%) 50%,
+			hsl(240, {{ saturation }}% ,50%) 66.666%,
+			hsl(300, {{ saturation }}% ,50%) 83.333%,
+			hsl(360, {{ saturation }}% ,50%) 100%)"
+	></div>
+
+	<div id="saturation" slidy min="0" max="100" snap value="50" name="saturation"
+		onchange=""
+		bind-style="background:
+			linear-gradient(to right,
+			hsl( {{ hue }} , 0%,  {{ lightness }}% ) 0%,
+			hsl( {{ hue }} , 100%,  {{ lightness }}% ) 100%)"></div>
+
+	<output id="color">hsla({{ hue }}, {{ saturation }}%, {{ lightness }}%, {{ alpha }})</output>
+
+</body>
+
+
+<!-- <script src='../dist/component.min.js'></script> -->
+<script src='../src/util.js'></script>
+<script src='../src/databind.js'></script>
+<script src='../src/Mod.js'></script>
+<script src='../mods/Draggable.js'></script>
+<script src='../mods/Slidy.js'></script>
