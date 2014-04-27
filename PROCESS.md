@@ -22,6 +22,7 @@
 	* Associates with color-picker
 	* Short
 	* Other sense (haughty)
+	* picky mode
 
 ## Notes
 * Source/Target concept.
