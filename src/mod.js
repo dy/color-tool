@@ -726,23 +726,19 @@ function Mod($el, opts){
 
 	//enter default state (1st level attributes)
 	$el.__stateRedirectCount = 0;
-	enterState($el, "create", CurrentMod.properties);
+	enterState($el, "create", CurrentMod.properties, opts);
 
-	//init passed options
-	for (var prop in opts){
-		var value = opts[prop];
-		if (value === undefined || /^(?:created|init)$/.test(prop)) {
-			continue;
-		}
-
+	//init additional passed options
+	for (var propName in opts){
+		var value = opts[propName];
 		//additional callback
-		if (isFn(value)) {
-			on($el, prop, value.bind($el));
+		if (isFn(value) && !/^(created|init)$/.test(propName)) {
+			// console.log("init", propName)
+			on($el, propName, value.bind($el));
 		}
-
 		//additional property
-		else {
-			$el[prop] = value;
+		else if (value !== undefined && !(propName in $el)) {
+			$el[propName] = value;
 		}
 	}
 
@@ -760,7 +756,7 @@ function Mod($el, opts){
 */
 //TODO: optimize after-initialization (now double code)
 //TODO: merge methods definition with properties definition (actually they’re very similar)
-function enterState($el, stateKey, props){
+function enterState($el, stateKey, props, initValues){
 	if (!props) return;
 
 	// LOG && console.group("to state:", stateKey)
@@ -769,16 +765,12 @@ function enterState($el, stateKey, props){
 	var activeEvents = $el['__' + stateKey] = [];
 
 	//sort properties
-	var orderedProps = Object.keys(props).filter(function(a){
-		return !(/^(?:init|before|after|created)$/.test(a))
-	}).sort(function(a,b){
-		return (getPropOrder(a, props[a]) > getPropOrder(a, props[b]) ? 1 : -1)
-	})
+	var orderedProps = sortPropsByOrder(Object.keys(props), props);
 
 	//save after method
 	activeEvents.after = props.after;
 
-	//for each property in state→
+	//for each property in state
 	orderedProps.forEach(function(propName){
 		var prop = getPropDesc(props[propName]), initValue, cb, propValue = prop.value;
 
@@ -815,14 +807,15 @@ function enterState($el, stateKey, props){
 			if ($el._mod.displayName){
 				on(doc, $el._mod.displayName + ":" + propName, cb);
 			}
+
+			//init custom callback passed
+			//initValues && isFn(initValues[propName]) && on($el, propName, initValues[propName])
 		}
 
 		//define property
 		else if (!(propName in $el)){
 			// LOG && console.log("define prop", propName, 'in state', stateKey)
 
-			//init default value
-			initValue = propValue
 			var _propName = '_' + propName;
 
 			//TODO: detect native properties
@@ -929,13 +922,12 @@ function enterState($el, stateKey, props){
 								self['__change' + key] = true;
 								try {
 									var changedValue = desc.change.call(self, value, oldValue)
-									if (changedValue !== undefined) self[_key] = changedValue;
 								} catch (e) {
-									if (win.console) console.log(e.message);
-
-									//invalidate value
-									self[_key] = oldValue
+									self[_key] = oldValue;
+									err(e);
 								}
+								if (changedValue === false) self[_key] = oldValue;
+								else if (changedValue !== undefined) self[_key] = changedValue;
 								self['__change' + key] = null;
 							}
 
@@ -966,8 +958,11 @@ function enterState($el, stateKey, props){
 				}
 			}
 
-			//init with value passed
-			$el[propName] = initValue;
+			//init custom value passed
+			if (initValues && (propName in initValues))
+				$el[propName] = initValues[propName];
+			else
+				$el[propName] = propValue;
 		}
 	});
 
@@ -1181,6 +1176,16 @@ function setAttrValue($el, attrName, value){
 		$el.setAttribute(attrName, stringify(value));
 	}
 	fire($el, "attributeChanged")
+}
+
+
+//return ordered list of properties
+function sortPropsByOrder(keys, props){
+	return keys.filter(function(a){
+		return !(/^(?:init|before|after|created)$/.test(a))
+	}).sort(function(a,b){
+		return (getPropOrder(a, props[a]) > getPropOrder(b, props[b]) ? 1 : -1)
+	})
 }
 
 

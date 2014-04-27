@@ -12,9 +12,9 @@ Mod.extend({
 		//watch for input element
 		if (this.tagName === "INPUT") {
 			this.isInput = true;
-			on(this, "change", function(){
-				console.log("slidy-input change", this.value)
-			})
+			// on(this, "change", function(){
+			// 	console.log("slidy-input change", this.value)
+			// })
 		}
 
 		//create pickers according to the settings
@@ -58,31 +58,32 @@ Mod.extend({
 
 	//HTML5 things
 	value: {
-		value: 50,
-		set: function(value, old){
-			// console.log("slidy set value", value, old)
-			if (value.length != this.dimensions) err("Value should be", this.dimensions + "-dimensional, passed", value );
+		change: function(value, old){
+			var result;
+			if (typeof value === "string" && /,/.test(value)) value = parseArray(value);
+			// console.log("slidy set value", value, old, this.dimensions)
 
-			if (value.length === 2){
-				var result = [];
+			if (value && value.length === 2) {
+				result = [];
 				result[0] = round(between(value[0], this.min[0], this.max[0]), this.step)
 				result[1] = round(between(value[1], this.min[1], this.max[1]), this.step)
 				if (!result[0] && result[0] !== 0) result[0] = old[0];
 				if (!result[1] && result[1] !== 0) result[1] = old[1];
-
-				this.value = result;
+				value = result;
+			} else {
+				value = parseFloat(value) ? value : 0;
+				result = round(between(value, this.min, this.max), this.step);
 			}
 
-			var res = round(between(value, this.min, this.max), this.step);
+			if (!result && result !== 0) err("Something went wrong in validating value", result)
 
-			if (!res && res !== 0) err("Something went wrong in validating value", res)
-
-			this.value = res;
+			this.value = result;
 
 			//console.log("slidy value changed", value, oldValue, this.value)
 			this.updatePosition();
-			this.fire("change")
-		}
+			fire(this, "change")
+		},
+		order: 3
 	},
 
 	dimensions: {
@@ -90,9 +91,10 @@ Mod.extend({
 		//mutual with vertical/horizontal
 		values: {
 			1: function(){
-
+				// console.log("set 1")
 			},
 			2: function(){
+				// console.log("set 2")
 				this.vertical = true;
 				this.horizontal = true;
 			},
@@ -100,7 +102,8 @@ Mod.extend({
 			_: function(){
 				return false;
 			}
-		}
+		},
+		order: 0
 	},
 
 	//Orientation
@@ -128,11 +131,23 @@ Mod.extend({
 		}
 	},
 
-	min: 0,
-	max: 100,
+	min: {
+		change: function(value){
+			// console.log("set min", value)
+			if (/,/.test(value)) return parseArray(value);
+			// if (this.dimensions == 2)
+		},
+		order: 0
+	},
+	max: {
+		change: function(value){
+			// console.log("set max", value)
+			if (/,/.test(value)) return parseArray(value);
+		},
+		order: 0
+	},
 	step: {
 		//detect step automatically based on min/max range (1/100 by default)
-		value: undefined,
 		change: function(value){
 			if (value === undefined) {
 				//initial call
@@ -145,12 +160,9 @@ Mod.extend({
 				value = range <= 100 ? .01 : 1;
 			}
 			return value;
-		}
+		},
+		order: 2
 	},
-
-	//TODO whether to expose self data to document’s scope
-	//for declarative bindings
-	expose: true,
 
 	//TODO Range
 	//jquery-way
@@ -203,8 +215,8 @@ Mod.extend({
 				},
 
 				change: function(e){
-					e.preventDefault()
 					console.log("slidy change", this.value)
+					e.preventDefault()
 				}
 			}
 		}
@@ -216,8 +228,11 @@ Mod.extend({
 			//relative coords to move picker to
 			x = 0,
 			y = 0,
-			picker = $el.picker,
-			lim = picker._limits,
+			picker = $el.picker;
+
+		if(!picker) return;
+
+		var	lim = picker._limits,
 			hScope = (lim.right - lim.left),
 			vScope = (lim.bottom - lim.top)
 
@@ -262,6 +277,10 @@ function handleDrag($el, e){
 	if ($el.dimensions === 2){
 		var normalValue = [(thumb.x - lim.left) / hScope, ( - thumb.y + lim.bottom) / vScope];
 
+		// console.log([
+		// 	normalValue[0] * ($el.max[0] - $el.min[0]) + $el.min[0],
+		// 	normalValue[1] * ($el.max[1] - $el.min[1]) + $el.min[1]
+		// ])
 		$el.value = [
 			normalValue[0] * ($el.max[0] - $el.min[0]) + $el.min[0],
 			normalValue[1] * ($el.max[1] - $el.min[1]) + $el.min[1]

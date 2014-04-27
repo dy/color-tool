@@ -206,18 +206,23 @@ function dataSourceChanged(name){
 //expose element data
 function expose($el){
 	_valueChanged( $el );
-	$el.addEventListener("change", function(e){_valueChanged(e.currentTarget)});
+	$el.addEventListener("change", function(e){
+		// console.log("changed")
+		_valueChanged(e.currentTarget)
+	});
 }
 //exposable element value changing callback
 function _valueChanged($el){
 	var name = parseArray($el.getAttribute("name"))
-	// console.log("valueChanged", name, $el.value)
+	var value = parseArray('value' in $el ? $el.value : $el.getAttribute('value'));
+	// console.log("valueChanged", name, value)
 	for (var i = 0; i < name.length; i++){
 		if ($el.value instanceof Array) {
 			dataSource[name[i]] = $el.value[i];
 		} else {
 			dataSource[name[i]] = $el.value;
 		}
+		// console.log(dataSource[name[i]], name[i])
 		dataSourceChanged(name[i]);
 	}
 }
@@ -232,7 +237,19 @@ function parseArray(str){
 
 	var result = [];
 	str.split(/\s*,\s*/).forEach(function(value){
-		result.push(value)
+		result.push(parseAttr(value))
 	})
 	return result
+}
+
+function parseAttr(str){
+	var v;
+	if (/true/i.test(str)) {
+		return true;
+	} else if (/false/i.test(str)) {
+		return false;
+	} else if (!/[^\d\.\-]/.test(str) && !isNaN(v = parseFloat(str))) {
+		return v;
+	}
+	return str;
 }
