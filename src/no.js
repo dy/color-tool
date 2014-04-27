@@ -1,10 +1,11 @@
 /**
-* Provide data-bindings for elements so you don’t have to write js at all
+* Provide data-bindings for elements so you don’t have to write js at all.
+*
 * Interface is simple:
-* make bindings with moustache-like notation
-* use `name` attribute to expose value with that name
-* fire `change` event to update data-bindings
-* use `bind-` prefixed properties for native attributes, like `<div bind-style="background:{{ color }}"/>`
+* - make bindings with moustache-like notation
+* - use `name` attribute to expose value with that name
+* - fire `change` event to update data-bindings
+* - use `bind-` prefixed properties for native attributes, like `<div bind-style="background:{{ color }}"/>`
 *
 * Example:
 * <div>{{ prop }}</div>
@@ -20,7 +21,11 @@
 * keyed by prop name particles to update
 {
 	prop1: [
-		{dataRequired: ["a", "b", "c"], target: node, text: "original tpl {{ with data }}"}, ...
+		{
+			dataRequired: ["a", "b", "c"],
+			target: node,
+			text: "original tpl {{ with data }}"
+		}, ...
 	],
 	prop2: [...]
 }

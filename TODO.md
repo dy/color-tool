@@ -1,4 +1,3 @@
-* fix slidy - color_picker.html
 * write ideal pickers code - photoshop.html
 * write megapickers code
 

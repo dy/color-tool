@@ -759,7 +759,7 @@ function Mod($el, opts){
 function enterState($el, stateKey, props, initValues){
 	if (!props) return;
 
-	// LOG && console.group("to state:", stateKey)
+	// console.group("to state:", stateKey)
 
 	//init state bound events
 	var activeEvents = $el['__' + stateKey] = [];
@@ -801,6 +801,7 @@ function enterState($el, stateKey, props, initValues){
 			//bind callback
 			cb.displayName = propName
 			activeEvents.push(cb)
+			// console.log("bind", propName)
 			on($el, propName, cb)
 
 			//document `name:propName` listener
