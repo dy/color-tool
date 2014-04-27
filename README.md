@@ -3,24 +3,24 @@
 <small>WIP</small>
 
 Universal color-picker.
-Built upon [slidy](), which is built upon [component]().
+Built using [slidy]() and [mod]().
 
 [Look and feel](http://dmitry-ivanov.me/playground/cpickr)
 <img src="http://img-fotki.yandex.ru/get/6511/51833996.0/0_996d3_7b5acfda_orig"/>
 
 
-## How to use
+## Use
 
-### Installing
+### Add script
 
 ```html
-<script src='picky.js'></script>
+<script src='picky.min.js'></script>
 ```
 
 ### No-JS
 
 ```html
-	<div picky mode="hl,s,a" />
+	<div class="picky" mode="hl,s,a" />
 ```
 
 ### Vanilla
@@ -43,7 +43,7 @@ Built upon [slidy](), which is built upon [component]().
 
 #### `mode`
 
-Defines what color pickers to create.
+Defines which color pickers to create.
 
 Array/comma-separated string.
 Default is photoshop-like `['sl', 'h', 'a']`.
@@ -55,22 +55,9 @@ Other pickers: `palette, web`
 
 You can easily implement your own pickers, look [how]().
 
-#### ✗ `format`
-
-@deprecated - use this in color model
-
-Format to return color in.
-
-Default is `'rgba'`.
-Possible values: `hsl, hsla, rgb, rgba, hex`.
-
-Available formats depends on the color library used (no library is used by default). You can connect custom color library (such as [jquery.color](), ...list of libs supported...) by passing it’s constructor to the [`colorLib`]() option.
-
 #### `color`
 
 Color object to use as a basis for retrieving data. By default no color object is used.
-
-#### `keyboard`
 
 
 ## API
@@ -83,23 +70,3 @@ Use API just as if you would use native input element:
 	picky.value = 'white';
 	picky.color //color object representing color picked
 ```
-
-Or if you use jQuery, call
-
-```js
-	var picky = $('#picky').data("picky");
-	picky.value = '#fff';
-	picky.color
-```
-
-### Properties
-
-#### `value`
-
-#### Any option value
-
-	Color object representing model of color to pick. All methods are
-
-### Methods
-
-## Events & states
