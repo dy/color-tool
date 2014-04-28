@@ -63,20 +63,20 @@
 
 <div picky name="color">
 	<section class="areas">
-		<div class="area big-area" sl-picker></div>
-		<div class="area small-area" hue-picker vertical></div>
+		<div class="area big-area" class="picker" mode="sl"></div>
+		<div class="area small-area" class="picker" mode="hue" vertical></div>
 	</section>
 
 	<section class="inputs">
 		<div class="preview" bind-style="background-color: {{ color }};"></div>
 
 		<div class="input-group">
-			<label for="hue"><input id="hue" type="radio" name="mode" checked />H:</label><input hue-picker/>°<br/>
+			<label for="hue"><input id="hue" type="radio" name="mode" checked />H:</label><input class="picker" mode="hue"/>°<br/>
 
-			<label for="saturation"><input id="saturation" type="radio" name="mode" />S:</label><input saturation-picker />%<br/>
+			<label for="saturation"><input id="saturation" type="radio" name="mode" />S:</label><input class="picker" mode="saturation" />%<br/>
 
 			<label for="lightness"><input id="lightness" type="radio" name="mode" />L:
-			</label><input lightness-picker/>%
+			</label><input class="picker" mode="lightness"/>%
 		</div>
 
 		<!--<div class="input-group">
@@ -111,17 +111,16 @@
 	</section>
 </div>
 
-<script src="../src/util.js"></script>
-<script src="../src/databind.js"></script>
-<script src="../src/Component.js"></script>
-<script src="../components/Draggable.js"></script>
-<script src="../components/Slidy.js"></script>
-<script src="../components/pickers/Picker.js"></script>
-<script src="../components/pickers/HuePicker.js"></script>
-<script src="../components/pickers/SaturationPicker.js"></script>
-<script src="../components/pickers/LightnessPicker.js"></script>
-<script src="../components/pickers/SLPicker.js"></script>
-<script src="../components/Picky.js"></script>
+<script src="../src/mod.js"></script>
+<script src="../src/no.js"></script>
+<script src="../src/Draggable.js"></script>
+<script src="../src/Slidy.js"></script>
+<script src="../src/pickers/Picker.js"></script>
+<!--<script src="../src/pickers/HuePicker.js"></script>
+<script src="../src/pickers/SaturationPicker.js"></script>
+<script src="../src/pickers/LightnessPicker.js"></script>
+<script src="../src/pickers/SLPicker.js"></script>-->
+<script src="../src/Picky.js"></script>
 
 <script>
 	//Customize modes switching

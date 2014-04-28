@@ -3,24 +3,24 @@
 * Picky.js creates such elements in bulk.
 */
 //TODO: get rid of or use in full strength
-Component.register("Picker", {
-	extends: "Slidy",
+var Picker = Slidy.extend({
+	picky: null,
+	threshold: 0,
+	mode: {
+		value: "default",
+		values: {
+			"default": {
+				change: function(){
+					console.log("picker change", this.value)
+					this.picky.fire("change");
+				},
 
-	options: {
-		picky: null,
-		threshold: 0
-	},
-
-	states: {
-		'ready, input': {
-			change: function(){
-				console.log("picker change", this.value)
-				this.picky.fire("change");
-			},
-
-			'$.picky change': 'render'
+				'@picky change': 'render'
+			}
 		}
 	},
+	render: function(){
 
-	autoinit: false
-})
+	}
+
+}).register("picker")
