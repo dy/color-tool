@@ -1,3 +1,6 @@
+* fix github bugs
+* make tests public
+
 * write ideal pickers code - photoshop.html
 * write megapickers code
 
