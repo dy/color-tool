@@ -1,7 +1,7 @@
 ﻿/**
 * Range input mod
 */
-Mod.extend({
+var Slidy = Mod.extend({
 	init: function(){
 		// console.log("init slidy")
 	},
@@ -105,9 +105,6 @@ Mod.extend({
 		},
 		order: 0
 	},
-
-	//Orientation
-	//? multidimensinal
 	vertical: {
 		value: false,
 		values: {
@@ -131,7 +128,9 @@ Mod.extend({
 		}
 	},
 
+	//value limits
 	min: {
+		value: 0,
 		change: function(value){
 			// console.log("set min", value)
 			if (/,/.test(value)) return parseArray(value);
@@ -140,6 +139,7 @@ Mod.extend({
 		order: 0
 	},
 	max: {
+		value: 100,
 		change: function(value){
 			// console.log("set max", value)
 			if (/,/.test(value)) return parseArray(value);
@@ -200,7 +200,7 @@ Mod.extend({
 				before: function(){
 				},
 				mousedown: function(e){
-					//console.log("mousedown")
+					// console.log("mousedown")
 					this.picker.startDrag(e);
 				},
 				'window resize': function(){
@@ -257,7 +257,9 @@ Mod.extend({
 		if (ratioX !== undefined) $el.picker.x = ratioX * hScope - $el.picker.pin[0];
 		if (ratioY !== undefined) $el.picker.y = ratioY * vScope - $el.picker.pin[1];
 	}
-}).register("slidy");
+})
+
+Slidy.register("slidy");
 
 
 //TODO: <input type="slidy"/>

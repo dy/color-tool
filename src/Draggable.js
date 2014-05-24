@@ -327,11 +327,11 @@ var Draggable = Mod.extend({
 			!isBetween(eAbsoluteX, this._offsets.left, this._offsets.right) ||
 			!isBetween(eAbsoluteY, this._offsets.top, this._offsets.bottom)
 		) {
-			//?d is always undefined here
+			//d is not always undefined here
 			if (d) {
 				//if threshold crossed outside self
-				// offsetX = d.offsetX + e.clientX - d.initX
-				// offsetY = d.offsetY + e.clientY - d.initY
+				offsetX = d.offsetX + e.clientX - d.initX
+				offsetY = d.offsetY + e.clientY - d.initY
 			} else {
 				//no threshold state (drag started from outside)
 				//pretend as if offsets within self are ideal
@@ -353,7 +353,7 @@ var Draggable = Mod.extend({
 			})
 			fire(this, 'dragstart', null, true)
 
-			//fire(this, 'drag', null, true)
+			fire(this, 'drag', null, true)
 		} else {
 			//console.log("inside")
 			if (!d) d = initDragparams(this, e);

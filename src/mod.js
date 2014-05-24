@@ -314,14 +314,31 @@ function css($el, style, value){
 //TODO: pass array of functions to bind
 //TODO: bind evtObj passed {evt, src, fn}
 var _modifierParamsRe = /\(([^)]*)\)/;
-function on(el, evtRefs, fn){
+function on($el, evtRefs, fn){
+	var methName;
 	if (!fn) return false;
 
+	//create method caller for stringy method reference
+	if (typeof fn === "string") {
+		methName = fn;
+
+		if (!$el.__methodReferenceCallbacks) $el.__methodReferenceCallbacks = {};
+
+		fn = (function($el, fn){
+			return function(){
+				// console.log(fn)
+				if ($el[fn]) return $el[fn].apply($el, arguments)
+				else return false;
+			}
+		})($el, methName);
+	}
+
 	each(evtRefs, function(evtRef){
-		var evtObj = _parseEvtRef(el, evtRef);
+		var evtObj = _parseEvtRef($el, evtRef), targetFn = fn;
 		// console.log(evtRef, evtObj)
 
-		var targetFn = fn;
+		//ignore bound method reference
+		if (methName && $el.__methodReferenceCallbacks[evtRef + methName]) return;
 
 		evtObj.modifiers.forEach(function(modifier){
 			if (/onc?e/.test(modifier)){
@@ -340,6 +357,9 @@ function on(el, evtRefs, fn){
 			}
 		})
 
+		//ignore absent property to bind event
+		if (!evtObj.src) err("Bad event target");
+
 		//bind target fn
 		if ($){
 			//delegate to jquery
@@ -348,33 +368,52 @@ function on(el, evtRefs, fn){
 			//listen element
 			evtObj.src.addEventListener(evtObj.evt, targetFn)
 		}
+
+		//save method reference
+		if (methName) {
+			$el.__methodReferenceCallbacks[evtRef + methName] = targetFn;
+			// console.log("save ref", evtRef + methName)
+		}
 	})
 
-	return el;
+	return fn;
 }
 
-function off(el, evtRefs, fn){
+function off($el, evtRefs, fn){
+	if (!fn) return false;
+
 	each(evtRefs, function(evtRef){
-		var evtObj = _parseEvtRef(el, evtRef);
+		var evtObj = _parseEvtRef($el, evtRef), targetFn;
+
+		//unbind method reference
+		if (typeof fn === "string"){
+			if (!$el.__methodReferenceCallbacks) return;
+			targetFn = $el.__methodReferenceCallbacks[evtRef + fn]
+			$el.__methodReferenceCallbacks[evtRef + fn] = null;
+		} else {
+			targetFn = fn;
+		}
 
 		if ($){
 			//delegate to jquery
-			$(evtObj.src).off(evtObj.evt, fn);
+			$(evtObj.src).off(evtObj.evt, targetFn);
 		} else {
 			//listen element
-			evtObj.src.removeEventListener(evtObj.evt, fn)
+			evtObj.src.removeEventListener(evtObj.evt, targetFn)
 		}
 	})
-	return el;
+
+	return fn;
 }
 
 //event callbacks modifiers factory
+//TODO: automatically identify all these modifiers in `on`
 var evtModifiers = {
 	//call callback once
 	one: function(evt, fn){
 		var cb = function(){
-			// console.log("once cb")
-			var result = fn.apply(this, arguments);
+			// console.log("once cb", fn)
+			var result = fn && fn.apply(this, arguments);
 			result !== false && off(this, evt, cb);
 			return result;
 		}
@@ -402,7 +441,7 @@ var evtModifiers = {
 	//filter target
 	delegate: function(evt, fn, selector){
 		var cb = function(e){
-			// console.log("delegate cb", e)
+			// console.log("delegate cb", e, selector)
 			if (matchSelector.call(e.target, selector)) {
 				return fn.apply(this, arguments);
 			}
@@ -693,8 +732,8 @@ function Mod($el, opts){
 	}
 
 	//save callbacks
-	var initCb =  CurrentMod.properties.init;
-	var createdCb = CurrentMod.properties.created;
+	var initCb =   CurrentMod.properties.init && CurrentMod.properties.init.value;
+	var createdCb = CurrentMod.properties.created && CurrentMod.properties.created.value;
 
 
 	//save predefined element properties, as well as other defined properties
@@ -707,7 +746,7 @@ function Mod($el, opts){
 
 		//if no preset value defined - read value from attributes
 		else {
-			var propValue = getPropDesc(CurrentMod.properties[propName]).value
+			var propValue = CurrentMod.properties[propName].value
 
 			var attr = $el.attributes[propName] || $el.attributes["data-" + propName];
 			if (attr) {
@@ -717,7 +756,6 @@ function Mod($el, opts){
 		}
 	}
 	opts = extend(preinit, opts);
-
 
 	//call init
 	on($el, "init:one", initCb);
@@ -733,11 +771,12 @@ function Mod($el, opts){
 		var value = opts[propName];
 		//additional callback
 		if (isFn(value) && !/^(created|init)$/.test(propName)) {
-			// console.log("init", propName)
+			// console.log("additional callback", propName)
 			on($el, propName, value.bind($el));
 		}
 		//additional property
 		else if (value !== undefined && !(propName in $el)) {
+			// console.log("additional property", propName)
 			$el[propName] = value;
 		}
 	}
@@ -761,252 +800,229 @@ function enterState($el, stateKey, props, initValues){
 
 	// console.group("to state:", stateKey)
 
-	//init state bound events
-	var activeEvents = $el['__' + stateKey] = [];
-
 	//sort properties
 	var orderedProps = sortPropsByOrder(Object.keys(props), props);
 
 	//save after method
-	activeEvents.after = props.after;
+	if (props.after) $el.__after = props.after.value;
 
+	//TODO: detect native properties
 	//for each property in state
 	orderedProps.forEach(function(propName){
-		var prop = getPropDesc(props[propName]), initValue, cb, propValue = prop.value;
+		var prop = props[propName];
+		// console.log(propName, props[propName], $el[propValue])
 
-		//define private property
-		if(propName[0] === "_"){
-			$el[propName] = props[propName];
+		//ignore empty props
+		if (prop === undefined) return;
+
+		var initValue, propValue = prop.value;
+
+		//set private/defined/non-descriptor property
+		if (propName[0] === "_"){
+			$el[propName] = prop;
+			return;
 		}
 
-		//define method
-		else if (isFn(propValue) || isFn(props[propValue]) || isFn($el[propValue])){
-			// console.log("define method", propName, 'in state', stateKey)
-
-			var cb;
-
-			//recognize stringy method
-			if (isFn(propValue)) {
-				//bind method
-				cb = propValue.bind($el);
-				$el[propName] = cb.bind($el);
-			} else {
-				//bind stringy method (prop.value cannot be method reference, so prop is surely string)
-				cb = props[propValue];
-				if (!isFn(cb)) cb = $el[propValue];
-				if (!isFn(cb)) err("Bad callback name " + propName)
-				cb = cb.bind($el)
-			}
-
-			//bind callback
-			cb.displayName = propName
-			activeEvents.push(cb)
-			// console.log("bind", propName)
-			on($el, propName, cb)
-
-			//document `name:propName` listener
-			if ($el._mod.displayName){
-				on(doc, $el._mod.displayName + ":" + propName, cb);
-			}
-
-			//init custom callback passed
-			//initValues && isFn(initValues[propName]) && on($el, propName, initValues[propName])
-		}
-
-		//define property
-		else if (!(propName in $el)){
-			// LOG && console.log("define prop", propName, 'in state', stateKey)
+		//define property, if not already
+		else if(!(propName in $el)){
+			// console.log("define prop", propName, 'in state', stateKey)
 
 			var _propName = '_' + propName;
 
-			//TODO: detect native properties
+			//define instance getters/setters
+			Object.defineProperty($el, propName, {
+				configurable: false,
+				enumerable: true,
+				get: (function(_key){
+					return function(){
+						return this[_key];
+					}
+				})(_propName),
+				set: (function(key, _key, desc){
+					return function(value){
+						var self = this;
 
-			//do not define twice
-			if (!(_propName in $el)){
-				//make private value (replace)
+						//LOG && console.log("set value", key, '`' + value + '` from', self[ _key ])
 
-				//define instance getters/setters
-				Object.defineProperty($el, propName, {
-					configurable: false,
-					enumerable: true,
-					get: (function(_key){
-						return function(){
-							return this[_key];
-						}
-					})(_propName),
-					set: (function(key, _key, desc){
-						return function(value){
-							var self = this;
+						//save old value
+						var oldValue = self[_key];
 
-							//LOG && console.log("set value", key, '`' + value + '` from', self[ _key ])
+						//pass initial set, ignore same value
+						if (_key in self) {
+							if (self[ _key ] === value) return;
 
-							//save old value
-							var oldValue = self[_key];
+							//count redirects
+							self.__stateRedirectCount++;
+							if (self.__stateRedirectCount >= Mod._maxRedirects) err("Too many redirects in " + key);
 
-							//pass initial set, ignore same value
-							if (_key in self) {
-								if (self[ _key ] === value) return;
-
-								//count redirects
-								self.__stateRedirectCount++;
-								if (self.__stateRedirectCount >= Mod._maxRedirects) err("Too many redirects in " + key);
-
-								//leave state routines
-								if (desc.values) {
-									var stateValue = desc.values[oldValue] ? oldValue : '_';
-
-									var oldStateKey = key + capfirst(stateValue);
-
-									if(!self['__after' + oldStateKey]){
-										self['__after' + oldStateKey] = true;
-										var afterResult = leaveState(self, oldStateKey);
-
-										//ignore leaving state
-										if (afterResult === false) {
-											return;
-										}
-
-										//redirect state, if returned any
-										if (afterResult !== undefined) {
-											self[key] = afterResult;
-											return;
-										}
-
-										//fire leaving event
-										fire(self, "after" + capfirst(key) + capfirst(oldValue))
-
-										self['__after' + oldStateKey] = null;
-									}
-								}
-							} else {
-								//NOTE: this is quite low performant: http://jsperf.com/dom-defineproperty
-								// Object.defineProperty(self, _key, {
-								// 	configurable: false,
-								// 	enumerable: false,
-								// 	writable: true
-								// })
-							}
-
-							//prevent redirect happened
-							if (self[_key] !== oldValue) return;
-
-							//set new value
-							self[ _key ] = value;
-
-							//enter state routines
-							var beforeResult;
+							//leave state routines
 							if (desc.values) {
-								var stateValue = desc.values[value] ? value : '_';
-								var state = desc.values[stateValue];
+								var stateValue = desc.values[oldValue] ? oldValue : '_';
 
-								beforeResult = isFn(state) ? state.call($el) : enterState(self, key + capfirst(stateValue), state);
+								var oldStateKey = key + capfirst(stateValue);
 
-								//fire entering event
-								fire(self, key + capfirst(value))
+								if(!self['__after' + oldStateKey]){
+									self['__after' + oldStateKey] = true;
 
-								//check whether state redirect needed
-								if (beforeResult !== undefined) {
-									//revert state if false returned
-									if (beforeResult === false) {
-										self[key] = oldValue;
+									//leave state
+									var afterResult = leaveState(self, oldStateKey, desc.values[stateValue]);
+
+									//ignore leaving state
+									if (afterResult === false) {
+										return;
 									}
-									//redirect state if returned any
-									else {
-										self[key] = beforeResult;
+
+									//redirect state, if returned any
+									if (afterResult !== undefined) {
+										self[key] = afterResult;
+										return;
 									}
-									return;
+
+									//fire leaving event
+									fire(self, "after" + capfirst(key) + capfirst(oldValue))
+
+									self['__after' + oldStateKey] = null;
 								}
 							}
-
-							//call change validator, if any
-							else if (desc.change && !self['__change' + key]) {
-								self['__change' + key] = true;
-								try {
-									var changedValue = desc.change.call(self, value, oldValue)
-								} catch (e) {
-									self[_key] = oldValue;
-									err(e);
-								}
-								if (changedValue === false) self[_key] = oldValue;
-								else if (changedValue !== undefined) self[_key] = changedValue;
-								self['__change' + key] = null;
-							}
-
-							//update attribute
-							desc.attribute && setAttrValue(self, key, value);
-
-							//notify change
-							fire(self, key + "Changed", {key: key, value: value, oldValue: oldValue});
-
-							//clean redirect counter
-							self.__stateRedirectCount = 0;
+						} else {
+							//NOTE: this is quite low performant: http://jsperf.com/dom-defineproperty
+							// Object.defineProperty(self, _key, {
+							// 	configurable: false,
+							// 	enumerable: false,
+							// 	writable: true
+							// })
 						}
-					})(propName, _propName, prop)
-				});
 
+						//prevent redirect happened
+						if (self[_key] !== oldValue) return;
 
-				//document `name:propName` listener
-				if ($el._mod.displayName) {
-					var docCb = function(e){
-						// console.log("doc cb", e)
-						e = e.originalEvent || e;
-						if (e.detail.value) $el[e.type.split(":")[1]] = e.detail.value;
-					}.bind($el);
-					docCb.displayName = propName;
-					activeEvents.push(docCb)
-						// LOG && console.log("register", $el._mod.displayName + ":" + propName)
-					on(doc, $el._mod.displayName + ":" + propName, docCb);
-				}
-			}
+						//set new value
+						self[ _key ] = value;
 
-			//init custom value passed
-			if (initValues && (propName in initValues))
-				$el[propName] = initValues[propName];
-			else
-				$el[propName] = propValue;
+						//enter state routines
+						var beforeResult;
+						if (desc.values) {
+							var stateValue = desc.values[value] ? value : '_';
+							var state = desc.values[stateValue];
+
+							if (state){
+								//enter state, if there’s any
+								beforeResult = isFn(state) ? state.call($el) : enterState(self, key + capfirst(stateValue), state);
+							} else {
+								//if there’s no state to enter - attempt to reset values
+
+							}
+
+							//fire entering event
+							fire(self, key + capfirst(value))
+
+							//check whether state redirect needed
+							if (beforeResult !== undefined) {
+								//revert state if false returned
+								if (beforeResult === false) {
+									self[key] = oldValue;
+								}
+								//redirect state if returned any
+								else {
+									self[key] = beforeResult;
+								}
+								return;
+							}
+						}
+
+						//call change validator, if any
+						else if (desc.change && !self['__change' + key]) {
+							self['__change' + key] = true;
+							try {
+								var changedValue = desc.change.call(self, value, oldValue)
+							} catch (e) {
+								self[_key] = oldValue;
+								err(e);
+							}
+							if (changedValue === false) self[_key] = oldValue;
+							else if (changedValue !== undefined) self[_key] = changedValue;
+							self['__change' + key] = null;
+						}
+
+						//update attribute
+						desc.attribute && setAttrValue(self, key, value);
+
+						//notify change
+						fire(self, escape(key) + "Changed", {key: key, value: value, oldValue: oldValue});
+
+						//clean redirect counter
+						self.__stateRedirectCount = 0;
+					}
+				})(propName, _propName, prop)
+			});
 		}
+
+
+		//set callback method reference (do not set value then)
+		if (isFn($el[propValue])){
+			// console.log("on method reference", propName, propValue, $el[propName]);
+			on($el, propName, propValue)
+
+		}
+
+		//set custom value passed/assign value
+		else if (!isFn(propValue) && initValues && (propName in initValues)){
+			// console.log("set init value", propName, propValue)
+			$el[propName] = initValues[propName];
+		}
+
+		//just set value
+		else {
+			// console.log("set custom value", propName, propValue)
+			$el[propName] = propValue;
+		}
+
+		//set straigt method callback (always by method reference, not the real fn)
+		if (isFn(propValue)) {
+			// console.log("on method", propName, propValue);
+			on($el, propName, propName)
+		}
+
 	});
 
 	var beforeResult;
 	if (props.before){
-		beforeResult = props.before.call($el);
+		beforeResult = props.before.value.call($el);
 	}
 
-	// LOG && console.groupEnd()
+	// console.groupEnd()
 
 	return beforeResult
 }
+
 
 /**
 * undefine state properties passed with the name passed
 */
 function leaveState($el, stateKey, props){
-	var activeEvents = $el['__' + stateKey],
-		afterCbResult;
+	// console.group("leave state", stateKey)
+	var afterCbResult;
 
-	// LOG && console.group("from state", stateKey, activeEvents, activeEvents.after)
+	//fire leaving state
+	if ($el.__after) {
+		afterCbResult = $el.__after.call($el);
 
-	if (activeEvents) {
-		//fire leaving state
-
-		if (activeEvents.after) {
-			afterCbResult = activeEvents.after.call($el);
-
-			//ignore entering state if false returned
-			if (afterCbResult === false) return false;
-		}
-
-		//unbind all previously bound callbacks/methods
-		activeEvents.forEach(function(activeEvent){
-			off($el, activeEvent.displayName, activeEvent)
-			$el._mod.displayName && off(doc, $el._mod.displayName + ":" + activeEvent.displayName, activeEvent)
-		})
-
-		//discard active events
-		activeEvents.length = 0;
+		//ignore entering state if false returned
+		if (afterCbResult === false) return false;
 	}
 
-	LOG && console.groupEnd()
+	//unbind all previously bound callbacks/methods
+	for(var evtRef in props) {
+		if (techCbRe.test(evtRef) || props[evtRef] === undefined) continue;
+		// console.log("off", evtRef)
+		if ($el[props[evtRef].value]) off($el, evtRef, props[evtRef].value);
+		else off($el, evtRef, evtRef);
+	}
+
+	//discard active events
+	$el.__after = null;
+
+	// console.groupEnd()
 
 	return afterCbResult;
 }
@@ -1036,6 +1052,8 @@ Mod.extend = function(props){
 	//merge passed properties with initial
 	// console.log("extend", CustomMod.properties, self.properties, props)
 	deepExtend(CustomMod.properties, self.properties, props);
+
+	CustomMod.properties = normalizeProperties(CustomMod.properties)
 
 	// LOG && console.groupEnd()
 
@@ -1180,10 +1198,12 @@ function setAttrValue($el, attrName, value){
 }
 
 
+var techCbRe = /^(?:init|before|after|created)$/;
+
 //return ordered list of properties
 function sortPropsByOrder(keys, props){
 	return keys.filter(function(a){
-		return !(/^(?:init|before|after|created)$/.test(a))
+		return !(techCbRe.test(a))// && a[0] !== "_"
 	}).sort(function(a,b){
 		return (getPropOrder(a, props[a]) > getPropOrder(b, props[b]) ? 1 : -1)
 	})
@@ -1197,18 +1217,18 @@ function getPropOrder(name, prop){
 		return 1;
 	} else if (prop.order !== undefined){
 		return prop.order;
-	} else if (isFn(prop)) {
-		//functions
+	} else if (isFn(prop.value)) {
+		//methods
 		return 1;
-	} else if (!isObject(prop)){
-		//plain values, including stringy fn declarations
-		return 2;
-	} else if ('change' in prop){
+	} else if (prop.change){
 		//descriptors with change fn
 		return 4;
-	} else if ('values' in prop){
+	} else if (prop.values){
 		//stateful descriptors: most dependable
 		return 5;
+	} else if (!isObject(prop.value)){
+		//plain values, including stringy fn declarations
+		return 2;
 	} else {
 		//simple descriptors
 		return 3;
@@ -1224,4 +1244,87 @@ function getPropDesc(prop){
 	if (prop.hasOwnProperty('values') || 'value' in prop || prop.change) return prop
 
 	return {value: prop};
+}
+
+
+function normalizeProperties(props){
+	//ensure descriptors
+	for (var propName in props){
+		if (propName[0] !== "_") props[propName] = getPropDesc(props[propName]);
+	}
+
+	//normalize properties quantity
+	for (var propName in props){
+		var prop = props[propName];
+
+		//normalize states
+		if (prop.values){
+			var allProps = {};
+
+			//disentangle listed properties
+			prop.values = flattenListedStates(prop.values);
+
+			//ensure empty state is present
+			if (!prop.values._) prop.values._ = {};
+
+			//collect the complete set of properties for the state
+			for (var value in prop.values) {
+				for (var subPropName in prop.values[value]) {
+					//ensure descriptor for non-rest properties
+					if (subPropName[0] !== "_") {
+						prop.values[value][subPropName] = getPropDesc(prop.values[value][subPropName])
+					}
+
+					//save not collected value
+					if (!(subPropName in allProps)){
+						//save default property value
+						if (value === "_") {
+							if (!techCbRe.test(subPropName)){
+								allProps[subPropName] = prop.values._[subPropName]
+							} else {
+								allProps[subPropName] = null;
+							}
+						} else {
+							//ensure element’s property exists
+							// if (!techCbRe.test(subPropName) && !(subPropName in props)){
+							// 	props[subPropName] = {value: undefined}
+							// }
+							allProps[subPropName] = props[subPropName];
+						}
+					}
+				}
+			}
+
+			//ensure every state's fullness
+			for (var value in prop.values){
+				prop.values[value] = extend({}, allProps, prop.values[value]);
+			}
+		}
+	}
+
+	// console.log("ext props", props)
+
+	return props;
+}
+
+
+//disentangle listed state values
+function flattenListedStates(values){
+
+	// console.log("before", values)
+
+	for(var valueNameList in values){
+		if (/,/.test(valueNameList)){
+			var value = values[valueNameList];
+			delete values[valueNameList];
+
+			each(valueNameList, function(valueName){
+				values[valueName] = value;
+			})
+		}
+	}
+
+	// console.log("after", values);
+
+	return values;
 }

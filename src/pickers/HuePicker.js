@@ -1,8 +1,8 @@
-/* Hue slider */
+/* Hue picker */
 Picker = Picker.extend({
 	mode: {
 		values: {
-			hue: {
+			'hue, h': {
 				min: 0,
 				max: 360,
 				value: 0,
