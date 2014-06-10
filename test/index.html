@@ -1,0 +1,59 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Slidy tests</title>
+	<link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
+
+	<style>
+		.picker {
+			width: 200px;
+			height: 30px;
+			outline: 1px solid #f3f3f3;
+		}
+
+		.picker > .draggable{
+			width: 20px;
+			height: 20px;
+			/*background: white;*/
+			border-radius: 10px;
+			box-shadow: inset 0 0 1px 1px rgba(240,250,255,.5), 0 0 1px 1px rgba(0,10,20,.25);
+			position: relative;
+		}
+
+	</style>
+</head>
+<body>
+	<div id="mocha"></div>
+
+	<!--<script src="../node_modules/jquery/dist/jquery.min.js"></script>-->
+
+	<script src="../node_modules/mocha/mocha.js"></script>
+	<script src="../node_modules/chai/chai.js"></script>
+
+	<!--[if IE 9]>
+	<script src="../src/polyfill.js"></script>
+	<![endif]-->
+
+	<script src="../src/mod.js"></script>
+	<script src="../src/Draggable.js"></script>
+	<script src="../src/Slidy.js"></script>
+
+	<script src="../src/Picker.js"></script>
+	<script src="../src/pickers/HuePicker.js"></script>
+	<script src="../src/Picky.js"></script>
+
+	<script>
+		mocha.setup('bdd');
+		assert = chai.assert;
+	</script>
+
+	<script src="testHelpers.js"></script>
+	<script src="picker.js"></script>
+	<script src="picky.js"></script>
+
+	<script>
+		mocha.checkLeaks();
+		mocha.run();
+	</script>
+</body>
+</html>

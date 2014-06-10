@@ -4,25 +4,66 @@
 *
 * Custom pickers extend possible mode values by extension and redefinition `mode`.
 */
-//TODO: get rid of or use in full strength
 var Picker = Slidy.extend({
+	//color model to reflect value in
+	color: null,
 	picky: null,
+
 	threshold: 0,
-	mode: {
+
+	//component[s] to pick
+	component:{
+		value: null,
 		values: {
 			_: {
-				change: function(){
-					console.log("picker change", this.value)
-					// this.picky.fire("change");
+
+			}
+		},
+
+		order: 2
+	},
+
+	//input/slidy mode of picking
+	mode: {
+		init: function(){
+			if(this.tagName === "INPUT") return "input";
+		},
+
+		values: {
+			//text-input mode
+			"input": {
+				before: function(){
+					console.log("to input mode")
 				},
 
-				'@picky change': 'render',
+				// change: function(){
 
-				render: function(){
-					console.log("undeifned picker render")
+				// }
+			},
+
+			//slidy mode
+			_: {
+				before: function(){
+					// console.log("before default mode")
+				},
+
+				change: function(){
+					// console.log("picker change", this.value)
+					this.setColor(this.value);
+
+					this.colorChanged();
+				},
+
+				'@picky change, colorChanged': function(){
+					// console.log("colorChanged")
+					this.setValue(this.color);
+
+					this.render();
 				}
 			}
-		}
+		},
+
+		order: 3
 	}
 
 })

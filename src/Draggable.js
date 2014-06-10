@@ -5,6 +5,16 @@ var Draggable = Mod.extend({
 
 	created: function(){
 		disableSelection(this);
+		// console.log("draggable created")
+	},
+
+	attached: function(){
+		//ensure pin correctness
+		// console.log("draggable attached")
+		if (this.pin[2] === 0){
+			// console.log("draggable attached")
+			// this.pin = [0,0,this.offsetWidth, this.offsetHeight];
+		}
 	},
 
 	//how many pixels to omit before switching to drag state
@@ -20,7 +30,8 @@ var Draggable = Mod.extend({
 	within: {
 		value: root,
 		change: function(within){
-			// console.log("within change", this.parentNode.id, within )
+			// console.log("within change", within )
+			// console.log(within, this.within, this.parentNode)
 			if (within instanceof Element){
 				this.within = within
 			} else if (typeof within === "string"){
@@ -37,6 +48,7 @@ var Draggable = Mod.extend({
 	pin: {
 		value: [],
 		change: function(value){
+			// console.log("pin changed", value)
 			try {
 				if (value.length === 2){
 					value = [value[0], value[1], value[0], value[1]];
@@ -65,7 +77,10 @@ var Draggable = Mod.extend({
 	translate3d: true,
 
 	//to what extent round position
-	precision: 1,
+	precision: {
+		value: 1,
+		order: 0
+	},
 
 	//slow down movement by pressing ctrl
 	sniper: true,
@@ -74,7 +89,15 @@ var Draggable = Mod.extend({
 	sniperSpeed: .15,
 
 	//false, 'x', 'y'
-	axis: false,
+	axis: {
+		value: null,
+		values: {
+			x: 'x',
+			y: 'y',
+			null: null,
+			_: null
+		}
+	},
 
 	//repeat position by one of axis
 	repeat: {
@@ -84,6 +107,7 @@ var Draggable = Mod.extend({
 			x: null,
 			y: null,
 			_: function(){
+				//TODO
 				//vector passed
 				if (this.repeat instanceof Array){
 					if (this.repeat.length){
@@ -97,7 +121,7 @@ var Draggable = Mod.extend({
 
 				//just repeat any possible way
 				} else if (this.repeat === true){
-					return this.axis ? this.axis : "both"
+					return this.axis
 
 				//unrecognized value passed
 				} else {
@@ -131,11 +155,13 @@ var Draggable = Mod.extend({
 			this.x = round(value, this.precision)
 
 			updatePosition(this)
-		}
+		},
+		order: 1
 	},
 	y: {
 		value: 0,
 		change: function(value, old){
+			// console.log("set y", value, this._limits)
 			if (this.repeat === 'both' || this.repeat === 'y'){
 				//mind repeat
 				if (value < this._limits.top){
@@ -144,6 +170,7 @@ var Draggable = Mod.extend({
 					value -= this._limits.bottom - this._limits.top;
 				}
 			} else if (!this.axis || this.axis === "y"){
+				// console.log("axis", this._limits)
 				//mind axis
 				value = between(value,
 					this._limits.top,
@@ -156,7 +183,8 @@ var Draggable = Mod.extend({
 			this.y = round(value, this.precision)
 
 			updatePosition(this);
-		}
+		},
+		order: 1
 	},
 
 	//use native drag
@@ -186,15 +214,13 @@ var Draggable = Mod.extend({
 			//non-native drag
 			idle: {
 				before: function(){
-					// console.log("before idle")
-					this.updateLimits();
-
 					//go native
 					if (this.native) this.dragstate = "native";
 				},
 
 				mousedown: function(e){
 					// console.log("ready click")
+					this.updateLimits();
 					initDragparams(this, e);
 					this.dragstate = "threshold";
 				}
@@ -210,7 +236,7 @@ var Draggable = Mod.extend({
 					//console.log("ts after")
 				},
 				'document mousemove': function(e){
-					//console.log("move in", this.threshold)
+					// console.log("move in", this.threshold)
 					var difX = (e.clientX - this._dragparams.initX);
 					var difY = (e.clientY - this._dragparams.initY);
 
@@ -341,8 +367,10 @@ var Draggable = Mod.extend({
 			//console.log("outside")
 
 			//move to that new place
-			if (!this.axis || this.axis === "x") this.x = eAbsoluteX - this.oX - offsetX;
-			if (!this.axis || this.axis === "y") this.y = eAbsoluteY - this.oY - offsetY;
+			if (!this.axis || this.axis === "x")
+				this.x = eAbsoluteX - this.oX - offsetX;
+			if (!this.axis || this.axis === "y")
+				this.y = eAbsoluteY - this.oY - offsetY;
 
 			//pretend as if drag has happened
 			d = initDragparams(this, {
@@ -355,7 +383,7 @@ var Draggable = Mod.extend({
 
 			fire(this, 'drag', null, true)
 		} else {
-			//console.log("inside")
+			// console.log("inside")
 			if (!d) d = initDragparams(this, e);
 			offsetX = e.pageX - this._offsets.left;
 			offsetY = e.pageY - this._offsets.top;
@@ -372,6 +400,7 @@ var Draggable = Mod.extend({
 		//relative coords (from initial(zero) position)
 		d.x = eAbsoluteX - this.oX;
 		d.y = eAbsoluteY - this.oY;
+		// console.log(d.x)
 
 		//sniper run distances
 		d.sniperRunX = 0;
@@ -406,6 +435,7 @@ var Draggable = Mod.extend({
 		//move according to dragstate
 		this.x = d.x - d.offsetX - d.sniperRunX;
 		this.y = d.y - d.offsetY - d.sniperRunY;
+		// console.log(this.x, d.x - d.offsetX - d.sniperRunX)
 
 		//if within limits - move buy difX
 		// this.x += difX;
@@ -420,9 +450,12 @@ var Draggable = Mod.extend({
 
 	//updates movement restrictions
 	updateLimits: function(){
-		// console.log("upd")
+
+		if (!this.isAttached) return;
+
 		//it is here because not always element is in DOM when constructor inits
 		var limOffsets = offsets(this.within);
+		// console.log("upd limits", limOffsets)
 
 		this._offsets = offsets(this);
 
@@ -430,8 +463,7 @@ var Draggable = Mod.extend({
 
 		//save relative coord system offsets
 		this.oX = this._offsets.left - this.x;
-		this.oY = this._offsets.top - this.y;
-
+		this.oY = this._offsets.top - this.y
 		var pin = this.pin;
 
 		//pinArea-including version
@@ -451,6 +483,17 @@ var Draggable = Mod.extend({
 		left: 0,
 		bottom: 0,
 		right: 0
+	},
+
+	_offsets: {
+		top: 0,
+		left: 0,
+		bottom: 0,
+		right: 0
+	},
+
+	'window resize': function(){
+		this.updateLimits();
 	}
 }).register("draggable");
 

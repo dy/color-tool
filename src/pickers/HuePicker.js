@@ -1,30 +1,30 @@
 /* Hue picker */
 Picker = Picker.extend({
-	mode: {
+	component: {
 		values: {
-			'hue, h': {
+			'hue': {
 				min: 0,
 				max: 360,
-				value: 0,
-				change: function(){
-					this.picky.color.hue = this.value;
+
+				before: function(){
+					// console.log("before hue")
 				},
-				'@picky change': function(){
-					//console.log("picky changed")
-					this.value = this.picky.color.hue
-				}
+
+				setColor: function(value){
+					// console.log("huepicker setColor", value)
+					this.color.hue = value;
+				},
+				setValue: function(color){
+					// console.log("huepicker setValue", color)
+					this.value = color.hue
+				},
 
 				//API
 				render: function(){
-					//console.log("hue render", color)
-
-					//render visuals
-					if (this.state !== "ready") return;
-
-					this.updatePosition();
+					console.log("hue render", this.color)
 
 					//model
-					var color = this.picky.color;
+					var color = this.color;
 					var s = color.saturation + "%",
 						h = color.hue,
 						b = color.lightness + "%";
@@ -33,7 +33,7 @@ Picker = Picker.extend({
 					//var direction = this.
 
 					//hue
-					var direction = this.vertical ? "top" : "right";
+					var direction = this.type === "vertical" ? "top" : "right";
 					var bg = ["linear-gradient(to " + direction + ",",
 						"hsl(0," + s + "," + b + "%) 0%,",
 						"hsl(60," + s + "," + b + "%) 16.666%,",

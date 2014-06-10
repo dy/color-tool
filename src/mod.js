@@ -119,6 +119,17 @@ function deepExtend(a){
 	return a;
 }
 
+//sinple clone of any value passed (mod instance init)
+function clone(a){
+	if (a instanceof Array) {
+		return a.slice();
+	}
+	if (isObject(a)){
+		return deepExtend({}, a);
+	}
+	return a;
+}
+
 function isObject(a){
 	return (a && a !== null && typeof a === "object" && !(a instanceof Array ) && !(a.nodeType))
 }
@@ -161,13 +172,18 @@ function isEqual(a, b){
 var _commaSplitRe = /\s*,\s*/;
 
 //match every comma-separated element ignoring 1-level parenthesis, like `1,2(3,4),5`
-var _commaMatchRe = /([^,]+?(?:\([^()]+\))?)(?=,|$)/g
+// var _commaMatchRe = /([^,]*?(?:\([^()]+\))?)(?=,)|,([^,]*?(?:\([^()]+\))?)(?=$)/g
+var _commaMatchRe = /(,[^,]*?(?:\([^()]+\)[^,]*)?)(?=,|$)/g
 
 //iterate over every item in string
 function each(str, fn){
-	var list = str.match(_commaMatchRe) || [''];
-	for(var i = 0; i < list.length; i++){
-		fn(list[i].trim(), i)
+	var list = ("," + str).match(_commaMatchRe) || [''];
+	for (var i = 0; i < list.length; i++) {
+		// console.log(matchStr)
+		var matchStr = list[i].trim();
+		if (matchStr[0] === ",") matchStr = matchStr.slice(1);
+		matchStr = matchStr.trim();
+		fn(matchStr, i);
 	}
 }
 
@@ -207,7 +223,7 @@ function selector(element) {
 
 //return absolute offsets
 function offsets(el){
-	if (!el) err("Bad offsets target", el);
+	if (!el) throw Error("Bad offsets target", el);
 	try{
 		var rect = el.getBoundingClientRect()
 		return {
@@ -310,12 +326,11 @@ function css($el, style, value){
 
 
 //Binds event declaration
-//TODO: make delegate as event-property `:delegate(selector)`
-//TODO: pass array of functions to bind
-//TODO: bind evtObj passed {evt, src, fn}
+//method reference could be passed
 var _modifierParamsRe = /\(([^)]*)\)/;
 function on($el, evtRefs, fn){
 	var methName;
+
 	if (!fn) return false;
 
 	//create method caller for stringy method reference
@@ -341,13 +356,13 @@ function on($el, evtRefs, fn){
 		if (methName && $el.__methodReferenceCallbacks[evtRef + methName]) return;
 
 		evtObj.modifiers.forEach(function(modifier){
-			if (/onc?e/.test(modifier)){
+			if (/^onc?e/.test(modifier)){
 				targetFn = evtModifiers.one(evtObj.evt, targetFn)
-			} else if (/delegate/.test(modifier)){
+			} else if (/^delegate/.test(modifier)){
 				//parse params
 				var selector = modifier.match(_modifierParamsRe)[1]
 				targetFn = evtModifiers.delegate(evtObj.evt, targetFn, selector)
-			} else if (/pass/.test(modifier)){
+			} else if (/^pass/.test(modifier)){
 				var keys = modifier.match(_modifierParamsRe)[1].split(_commaSplitRe).map(upper);
 				targetFn = evtModifiers.pass(evtObj.evt, targetFn, keys);
 				// console.log("bind", targetFn)
@@ -357,8 +372,19 @@ function on($el, evtRefs, fn){
 			}
 		})
 
-		//ignore absent property to bind event
-		if (!evtObj.src) err("Bad event target");
+		//save property event target to bind in a deferred way
+		// console.log("on", evtObj)
+		if (evtObj.src[0] === "@"){
+			var targetEl = $el[evtObj.src.slice(1)];
+			// console.log("not existing property event reference", evtObj)
+			if (!targetEl) {
+				return false;
+			} else evtObj.src = targetEl;
+
+			//save evt target to unbind
+			targetFn._evtTarget = targetEl;
+			// throw Error("Bad event target " + evtRef);
+		}
 
 		//bind target fn
 		if ($){
@@ -387,11 +413,20 @@ function off($el, evtRefs, fn){
 
 		//unbind method reference
 		if (typeof fn === "string"){
+			// console.log("off", $el.__methodReferenceCallbacks)
 			if (!$el.__methodReferenceCallbacks) return;
 			targetFn = $el.__methodReferenceCallbacks[evtRef + fn]
 			$el.__methodReferenceCallbacks[evtRef + fn] = null;
 		} else {
 			targetFn = fn;
+		}
+
+		if (!targetFn) return fn;
+
+		if (evtObj.src[0] === "@") {
+			//get saved evt target
+			if (targetFn._evtTarget) evtObj.src = targetFn._evtTarget;
+			else return false;
 		}
 
 		if ($){
@@ -408,13 +443,14 @@ function off($el, evtRefs, fn){
 
 //event callbacks modifiers factory
 //TODO: automatically identify all these modifiers in `on`
+var DENY_EVT_CODE = 1;
 var evtModifiers = {
 	//call callback once
 	one: function(evt, fn){
 		var cb = function(){
 			// console.log("once cb", fn)
 			var result = fn && fn.apply(this, arguments);
-			result !== false && off(this, evt, cb);
+			result !== DENY_EVT_CODE && off(this, evt, cb);
 			return result;
 		}
 		return cb;
@@ -423,17 +459,16 @@ var evtModifiers = {
 	//filter keys
 	pass: function(evt, fn, keys){
 		var cb = function(e){
-			// console.log("pass cb", e)
-			var pass = false;
-			keys.forEach(function(key){
-				if ((key in keyDict && keyDict[key] == e.which) || e.which == key){
+			var pass = false, key;
+			for (var i = keys.length; i--;){
+				key = keys[i]
+				var which = 'originalEvent' in e ? e.originalEvent.which : e.which;
+				if ((key in keyDict && keyDict[key] == which) || which == key){
 					pass = true;
+					return fn.apply(this, arguments);
 				}
-			});
-			if (pass) {
-				return fn.apply(this, arguments);
-			}
-			return false;
+			};
+			return DENY_EVT_CODE;
 		}
 		return cb
 	},
@@ -441,11 +476,17 @@ var evtModifiers = {
 	//filter target
 	delegate: function(evt, fn, selector){
 		var cb = function(e){
-			// console.log("delegate cb", e, selector)
-			if (matchSelector.call(e.target, selector)) {
-				return fn.apply(this, arguments);
+			// console.log("delegate cb", e.target, selector)
+			if (!(e.target instanceof HTMLElement)) return DENY_EVT_CODE;
+
+			var target = e.target;
+
+			while (target && target !== this) {
+				if (matchSelector.call(target, selector)) return fn.apply(this, arguments);
+				target = target.parentNode;
 			}
-			return false;
+
+			return DENY_EVT_CODE;
 		}
 		return cb;
 	}
@@ -453,8 +494,9 @@ var evtModifiers = {
 
 //returns parsed event object from event reference
 function _parseEvtRef($el, evtRef){
-	// console.log("parse reference", '`' + evtRef + '`')
+	// console.group("parse reference", '`' + evtRef + '`')
 	var evtDecl = evtRef.match(/\w+(?:\:\w+(?:\(.+\))?)*$/)[0];
+	// console.log(evtDecl)
 	var evtObj = {};
 	evtRef = evtRef.slice(0, -evtDecl.length).trim()
 	// console.log("result ref", evtRef)
@@ -470,24 +512,26 @@ function _parseEvtRef($el, evtRef){
 	});
 
 	// console.log(evtObj)
+	// console.groupEnd();
 	return evtObj;
 }
 
 //detect source element from string
-function parseTarget($el, str){
+function parseTarget($el, str) {
 	if (!str){
 		return $el
-	} if (str === 'document'){
+	} if (/^document/i.test(str)) {
 		return doc;
-	} else if (str === 'window'){
+	} else if (/^window/i.test(str)) {
 		return win;
-	} else if (str === 'root') {
+	} else if (/^root/i.test(str)) {
 		return root
-	}  else if (str === 'parent') {
+	}  else if (/parent/i.test(str) || '..' === str) {
 		return $el.parentNode
 	} else if (str[0] === '@') {
 		//`this` reference
-		return $el[str.slice(1)]
+		// return $el[str.slice(1)]
+		return str;
 	} else if (/^[.#[]/.test(str)) {
 		//custom one-word selector
 		return doc.querySelector(str);
@@ -503,11 +547,12 @@ function preventDefault(e){
 //dispatch event
 function fire(el, eventName, data, bubbles){
 	if ($){
-		//TODO: decide how to pass data & bubbleable to triggerHandler
-		var event = $.Event( eventName );
+		//TODO: decide how to pass data
+		var event = $.Event( eventName, data );
 		event.detail = data;
-		$(el).triggerHandler(event);
+		bubbles ? $(el).trigger(event) : $(el).triggerHandler(event);
 	} else {
+		//NOTE: this doesnot bubble in disattached elements
 		var event;
 		if (!(eventName instanceof Event)) {
 			event =  doc.createEvent("CustomEvent");
@@ -525,7 +570,7 @@ function fire(el, eventName, data, bubbles){
 */
 //limiter
 function between(a, min, max){
-	return Math.max(Math.min(a,max),min);
+	return max > min ? Math.max(Math.min(a,max),min) : Math.max(Math.min(a,min),max)
 }
 function isBetween(a, left, right){
 	if (a <= right && a >= left) return true;
@@ -533,12 +578,20 @@ function isBetween(a, left, right){
 }
 
 //precision round
-function round(value, precision){
-	precision = parseInt(precision);
-	if (precision === 0) return value;
-	return Math.round(value / precision) * precision
+function round(value, step) {
+	step = parseFloat(step);
+	if (step === 0) return value;
+	value = Math.round(value / step) * step
+	return parseFloat(value.toFixed(getPrecision(step)));
 }
 
+//get precision from float: 1.1 → 1, 1234 → 0, .1234 → 4
+function getPrecision(n){
+	 var s = n + "",
+        d = s.indexOf('.') + 1;
+
+    return !d ? 0 : s.length - d;
+}
 
 
 /**
@@ -599,10 +652,11 @@ function parseArray(str){
 	if (str.length > 1 && str[str.length - 1] === "]") str = str.slice(0,-1);
 
 	var result = [];
-	each(str, function(value){
+	each(str, function(value) {
 		result.push(parseAttr(value))
 	})
-	return result
+
+	return result;
 }
 
 //camel-case → CamelCase
@@ -660,15 +714,6 @@ function stringify(el){
 		return el.toString();
 	}
 }
-
-
-
-//Error
-function err(str){
-	//TODO: concat arguments, wrap non-strings
-	//TODO: recognize typed errors passed
-	throw new Error(str);
-}
 //→
 /**
 * Controller on elements
@@ -698,33 +743,26 @@ function Mod($el, opts){
 	//check first time init
 	if ($el._mod) {
 		//prevent double instantiation
-		if ($el._mod === CurrentMod) {
+		if ($el._mod === CurrentMod || (
+			($el._mod.displayName && CurrentMod.displayName) &&
+			($el._mod.displayName === CurrentMod.displayName))) {
 			return $el;
 		}
 
 		//create new anonymous mod merging passed mod
-		CurrentMod = CurrentMod.extend($el._mod);
+		//NOTE: Can’t find actual useful cases to keep reference to previous mods
+		// CurrentMod = CurrentMod.extend($el._mod);
 	} else {
 		//create anonymous customMod, if straight Mod constructor called
+
 		if (CurrentMod === Mod){
 			CurrentMod = Mod.extend();
 		}
 	}
 
-	//save current mod class
-	$el._mod = CurrentMod;
-
 	//keep track of instances
 	$el._id = CurrentMod.instances.length;
 	CurrentMod.instances.push($el);
-
-	//prevent DOM interference
-	//TODO: detect and handle native attributes
-	// for (var optName in CurrentMod.options){
-	// 	if (optName in self){
-			// LOG && console.log(CurrentMod.displayName, "native", optName, '`' + self[optName] + '`', '`' + this[optName] + '`')
-	// 	}
-	// }
 
 	//treat element
 	if (CurrentMod.displayName) {
@@ -732,30 +770,46 @@ function Mod($el, opts){
 	}
 
 	//save callbacks
-	var initCb =   CurrentMod.properties.init && CurrentMod.properties.init.value;
+	var initCb = CurrentMod.properties.init && CurrentMod.properties.init.value;
 	var createdCb = CurrentMod.properties.created && CurrentMod.properties.created.value;
 
 
 	//save predefined element properties, as well as other defined properties
 	var preinit = {};
+	var testElement = $el.cloneNode();
+
 	for (var propName in CurrentMod.properties) {
 		if (propName[0] === "_") continue;
 
 		//read element property
-		if (propName in $el) preinit[propName] = $el[propName];
+		if (propName in $el) {
+			//prevent DOM interfering property
+			if (!(/^on/.test(propName)) &&
+				(($el._mod && $el._mod.properties && propName in $el._mod.properties) ||
+					propName in testElement)
+				) {
+				// console.log("Interfering property `" + propName + "` in creating `" + CurrentMod.displayName + "` over `" + ($el._mod && $el._mod.displayName || $el.tagName) + "`")
+				throw Error("Interfering property `" + propName + "` in creating `" + CurrentMod.displayName + "` over `" + ($el._mod && $el._mod.displayName || $el.tagName) + "`")
+			} else {
+				//save predefined element value
+				preinit[propName] = $el[propName];
+			}
+		}
 
 		//if no preset value defined - read value from attributes
 		else {
 			var propValue = CurrentMod.properties[propName].value
-
 			var attr = $el.attributes[propName] || $el.attributes["data-" + propName];
 			if (attr) {
-				if (propName.slice(0,2) === "on") preinit[propName] = new Function(attr.value);
+				if (/^on/.test(propName)) preinit[propName] = new Function(attr.value);
 				else preinit[propName] = parseTypedAttr(attr.value, propValue);
 			}
 		}
 	}
 	opts = extend(preinit, opts);
+
+	//save current mod class
+	$el._mod = CurrentMod;
 
 	//call init
 	on($el, "init:one", initCb);
@@ -764,18 +818,23 @@ function Mod($el, opts){
 
 	//enter default state (1st level attributes)
 	$el.__stateRedirectCount = 0;
-	enterState($el, "create", CurrentMod.properties, opts);
 
-	//init additional passed options
+	//init passed listeners beforehead
 	for (var propName in opts){
 		var value = opts[propName];
-		//additional callback
-		if (isFn(value) && !/^(created|init)$/.test(propName)) {
+		if (isFn(value)) {
 			// console.log("additional callback", propName)
 			on($el, propName, value.bind($el));
+			opts[propName] = null
 		}
-		//additional property
-		else if (value !== undefined && !(propName in $el)) {
+	}
+
+	enterState($el, "create", CurrentMod.properties, opts);
+
+	//init passed values
+	for (var propName in opts){
+		var value = opts[propName];
+		if (value !== undefined && !(propName in $el)) {
 			// console.log("additional property", propName)
 			$el[propName] = value;
 		}
@@ -798,10 +857,10 @@ function Mod($el, opts){
 function enterState($el, stateKey, props, initValues){
 	if (!props) return;
 
-	// console.group("to state:", stateKey)
-
 	//sort properties
 	var orderedProps = sortPropsByOrder(Object.keys(props), props);
+
+	// console.group("enterState:", stateKey, orderedProps)
 
 	//save after method
 	if (props.after) $el.__after = props.after.value;
@@ -815,7 +874,7 @@ function enterState($el, stateKey, props, initValues){
 		//ignore empty props
 		if (prop === undefined) return;
 
-		var initValue, propValue = prop.value;
+		var initValue, propValue = clone(prop.value);
 
 		//set private/defined/non-descriptor property
 		if (propName[0] === "_"){
@@ -823,7 +882,7 @@ function enterState($el, stateKey, props, initValues){
 			return;
 		}
 
-		//define property, if not already
+		//define property, if is not already
 		else if(!(propName in $el)){
 			// console.log("define prop", propName, 'in state', stateKey)
 
@@ -842,7 +901,7 @@ function enterState($el, stateKey, props, initValues){
 					return function(value){
 						var self = this;
 
-						//LOG && console.log("set value", key, '`' + value + '` from', self[ _key ])
+						// console.log("set value", key, '`' + value + '` from', self[ _key ])
 
 						//save old value
 						var oldValue = self[_key];
@@ -853,7 +912,7 @@ function enterState($el, stateKey, props, initValues){
 
 							//count redirects
 							self.__stateRedirectCount++;
-							if (self.__stateRedirectCount >= Mod._maxRedirects) err("Too many redirects in " + key);
+							if (self.__stateRedirectCount >= Mod._maxRedirects) throw Error("Too many redirects in " + key);
 
 							//leave state routines
 							if (desc.values) {
@@ -902,12 +961,12 @@ function enterState($el, stateKey, props, initValues){
 						//enter state routines
 						var beforeResult;
 						if (desc.values) {
-							var stateValue = desc.values[value] ? value : '_';
+							var stateValue = value in desc.values ? value : '_';
 							var state = desc.values[stateValue];
 
-							if (state){
+							if (stateValue in desc.values){
 								//enter state, if there’s any
-								beforeResult = isFn(state) ? state.call($el) : enterState(self, key + capfirst(stateValue), state);
+								beforeResult = enterState(self, key + capfirst(stateValue), state);
 							} else {
 								//if there’s no state to enter - attempt to reset values
 
@@ -937,7 +996,7 @@ function enterState($el, stateKey, props, initValues){
 								var changedValue = desc.change.call(self, value, oldValue)
 							} catch (e) {
 								self[_key] = oldValue;
-								err(e);
+								throw e
 							}
 							if (changedValue === false) self[_key] = oldValue;
 							else if (changedValue !== undefined) self[_key] = changedValue;
@@ -947,27 +1006,61 @@ function enterState($el, stateKey, props, initValues){
 						//update attribute
 						desc.attribute && setAttrValue(self, key, value);
 
+						//NOTE: this is going to be deprecated (no use-cases found)
 						//notify change
-						fire(self, escape(key) + "Changed", {key: key, value: value, oldValue: oldValue});
+						// fire(self, escape(key) + "Changed", {key: key, value: value, oldValue: oldValue});
 
 						//clean redirect counter
 						self.__stateRedirectCount = 0;
 					}
 				})(propName, _propName, prop)
 			});
+
+			//call init prop, if any
+			if (prop.init) {
+				propValue = prop.init.call($el, (propName in initValues) ? initValues[propName] : prop.value);
+				if (propValue === undefined) {
+					if (_propName in $el){
+						//if property was changed fromwithin init
+						initValues[propName] = $el[propName];
+					} else {
+						//if property hasn’t been changed - get back to value init
+						initValues[propName] = (propName in initValues) ? initValues[propName] : prop.value;
+					}
+				} else {
+					//if returned value
+					initValues[propName] = propValue;
+				}
+				// console.log("after init call", propValue)
+			}
+		}
+
+
+		//set straigt method callback (always by method reference, not the real fn)
+		if (isFn(propValue)) {
+			// console.log("on", propName, propName);
+			on($el, propName, propName)
+		} else {
+			//TODO: bind property state-redirector
+			// var redirectCb = function(){
+			// 	return function(){
+			// 		this[stateKey] = ???
+			// 	}
+			// }
+			// $el[_propName + 'RedirectCb'] = redirectCb;
+			// on($el, propName, redirectCb)
 		}
 
 
 		//set callback method reference (do not set value then)
-		if (isFn($el[propValue])){
-			// console.log("on method reference", propName, propValue, $el[propName]);
+		var isRef = false;
+		if (isFn($el[propValue])) {
 			on($el, propName, propValue)
-
 		}
 
 		//set custom value passed/assign value
-		else if (!isFn(propValue) && initValues && (propName in initValues)){
-			// console.log("set init value", propName, propValue)
+		else if (!isFn(propValue) && initValues && (propName in initValues)) {
+			// console.log("set init value", propName, propValue, initValues[propName])
 			$el[propName] = initValues[propName];
 		}
 
@@ -975,12 +1068,6 @@ function enterState($el, stateKey, props, initValues){
 		else {
 			// console.log("set custom value", propName, propValue)
 			$el[propName] = propValue;
-		}
-
-		//set straigt method callback (always by method reference, not the real fn)
-		if (isFn(propValue)) {
-			// console.log("on method", propName, propValue);
-			on($el, propName, propName)
 		}
 
 	});
@@ -1000,7 +1087,7 @@ function enterState($el, stateKey, props, initValues){
 * undefine state properties passed with the name passed
 */
 function leaveState($el, stateKey, props){
-	// console.group("leave state", stateKey)
+	// console.group("leave state", stateKey, props)
 	var afterCbResult;
 
 	//fire leaving state
@@ -1014,9 +1101,15 @@ function leaveState($el, stateKey, props){
 	//unbind all previously bound callbacks/methods
 	for(var evtRef in props) {
 		if (techCbRe.test(evtRef) || props[evtRef] === undefined) continue;
-		// console.log("off", evtRef)
-		if ($el[props[evtRef].value]) off($el, evtRef, props[evtRef].value);
-		else off($el, evtRef, evtRef);
+		if (isFn($el[props[evtRef].value])) {
+			// console.log("off ref", evtRef, props[evtRef].value)
+			//unbind reference
+			off($el, evtRef, props[evtRef].value);
+		} else {
+			// console.log("off", evtRef)
+			//unbind method
+			off($el, evtRef, evtRef);
+		}
 	}
 
 	//discard active events
@@ -1031,22 +1124,26 @@ function leaveState($el, stateKey, props){
 /**
 * Main mod creator
 */
-Mod.extend = function(props){
+Mod.extend = function(extObj){
 	var self = this;
 
-	// LOG && console.group('extend', props)
-
-	//ensure props list passed
-	props = props || {};
-
-	//handle mod passed
-	props = props.properties || props;
+	// console.group('extend', extObj)
 
 	//create new Mod
 	function CustomMod() { return Mod.apply(this, arguments); }
+
+	//ensure props list passed
+	extObj = extObj || {};
+
+	//handle mod passed
+	var props = extObj.properties || extObj;
+
+	//infer extending mod statics
 	CustomMod.instances = [];
 	CustomMod.extend = Mod.extend;
 	CustomMod.register = Mod.register;
+	CustomMod.displayName = self.displayName;
+	CustomMod.settings = self.settings;
 	CustomMod.properties = {};
 
 	//merge passed properties with initial
@@ -1055,7 +1152,7 @@ Mod.extend = function(props){
 
 	CustomMod.properties = normalizeProperties(CustomMod.properties)
 
-	// LOG && console.groupEnd()
+	// console.groupEnd()
 
 	return CustomMod;
 }
@@ -1071,7 +1168,9 @@ Mod.registry = {};
 Mod.register = function(name, settings){
 	var self = this;
 
-	if (!name || self === Mod) err("Bad arguments");
+	// console.log("register", name)
+
+	if (!name || self === Mod) throw Error("Bad arguments");
 
 	//recognize register options
 	settings = extend({
@@ -1110,7 +1209,14 @@ Mod.register = function(name, settings){
 	}
 
 	//Autoinit present in DOM elements
-	autoinit(self);
+	//init children
+	var targets = document.querySelectorAll(settings.selector);
+	for (var i = 0; i < targets.length; i++) {
+		// console.log("autoinit children")
+
+		new self(targets[i]);
+		fire(targets[i], "attached");
+	}
 
 	return self;
 }
@@ -1129,19 +1235,56 @@ if (MO) {
 			} else if (mutation.type === "childList"){
 				//check whether appended elements are Mods
 
-				var l = mutation.addedNodes.length
+				var l = mutation.addedNodes.length;
+
 				for (var i = 0; i < l; i++){
 					var el = mutation.addedNodes[i];
 
 					if (el.nodeType !== 1) continue;
 
 					//check whether element added is noname mod
-					// console.log(el, el._mod && el._mod.displayName)
-					if (el._mod && !el._mod.displayName) fire(el, "attached");
+					if (el._mod && !el._mod.displayName) {
+						if (!el.isAttached) {
+							el.isAttached = true;
+							fire(el, "attached");
+						}
+					}
+					//NOTE: noname mods within elements wont fire `attached`
 
-					//autoinit registered mods
+					//autoinit top-level registered mods
 					for (var modName in Mod.registry){
-						autoinit(Mod.registry[modName], el);
+						var mod = Mod.registry[modName];
+
+						if (matchSelector.call(el, mod.settings.selector)){
+							// console.log("autoinit parent", modName, el.isAttached)
+
+							new mod(el);
+
+							if (!el.isAttached) {
+								el.isAttached = true;
+								fire(el, "attached");
+							}
+						}
+					}
+
+					//autoinit low-level registered mods
+					for (var modName in Mod.registry){
+						var mod = Mod.registry[modName];
+
+						//init children
+						var targets = el.querySelectorAll(mod.settings.selector);
+
+						for (var j = 0; j < targets.length; j++){
+							var innerEl = targets[j];
+							// console.log("autoinit child", modName, el.isAttached)
+
+							new mod(innerEl);
+
+							if (!innerEl.isAttached) {
+								innerEl.isAttached = true;
+								fire(innerEl, "attached");
+							}
+						}
 					}
 				}
 
@@ -1164,25 +1307,6 @@ if (MO) {
 /**
 * helpers
 */
-
-//go by elements, init mods
-function autoinit(mod, parent){
-	parent = parent || root;
-	var selector = mod.settings.selector;
-
-	//init self
-	if (matchSelector.call(parent, selector)){
-		new mod(parent);
-		fire(parent, "attached");
-	}
-
-	//init children
-	var targets = parent.querySelectorAll(selector);
-	for (var i = 0; i < targets.length; i++){
-		new mod(targets[i]);
-		fire(targets[i], "attached");
-	}
-}
 
 
 //reflect passed value in attribute
@@ -1211,28 +1335,72 @@ function sortPropsByOrder(keys, props){
 
 
 //property init priority assessor
+//TODO: test whether order is ok
 function getPropOrder(name, prop){
-	if (name[0] === "_") return 0;
-	if (!prop) {
-		return 1;
-	} else if (prop.order !== undefined){
-		return prop.order;
-	} else if (isFn(prop.value)) {
-		//methods
-		return 1;
-	} else if (prop.change){
-		//descriptors with change fn
-		return 4;
-	} else if (prop.values){
-		//stateful descriptors: most dependable
-		return 5;
-	} else if (!isObject(prop.value)){
-		//plain values, including stringy fn declarations
-		return 2;
-	} else {
-		//simple descriptors
-		return 3;
+	var order = 0;
+
+	//private things are non-depending
+	if (name[0] === "_") {
+		return -10;
 	}
+
+	//non-descriptors are first-priority
+	if (!prop) {
+		return -9;
+	}
+
+	//predefined order is out of question
+	if (prop.order !== undefined){
+		return prop.order;
+	}
+
+	//if plain prop (no meta-things) - second priority
+	//NOTE: stringy can be fn references
+	if (!prop.init && !prop.change && !prop.values){
+		//methods - second priority
+		if (isFn(prop.value)) {
+			return -8;
+		}
+
+		//plain values, including stringy fn declarations - second priority
+		else if (!isObject(prop.value)) {
+			return -7;
+		}
+
+		//object descriptors
+		else {
+			return -6;
+		}
+	}
+
+	//descriptors with meta-things
+	else {
+		//methods - before references
+		if (isFn(prop.value)) {
+			order = 10;
+		} else if (typeof prop.value === "string"){
+			order = 13;
+		} else {
+			order = 11;
+		}
+	}
+
+	//descriptors with init fn
+	if (prop.init) {
+		order += 1;
+	}
+
+	//descriptors with change fn
+	if (prop.change) {
+		order += 2;
+	}
+
+	//stateful descriptors: most dependable
+	if (prop.values) {
+		order += 4;
+	}
+
+	return order;
 }
 
 //return ensured property descriptor
@@ -1241,7 +1409,7 @@ function getPropDesc(prop){
 		value: prop
 	};
 
-	if (prop.hasOwnProperty('values') || 'value' in prop || prop.change) return prop
+	if (prop.hasOwnProperty('values') || 'value' in prop || prop.change || prop.init) return prop
 
 	return {value: prop};
 }
@@ -1253,52 +1421,105 @@ function normalizeProperties(props){
 		if (propName[0] !== "_") props[propName] = getPropDesc(props[propName]);
 	}
 
+	//flatten
+	props = flattenValues(props);
+
 	//normalize properties quantity
 	for (var propName in props){
-		var prop = props[propName];
+		var prop = props[propName], subPropName = '';
 
 		//normalize states
 		if (prop.values){
-			var allProps = {};
-
 			//disentangle listed properties
-			prop.values = flattenListedStates(prop.values);
+			prop.values = flattenValues(prop.values);
 
-			//ensure empty state is present
-			if (!prop.values._) prop.values._ = {};
-
-			//collect the complete set of properties for the state
+			//ensure descriptors
+			// console.log("before", prop.values)
 			for (var value in prop.values) {
-				for (var subPropName in prop.values[value]) {
-					//ensure descriptor for non-rest properties
+				//expand states shortcuts
+				if (isFn(prop.values[value])){
+					prop.values[value] = {
+						before: prop.values[value]
+					}
+				} else if(!isObject(prop.values[value])){
+					prop.values[value] = {
+						before: (function(arg){return function(){ return arg }})(prop.values[value])
+					}
+				}
+
+				//ensure descriptors
+				for (subPropName in prop.values[value]) {
 					if (subPropName[0] !== "_") {
 						prop.values[value][subPropName] = getPropDesc(prop.values[value][subPropName])
 					}
+				}
+			}
+			// console.log("after", prop.values)
 
-					//save not collected value
-					if (!(subPropName in allProps)){
-						//save default property value
-						if (value === "_") {
-							if (!techCbRe.test(subPropName)){
-								allProps[subPropName] = prop.values._[subPropName]
-							} else {
-								allProps[subPropName] = null;
-							}
-						} else {
-							//ensure element’s property exists
-							// if (!techCbRe.test(subPropName) && !(subPropName in props)){
-							// 	props[subPropName] = {value: undefined}
-							// }
-							allProps[subPropName] = props[subPropName];
-						}
+			//ensure empty state is present
+			if (!("_" in prop.values)) prop.values._ = {};
+
+			// console.log(prop.values)
+
+			//collect the complete set of properties for the state
+			var mutualProps = {};
+			for (var value in prop.values) {
+				// console.log("try", value)
+				if (value === "_") continue;
+				for (subPropName in prop.values[value]) {
+					// console.log("subProp", subPropName)
+					if (!(subPropName in mutualProps) && !techCbRe.test(subPropName) && !(subPropName in prop.values._)){
+						mutualProps[subPropName] = props[subPropName];
 					}
 				}
 			}
 
-			//ensure every state's fullness
-			for (var value in prop.values){
-				prop.values[value] = extend({}, allProps, prop.values[value]);
+			// console.log(prop.values._, mutualProps)
+
+			//TODO: think of simplifying this
+			//fulfill rest value state to overlap every property covered with states
+			extend(prop.values._, mutualProps);
+
+			//expand collected rest value properties to element (predefine)
+			for (var mutualProp in prop.values._){
+				if (!(mutualProp in props) && !techCbRe.test(mutualProp)){
+					props[mutualProp] = getPropDesc(prop.values._[mutualProp])
+				}
 			}
+			// console.log(props)
+		}
+
+		//treat events with self-references
+		if (/\@/.test(propName)){
+			// var evtObj = _parseEvtRef(null, propName);
+			var refTarget = propName.split(/\s/)[0];
+			// console.log("@ref found", refTarget)
+
+			//override refering property’s (like @el) `change` method to catch it’s `HTMLElement` value
+			var refPropName = refTarget.slice(1);
+			var refPropDesc = props[refPropName] || {value: undefined};
+			var refPropChangeWrapper = (function(change, propName){
+				return function(value, oldValue){
+					// console.log("wrapper", value);
+					if (!(value instanceof HTMLElement)) {
+						// console.log("unbind", value, oldValue)
+						off(this, propName, propName)
+					}
+
+					var result = change ? change.apply(this, arguments) : value;
+
+					//bind handler each time evt target becomes an HTMLElement
+					if (result instanceof HTMLElement) {
+						// console.log("bind", value)
+						on(this, propName, propName);
+					}
+
+					return result;
+				}
+			})(refPropDesc.change, propName);
+
+			refPropDesc.change = refPropChangeWrapper;
+			props[refPropName] = refPropDesc;
 		}
 	}
 
@@ -1308,8 +1529,8 @@ function normalizeProperties(props){
 }
 
 
-//disentangle listed state values
-function flattenListedStates(values){
+//disentangle listed values
+function flattenValues(values){
 
 	// console.log("before", values)
 

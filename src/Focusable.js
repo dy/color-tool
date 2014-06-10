@@ -1,1 +1,0 @@
-//TODO: make this innate component property
