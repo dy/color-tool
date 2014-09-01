@@ -16,42 +16,137 @@
 <title>Picky - the brilliant color picker</title>
 
 
-
-<!-- 1. Demo -->
 <section id="demo">
-	<div class="demo-picker" data-picky data-mode="hl,s"></div>
+	<div data-picky="" data-mode="hl,s" data-info-tooltip=""></div>
 </section>
-
 
 
 <!-- 2. Intro -->
 <section id="intro">
+	<header>
+		<h1>Picky<sup class="js-label">js</sup>
+			<a href="#intro" class="anchor-link"><i class="icon-link"></i></a>
+		</h1>
+		<p>Brilliant color picker</p>
+	</header>
 
+	<h4>1. Include <em><code data-tooltip="" title="5.78 kb">mod.js</code></em></h4>
+	<p>
+		</p><pre id="include-mod">			<script src="link to mod.js CDN"></script>
+		</pre>
+		<div data-coppy="" data-for="#include-mod"></div>
+
+		<aside>
+			Mod is a base class for organizing picky.
+			There’re also a lot of other components using mod, if you’re interesting − <a href="link to mod components">have a look</a>.
+		</aside>
+	<p></p>
+
+	<h4>2. Include <em><code data-tooltip="" title="10 kb">picky.js</code></em></h4>
+	<p>
+		</p><pre id="include-picky">			<script src="link to mod.js CDN"></script>
+		</pre>
+		<button data-copy="" data-for="#include-picky"><i class="icon-copy"></i></button>
+	<p></p>
 </section>
-
 
 
 <!-- 3. Use-cases -->
 <section id="use-cases">
+	<header>
+		<h2>Use cases</h2>
+		<a href="#use-cases" class="anchor-link"><i class="icon-link"></i></a>
+	</header>
+	<div class="use-cases-container">
+		<article class="use-case">
+			<div class="use-case-preview">
 
+			</div>
+			<a href="#use-case-1-preview" data-popup="">Demo</a>
+			<code id="#use-case-1-code"></code>
+			<button data-copy="" data-for="#use-case-1" title="Copy code"><i class="icon-copy"></i></button>
+		</article>
+	</div>
+	<!-- TODO: real use-cases -->
 </section>
-
 
 
 <!-- 4. Options -->
 <section id="options">
+	<header>
+		<h2>Options</h2>
+		<a href="#options" class="anchor-link"><i class="icon-link"></i></a>
+	</header>
 
+	<table>
+		<thead>
+			<tr>
+				<th>Option</th>
+				<th>Values</th>
+			</tr>
+		</thead>
+
+		<tbody>
+			<tr>
+				<td>
+					<code>mode</code>
+				</td>
+				<td>
+					Defines the mode of color-picker. Can be any comma-separated values passed, where each value is a `component` identifier.
+
+					Example 1:
+						<code><div data-picky="" data-mode="hs, l"></div></code> − will create 2-dimensional hs- and one-dimensional l- picking areas.
+
+					<!-- TODO -->
+					Example 2:
+						<code><div data-picky="" data-mode=""></div></code>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<code>format</code>
+				</td>
+				<td>
+					Output format of color. Possible values:
+					<dl>
+						<dt>hsla</dt>
+						<dd></dd>
+
+						<dt></dt>
+						<dd></dd>
+					</dl>
+				</td>
+			</tr>
+		</tbody>
+	</table>
 </section>
-
 
 
 <!-- 5. Like-it -->
 <section id="like-it">
+	<button class="like-donate-button" data-popover="" data-for=".donate-popover">
+		<i class="icon-thumbs-up"></i> Like It!
+	</button>
 
+	<div class="donate-popover">
+		<h4>I would like to help project with:</h4>
+		<input data-slidy-input="" value="$5">
+		<button>Donate</button>
+	</div>
 </section>
 
 
-
 <!-- 6. Credits -->
-<section id="credits"
-></section>
+<section id="credits">
+	<ul>
+		<li>I have found a bug: <a href="">create issue</a></li>
+		<li>I have a feature request: <a href="">create issue</a></li>
+		<li>I have a question: <a href="">create issue</a></li>
+	</ul>
+
+	<footer>
+		© Deema Evanov —
+		<a href="http://dfcreative.github.io"><i class="icon-github"></i></a>
+		<a href="mailto:dfcreative@gmail.com"><i class="icon-mail"></i></a>
+	</footer>
+</section>
