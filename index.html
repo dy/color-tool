@@ -4,20 +4,40 @@
 <meta name="description" content="Picky — the brilliant color picker.">
 <meta name="viewport" content="width=device-width">
 
+<title>Picky - the brilliant color picker</title>
+
 <link rel="stylesheet" href="css/normalize.css">
 <link rel="stylesheet" href="css/normalize-opentype.css">
 <style>
-	.demo-picker{
-		width: 100vw;
-		height: 100vh;
-	}
+* {
+	box-sizing: border-box;
+}
+#demo{
+	background: #444;
+	height: 100vh;
+}
+section {
+	padding: 10px 8%;
+}
+sup{
+	background: red;
+	color: white;
+	font-family: serif;
+	font-style: italic;
+	border-radius: 80px;
+	font-weight: normal;
+	font-size: .65em;
+	margin-left: .25em;
+}
+sup:before, sup:after{
+	content: ' ';
+}
 </style>
 
-<title>Picky - the brilliant color picker</title>
 
-
+<!-- 1. Demo -->
 <section id="demo">
-	<div data-picky="" data-mode="hl,s" data-info-tooltip=""></div>
+	<div class="demo-picker" data-picky="" data-mode="hl,s" data-info-tooltip=""></div>
 </section>
 
 
