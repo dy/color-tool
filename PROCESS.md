@@ -27,11 +27,11 @@
 ## Notes
 * Source/Target concept.
 	* ✗ Each source, firing change event, causes ColorManager to update all the targets
-	* ♥ How to populate target/sources? Should we create any of them? Basically, passing modes and options isn’t that good because it’s the same as inventing own standard of creating elements
+	* ✘ How to populate target/sources? Should we create any of them? Basically, passing modes and options isn’t that good because it’s the same as inventing own standard of creating elements
 	* Minimal reliable prerequisites:
 		* ✗ It’s good to pass targets selector, like $.colorite({ targets: $(".color-target")})
 		* ✗ It’s good to pass sources selector, like $.colorite({ sources: $(".color-source")})
-		* ✔ It’s good to parse source and target’s attributes in order to init them
+		* ✘ It’s good to parse source and target’s attributes in order to init them
 			* Source tpl: `<div class="color-source" data-color-source="style.background"></div>`
 			* Target tpl: `<div class="color-source" data-color-target="style.background, text"></div>`
 			* Source/Target tpl: `<input class="color-source" data-color-target="value" data-color-source="value" value="123"></div>`
@@ -60,7 +60,7 @@
 
 * Picker targets can be set up right on target elements: it allows init them with no js at all.
 
-* Basic way of launching cpickr `$(el).cpickr({ mode: "hs"})`
+* Basic way of launching cpickr `$(el).picky({ mode: "hs"})`
 	* So, make container, connect cpickr, viola.
 	* That’s why zones have to be rendered separately
 
@@ -72,4 +72,14 @@
 * The concept
 	* lots of different pickers for different modes: hs, hl, ls, h, l, etc, each has own behaviour
 	* Targets are easily bound component-expose way, by automatic exposing color values to the global (all color values)
-	*
+
+* Each picker is a duplex stream;
+
+* ✔ There’s no Picky class. Everything is a picker. Picker can pick the full color and consist of sub-pickers. Picker is the final point.
+	* If you want to create custom picker, do it programmatically, it’s easy: just extend class Picker and include sub-pickers you need, that’s all.
+
+* Color object can be programmatically shared between pickers - in that case, pickers are bound;
+	* Otherwise, color is parsed from the attributes.
+
+
+* DO Russian version on a site by the goodui guidelines.

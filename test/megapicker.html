@@ -45,9 +45,9 @@
 </style>
 <!-- <script src="../src/lib/modernizr.js"></script> -->
 
-<body picky style="background-color: {{ color.rgba }};">
+<body data-picker style="background-color: {{ color.rgba }};">
 
-<div class="container" waterfall col-width="120">
+<div class="container" data-waterfall col-width="120">
 	<div class="item" span="2">
 		<h2>Sources</h2>
 		<dl>
@@ -74,7 +74,7 @@
 		</dl>
 	</div>
 
-	<div class="item" picker="hue" span="2"><h2>Hue: <span>{{ hue }}</span></h2></div>
+	<div class="item" picker="hue" span="2"><h2>Hue: <span data-picky>{{ hue }}</span></h2></div>
 
 	<div class="item" picker="saturation"><h2>Saturation: <span>{{ saturation }}</span></h2></div>
 

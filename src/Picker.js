@@ -1,71 +1,75 @@
+var Color = require('color');
+
+module.exports = Picker;
+
+
 /**
-* Generic picker class
-* Picky.js creates such elements in bulk
-*
-* Custom pickers extend possible mode values by extension and redefinition `mode`.
-*/
-var Picker = Slidy.extend({
-	//color model to reflect value in
-	color: null,
-	picky: null,
+ * @abstract
+ *
+ * @todo Transfer delta-stream
+ * @todo It is duplex-stream btw
+ * @todo raise change events
+ * @todo  Able to be piped
+ *
+ * This is a main picker class.
+ * It provides an abstract interface for any picker you can create.
+ */
+function Picker(target, options){
+	var self = this, constr = self.constructor;
 
-	threshold: 0,
+	this.element = target;
 
-	//component[s] to pick
-	component:{
-		value: null,
-		values: {
-			_: {
+	options = options || {};
 
-			}
-		},
+	//parse attributes of targret
+	var prop, parseResult;
+	for (var propName in constr.options){
+		if (options[propName] !== undefined) {
+			prop = props[propName];
+			options[propName] = parse.attribute(target, propName, prop);
+		}
+		else {
+			options[propName] = constr.options[propName];
+		}
 
-		order: 2
-	},
-
-	//input/slidy mode of picking
-	mode: {
-		init: function(){
-			if(this.tagName === "INPUT") return "input";
-		},
-
-		values: {
-			//text-input mode
-			"input": {
-				before: function(){
-					console.log("to input mode")
-				},
-
-				// change: function(){
-
-				// }
-			},
-
-			//slidy mode
-			_: {
-				before: function(){
-					// console.log("before default mode")
-				},
-
-				change: function(){
-					// console.log("picker change", this.value)
-					this.setColor(this.value);
-
-					this.colorChanged();
-				},
-
-				'@picky change, colorChanged': function(){
-					// console.log("colorChanged")
-					this.setValue(this.color);
-
-					this.render();
-				}
-			}
-		},
-
-		order: 3
+		//declare initial value
+		this[propName] = options[propName];
 	}
 
-})
 
-Picker.register("picker")
+	//create color
+	this.color = new Color(this.color);
+
+
+	//rerender on color change
+	Color.on('change', this.colorChanged);
+
+
+	//change color on self slidy change
+	this.element.addEventListener('change', this.valueChanged);
+}
+
+
+/** Set options in descendants */
+Picker.options = {};
+
+
+/** Registered pickers (shortcuts) */
+Picker.pickers = {};
+Picker.register = function(name, pickerClass){
+	if (Picker.pickers[name]) throw Error('Bad picker shortcut: ' + name + '. Already registered.');
+
+	Picker.pickers[name] = pickerClass;
+};
+
+
+var PickerProto = Picker.prototype;
+
+
+/** Redefine these methods in descendants */
+PickerProto.valueChanged = function(){
+	//set color [component]
+};
+PickerProto.colorChanged = function(){
+	//set self value
+};
