@@ -5,7 +5,7 @@
 * Colorific
 * Chromatic
 * Colorado
-* Piccolor
+* Piccolo
 * Colorificator
 * ColorMan
 * ColorConnector
@@ -22,7 +22,7 @@
 	* Associates with color-picker
 	* Short
 	* Other sense (haughty)
-	* picky mode
+	* ✘ picky mode
 
 ## Notes
 * Source/Target concept.
@@ -83,3 +83,6 @@
 
 
 * DO Russian version on a site by the goodui guidelines.
+
+* The product has a very narrow audience and high competitional standards.
+	* You have to implement some exclusive feature to make use exactly this one picker.

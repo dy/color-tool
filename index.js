@@ -1,12 +1,6 @@
 var parse = require('muparse');
 var Picker = require('src/Picker');
-var HPicker = require('src/HuePicker');
-var SPicker = require('src/SaturationPicker');
-var LPicker = require('src/LightnessPicker');
-var HSPicker = require('src/HSPicker');
-var HLPicker = require('src/HLPicker');
-var SLPicker = require('src/SLPicker');
-var AlphaPicker = require('src/AlphaPicker');
+var LinearPicker = require('src/LinearPicker');
 
 
 module.exports = CompoundPicker;
@@ -37,6 +31,24 @@ function CompoundPicker(target, options){
 /** Register picker */
 Picker.register('hsl', CompoundPicker);
 Picker.register('hsla', CompoundPicker);
+
+/** Register linear pickers */
+Picker.register('r, red', createLinearPicker('red'));
+Picker.register('g, green', createLinearPicker('green'));
+Picker.register('b, blue', createLinearPicker('blue'));
+Picker.register('h, hue', createLinearPicker('hue'));
+Picker.register('s, saturation', createLinearPicker('saturation'));
+Picker.register('l, lightness', createLinearPicker('lightness'));
+
+/** Register rectangular pickers */
+
+/** Linear picker for component creator */
+function createLinearPicker(component){
+	return function(el, opts){
+		opts.component = component;
+		return new LinearPicker(el, opts);
+	};
+}
 
 
 /** Settable initial defaults */

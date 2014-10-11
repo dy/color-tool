@@ -34,13 +34,35 @@
 	<script src="../src/polyfill.js"></script>
 	<![endif]-->
 
-	<script src="../src/mod.js"></script>
-	<script src="../src/Draggable.js"></script>
-	<script src="../src/Slidy.js"></script>
+	<!-- dev -->
+	<script src="../node_modules/require-stub/index.js"></script>
+	<script src="../node_modules/extend/index.js"></script>
+	<script src="../node_modules/icicle/index.js"></script>
+	<script src="../node_modules/mucss/index.js"></script>
+	<script src="../node_modules/mutation-observer/index.js"></script>
+	<script src="../node_modules/matches-selector/index.js"></script>
+	<script src="../node_modules/mutypes/index.js"></script>
+	<script src="../node_modules/each-csv/index.js"></script>
+	<script src="../node_modules/mustring/index.js"></script>
+	<script src="../node_modules/muparse/index.js"></script>
+	<script src="../node_modules/emmy/index.js"></script>
+	<script src="../node_modules/tiny-element/index.js"></script>
+	<script src="../node_modules/intersects/index.js"></script>
+	<script src="../node_modules/mumath/index.js"></script>
+	<script src="../node_modules/lifecycle-events/index.js"></script>
+	<script src="../node_modules/enot/index.js"></script>
+	<script src="../node_modules/st8/index.js"></script>
+	<script src="../node_modules/draggy/index.js"></script>
+	<script src="../node_modules/slidy/index.js"></script>
+	<script src="../node_modules/color-stub/index.js" data-module-name='color'></script>
 
 	<script src="../src/Picker.js"></script>
-	<script src="../src/pickers/HuePicker.js"></script>
-	<script src="../src/Picky.js"></script>
+	<script src="../src/LinearPicker.js"></script>
+	<script src="../src/HSPicker.js"></script>
+	<script src="../src/HLPicker.js"></script>
+	<script src="../src/SLPicker.js"></script>
+
+	<script src="../index.js"></script>
 
 	<script>
 		mocha.setup('bdd');
@@ -48,8 +70,7 @@
 	</script>
 
 	<script src="testHelpers.js"></script>
-	<script src="picker.js"></script>
-	<script src="picky.js"></script>
+	<script src="index.js"></script>
 
 	<script>
 		mocha.checkLeaks();

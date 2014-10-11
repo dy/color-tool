@@ -56,10 +56,10 @@ Picker.options = {};
 
 /** Registered pickers (shortcuts) */
 Picker.pickers = {};
-Picker.register = function(name, pickerClass){
-	if (Picker.pickers[name]) throw Error('Bad picker shortcut: ' + name + '. Already registered.');
-
-	Picker.pickers[name] = pickerClass;
+Picker.register = function(names, pickerClass){
+	names.split(/\s?,\s?/).forEach(function(name){
+		Picker.pickers[name] = pickerClass;
+	});
 };
 
 

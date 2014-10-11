@@ -2,16 +2,16 @@ var Picker = require('Picker');
 var Slidy = require('slidy');
 
 
-module.exports = SaturationPicker;
+module.exports = HLPicker;
 
 
 /**
- * Saturation linear picker
+ * HS linear picker
  *
  * @module
  * @constructor
  */
-function SaturationPicker(target, options){
+function HLPicker(target, options){
 	Picker.call(this, target, options);
 
 	//make self a slidy
@@ -19,7 +19,7 @@ function SaturationPicker(target, options){
 }
 
 
-SaturationPicker.options = {
+HLPicker.options = {
 	/** direction to show picker */
 	orientation: 'vertical',
 
@@ -29,33 +29,32 @@ SaturationPicker.options = {
 
 
 /** Register shortcuts */
-Picker.register('s', SaturationPicker);
-Picker.register('saturation', SaturationPicker);
+Picker.register('hl', HLPicker);
 
 
 
-var proto = SaturationPicker.prototype = Object.create(Picker.prototype);
+var proto = HLPicker.prototype = Object.create(Picker.prototype);
 
 
 /** Set color */
 proto.valueChanged = function(){
 	//update color value
-	this.color.saturation = value;
+	this.color.lightness = value;
 };
 
 
 /** Update bg */
 proto.colorChanged = function(){
 	//update self value so to correspond to the color
-	this.value = this.color.saturation;
+	this.value = this.color.lightness;
 
 	//rerender
 	var color = this.color;
-	var s = color.saturation + "%",
-		h = color.saturation,
+	var s = color.lightness + "%",
+		h = color.lightness,
 		b = color.lightness + "%";
 
-	//saturation
+	//lightness
 	var bg = ["linear-gradient(to " + direction + ",",
 		"hsl(0," + s + "," + b + "%) 0%,",
 		"hsl(60," + s + "," + b + "%) 16.666%,",
