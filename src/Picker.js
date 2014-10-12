@@ -47,7 +47,10 @@ function Picker(target, options){
 
 
 	//create color
-	this.color = new Color(this.color);
+	if (!(this.color instanceof Color)) {
+		console.log(this.color)
+		// this.color = new Color(this.color);
+	}
 
 	//rerender on color change
 	Emitter.on(this.color, 'change', function(e){

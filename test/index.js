@@ -4,10 +4,12 @@ var LinearPicker = require('LinearPicker');
 var body = document.body;
 
 describe('1-component pickers', function(){
+	var color = new Color('green');
+
 	it('hue', function(){
 		var el = document.createElement('div');
 		new LinearPicker(el, {
-			color: 'green',
+			color: color,
 			component: 'hue',
 			change: function(){
 				// console.log('----change')
@@ -19,7 +21,17 @@ describe('1-component pickers', function(){
 	});
 
 	it('saturation', function(){
+		var el = document.createElement('div');
+		new LinearPicker(el, {
+			color: color,
+			component: 'saturation',
+			change: function(){
+				// console.log('----change')
+				this.element.setAttribute('data-color', this.color.rgbString());
+			}
+		});
 
+		body.appendChild(el);
 	});
 
 	it('brightness', function(){

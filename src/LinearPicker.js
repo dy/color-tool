@@ -82,14 +82,14 @@ LinearPicker.options = extend({}, Picker.options, {
 					l = color.lightness();
 
 				//lightness
-				var bg = ["linear-gradient(to " + this.direction + ",",
-					"hsl(0," + s + "%," + l + "%) 0%,",
-					"hsl(60," + s + "%," + l + "%) 16.666%,",
-					"hsl(120," + s + "%," + l + "%) 33.333%,",
-					"hsl(180," + s + "%," + l + "%) 50%,",
-					"hsl(240," + s + "%," + l + "%) 66.666%,",
-					"hsl(300," + s + "%," + l + "%) 83.333%,",
-					"hsl(360," + s + "%," + l + "%) 100%)"].join("");
+				var bg = ['linear-gradient(to ' + this.direction + ',',
+					'hsl(0,' + s + '%,' + l + '%) 0%,',
+					'hsl(60,' + s + '%,' + l + '%) 16.666%,',
+					'hsl(120,' + s + '%,' + l + '%) 33.333%,',
+					'hsl(180,' + s + '%,' + l + '%) 50%,',
+					'hsl(240,' + s + '%,' + l + '%) 66.666%,',
+					'hsl(300,' + s + '%,' + l + '%) 83.333%,',
+					'hsl(360,' + s + '%,' + l + '%) 100%)'].join('');
 
 				this.element.style.background = bg;
 			},
@@ -98,7 +98,23 @@ LinearPicker.options = extend({}, Picker.options, {
 		},
 		saturation: {
 			min: 0,
-			max: 100
+			max: 100,
+			render: function(){
+				// console.log('render')
+
+				//render
+				var color = this.color;
+				var s = color.saturation(),
+					h = color.hue(),
+					l = color.lightness();
+
+				//lightness
+				var bg = ['linear-gradient(to ' + this.direction + ',',
+					'hsl(' + h + ',0%,' + l + '%) 0%,',
+					'hsl(' + h + ',100%,' + l + '%) 100%)'].join('');
+
+				this.element.style.background = bg;
+			}
 		},
 		lightness: {
 			min: 0,
