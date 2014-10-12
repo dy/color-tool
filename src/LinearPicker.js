@@ -4,6 +4,7 @@ var Picker = require('Picker');
 var Slidy = require('slidy');
 var Emitter = require('Emmy');
 var css = require('mucss');
+var extend = require('extend');
 
 
 module.exports = LinearPicker;
@@ -20,7 +21,9 @@ function LinearPicker(target, options){
 
 	//make self a slidy
 	//goes after self init because fires first change
-	this.slidy = new Slidy(target);
+	this.slidy = new Slidy(target, {
+
+	});
 
 	//call picker constructor
 	Picker.call(this, target, options);
@@ -31,7 +34,7 @@ function LinearPicker(target, options){
 }
 
 
-LinearPicker.options = {
+LinearPicker.options = extend({}, Picker.options, {
 	/** Shared color object */
 	color: undefined,
 
@@ -120,17 +123,8 @@ LinearPicker.options = {
 	},
 
 	/** whether to repeat */
-	repeat: true,
-
-	value: {
-		changed: function(val){
-			this.slidy.value = val;
-		}
-	},
-
-	/** callbacks */
-	change: undefined
-};
+	repeat: true
+});
 
 
 var proto = LinearPicker.prototype = Object.create(Picker.prototype);

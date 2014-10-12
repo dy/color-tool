@@ -52,7 +52,7 @@ function Picker(target, options){
 	//rerender on color change
 	Emitter.on(this.color, 'change', function(e){
 		self.colorChanged.call(self, e);
-	})
+	});
 
 
 	//change color on self slidy change
@@ -65,7 +65,20 @@ function Picker(target, options){
 
 
 /** Set options in descendants */
-Picker.options = {};
+Picker.options = {
+	/** sync value with slidy value */
+	value: {
+		changed: function(val){
+			this.slidy.value = val;
+		}
+	},
+
+	/** callbacks */
+	change: null,
+
+	/** parse color from the options */
+	color: null
+};
 
 
 /** Registered pickers (shortcuts) */

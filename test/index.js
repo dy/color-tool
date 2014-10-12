@@ -10,6 +10,7 @@ describe('1-component pickers', function(){
 			color: 'green',
 			component: 'hue',
 			change: function(){
+				// console.log('----change')
 				this.element.setAttribute('data-color', this.color.rgbString());
 			}
 		});
