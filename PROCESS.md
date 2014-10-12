@@ -85,4 +85,20 @@
 * DO Russian version on a site by the goodui guidelines.
 
 * The product has a very narrow audience and high competitional standards.
-	* You have to implement some exclusive feature to make use exactly this one picker.
+You have to implement some exclusive feature to make use exactly this one picker. Which is that?
+	* Relative palettes (exists)
+	* Lab space (rare, interesting)
+	* Realt Palette?
+
+* Competitors
+	* System picker (especially osx)
+	* Photoshop picker and alike
+
+* Comparison table: Name | Value | Ideal case
+	* SEO | Easy to google | First item
+	* Features | Versatility to use | All the common use-cases
+	* Speed | UX satisfaction | As native
+	* Conventions | Easy to install | jQuery plugin / module / web-coomponent
+	* Docs | Easy to solve troubles | FAQed every issue
+	* Badges, tests | Subconscious trust | as 6to5
+	* Demo page | Engagement | Concise & maximally intuitive

@@ -1,90 +1,94 @@
-var Color = require('color-stub');
+var Color = require('color');
 var LinearPicker = require('LinearPicker');
 
-var body = document.createElement('body');
+var body = document.body;
 
-describe("1-component pickers", function(){
-	it("hue", function(){
+describe('1-component pickers', function(){
+	it('hue', function(){
 		var el = document.createElement('div');
 		new LinearPicker(el, {
-			component: "hue"
+			color: 'green',
+			component: 'hue',
+			change: function(){
+				this.element.setAttribute('data-color', this.color.rgbString());
+			}
 		});
 
 		body.appendChild(el);
 	});
 
-	it("saturation", function(){
+	it('saturation', function(){
 
-	})
+	});
 
-	it("brightness", function(){
+	it('brightness', function(){
 
-	})
+	});
 
-	it("lightness", function(){
+	it('lightness', function(){
 
-	})
+	});
 
-	it("red", function(){
+	it('red', function(){
 
-	})
+	});
 
-	it("green", function(){
+	it('green', function(){
 
-	})
+	});
 
-	it("blue", function(){
+	it('blue', function(){
 
-	})
+	});
 
-	it("alpha", function(){
+	it('alpha', function(){
 
-	})
+	});
 
-	it("opacity", function(){
+	it('opacity', function(){
 
-	})
+	});
 
-	it("luma", function(){
+	it('luma', function(){
 		xxx
-	})
+	});
 
 
 
-})
+});
 
 
-describe("2-component pickers", function(){
-	it("HL", function(){
+describe('2-component pickers', function(){
+	it('HL', function(){
 
-	})
+	});
 
-	it("SL", function(){
+	it('SL', function(){
 
-	})
+	});
 
-	it("HS", function(){
+	it('HS', function(){
 
-	})
+	});
 
-	it("other", function(){
+	it('other', function(){
 		xxx
-	})
-})
+	});
+});
 
-describe("Special pickers", function(){
-	it("input", function(){
+describe('Special pickers', function(){
+	it('input', function(){
 
-	})
+	});
 
-	it("palette", function(){
+	it('palette', function(){
 
-	})
+	});
 
-	it("preview", function(){
+	it('preview', function(){
 
-	})
-})
+	});
+});
 
 
 

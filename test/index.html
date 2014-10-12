@@ -6,12 +6,25 @@
 
 	<style>
 		.picker {
+			position: relative;
 			width: 200px;
 			height: 30px;
-			outline: 1px solid #f3f3f3;
+			outline: 1px solid #f2f2f2;
+			margin: 50px;
 		}
 
-		.picker > .draggable{
+		.picker:after{
+			content: attr(data-color);
+			position: absolute;
+			top: 0;
+			width: 200px;
+			right: -210px;
+			font-size: 13px;
+			line-height: 30px;
+			font-family: sans-serif;
+		}
+
+		.picker > .draggy{
 			width: 20px;
 			height: 20px;
 			/*background: white;*/
@@ -21,6 +34,7 @@
 		}
 
 	</style>
+	<style type="text/css"></style>
 </head>
 <body>
 	<div id="mocha"></div>
@@ -54,7 +68,12 @@
 	<script src="../node_modules/st8/index.js"></script>
 	<script src="../node_modules/draggy/index.js"></script>
 	<script src="../node_modules/slidy/index.js"></script>
-	<script src="../node_modules/color-stub/index.js" data-module-name='color'></script>
+	<!--<script src="../node_modules/color-convert/conversions.js"></script>
+	<script src="../node_modules/color-convert/index.js"></script>
+	<script src="../node_modules/color-string/color-string.js"></script>
+	<script src="../node_modules/color/color.js"></script>-->
+	<script src="shim/color.js"></script>
+	<script type="text/javascript"></script>
 
 	<script src="../src/Picker.js"></script>
 	<script src="../src/LinearPicker.js"></script>

@@ -1,4 +1,6 @@
 var Color = require('color');
+var state = require('st8');
+var Emitter = require('Emmy');
 
 module.exports = Picker;
 
@@ -24,29 +26,41 @@ function Picker(target, options){
 	//parse attributes of targret
 	var prop, parseResult;
 	for (var propName in constr.options){
-		if (options[propName] !== undefined) {
-			prop = props[propName];
-			options[propName] = parse.attribute(target, propName, prop);
-		}
-		else {
-			options[propName] = constr.options[propName];
+		//parse attribute, if no option passed
+		if (options[propName] === undefined){
+			prop = constr.options[propName];
+			options[propName] = parse.attribute(target, propName, prop && prop.init !== undefined ? prop.init : prop);
 		}
 
 		//declare initial value
-		this[propName] = options[propName];
+		if (options[propName] !== undefined) {
+			this[propName] = options[propName];
+		}
 	}
+
+	//add class
+	this.element.classList.add('picker');
+
+
+	//apply options
+	state(this, constr.options);
 
 
 	//create color
 	this.color = new Color(this.color);
 
-
 	//rerender on color change
-	Color.on('change', this.colorChanged);
+	Emitter.on(this.color, 'change', function(e){
+		self.colorChanged.call(self, e);
+	})
 
 
 	//change color on self slidy change
-	this.element.addEventListener('change', this.valueChanged);
+	this.element.addEventListener('change', function(e){
+		self.value = self.slidy.value;
+		self.valueChanged.call(self, e);
+		self.emit('change');
+	});
 }
 
 
@@ -63,12 +77,12 @@ Picker.register = function(names, pickerClass){
 };
 
 
-var PickerProto = Picker.prototype;
+var PickerProto = Emitter(Picker.prototype);
 
 
 /** Redefine these methods in descendants */
 PickerProto.valueChanged = function(){
-	//set color [component]
+	//set color/component
 };
 PickerProto.colorChanged = function(){
 	//set self value
