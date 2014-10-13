@@ -52,16 +52,20 @@ function Picker(target, options){
 		this.color = new Color(this.color);
 	}
 
-	//rerender on color change - loosely calling (50 is the most appropriate interval)
-	Enot.on(this, '@color change:throttle(50)', function(e){
+	//rerender on color change - loosely calling
+	//50 is the most appropriate interval for bg
+	//10 is the interval for picker movement
+	Enot.on(this, '@color change:throttle(15)', function(e){
 		self.colorChanged.call(self, e);
 	});
 
 
 	//change color on self slidy change
 	this.element.addEventListener('change', function(e){
+		// console.group('change')
 		self.valueChanged.call(self, e);
 		self.emit('change');
+		// console.groupEnd();
 	});
 }
 

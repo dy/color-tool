@@ -139,15 +139,63 @@ LinearPicker.options = extend({}, Picker.options, {
 		},
 		red: {
 			min: 0,
-			max: 255
+			max: 255,
+			render: function(){
+				// console.log('render')
+
+				//render
+				var color = this.color;
+				var r = color.red(),
+					g = color.green(),
+					b = color.blue();
+
+				//lightness
+				var bg = ['linear-gradient(to ' + this.direction + ',',
+					'rgb(0,' + g + ',' + b +') 0%,',
+					'rgb(255,' + g + ',' + b + ') 100%)'].join('');
+
+				this.element.style.background = bg;
+			}
 		},
 		green: {
 			min: 0,
-			max: 255
+			max: 255,
+			render: function(){
+				// console.log('render')
+
+				//render
+				var color = this.color;
+				var r = color.red(),
+					g = color.green(),
+					b = color.blue();
+
+				//lightness
+				var bg = ['linear-gradient(to ' + this.direction + ',',
+					'rgb(' + r + ',0,' + b +') 0%,',
+					'rgb(' + r + ',255,' + b + ') 100%)'].join('');
+
+				this.element.style.background = bg;
+			}
 		},
 		blue: {
 			min: 0,
-			max: 255
+			max: 255,
+			render: function(){
+				// console.log('render')
+
+				//render
+				var color = this.color;
+				var r = color.red(),
+					g = color.green(),
+					b = color.blue();
+
+				//lightness
+				var bg = ['linear-gradient(to ' + this.direction + ',',
+					'rgb(' + r + ',' + g + ',0) 0%,',
+					'rgb(' + r + ',' + g + ',255) 100%)'].join('');
+
+				this.element.style.background = bg;
+			}
 		},
 		alpha: {
 			min: 0,
@@ -167,15 +215,23 @@ proto.constructor = LinearPicker;
 /** Set color */
 proto.valueChanged = function(){
 	//update color value
+	//FIXME: color change here affects in some way other pickers
 	this.color[this.component](this.slidy.value);
-	Emitter.emit(this.color, 'change');
+	// console.log(this.component);
+	Emitter.emit(this.color, 'change', {component: this.component});
 };
 
 
 /** Update bg */
-proto.colorChanged = function(){
+proto.colorChanged = function(e){
+	if (e.detail && e.detail.component !== this.component){
+		this.slidy.mute = true;
+	}
+
 	//update self value so to correspond to the color
 	this.slidy.value = this.color[this.component]();
+
+	this.slidy.mute = false;
 
 	this.render();
 };

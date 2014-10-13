@@ -63,6 +63,7 @@ describe('1-component pickers', function(){
 			change: function(){
 				// console.log('----change')
 				this.element.setAttribute('data-color', this.color.rgbString());
+				this.element.style.color = this.color.rgbString();
 			}
 		});
 
