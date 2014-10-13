@@ -21,8 +21,8 @@ function LinearPicker(target, options){
 	//make self a slidy
 	//goes after self init because fires first change
 	this.slidy = new Slidy(target, {
-		step: 1,
-		instant: true
+		instant: true,
+		step: 1
 	});
 
 	//call picker constructor
@@ -137,6 +137,33 @@ LinearPicker.options = extend({}, Picker.options, {
 				this.element.style.background = bg;
 			}
 		},
+		/** @alias brightness */
+		//TODO: update color model
+		value: {
+			min: 0,
+			max: 100,
+			render: function(){
+				// console.log('render')
+
+				//render
+				var color = this.color.clone();
+				var s = color.saturation(),
+					h = color.hue(),
+					l = color.lightness();
+
+				//lightness
+				var bg = ['linear-gradient(to ' + this.direction + ','];
+				color.value(0);
+				bg.push(color.hslString() + ' 0%, ');
+				color.value(50);
+				bg.push(color.hslString() + ' 50%, ');
+				color.value(100);
+				bg.push(color.hslString() + ' 100%) 100%)');
+				console.log(bg.join(''))
+
+				this.element.style.background = bg.join('');
+			}
+		},
 		red: {
 			min: 0,
 			max: 255,
@@ -199,9 +226,34 @@ LinearPicker.options = extend({}, Picker.options, {
 		},
 		alpha: {
 			min: 0,
-			max: 255
+			max: 1,
+			before: function(){
+				this.slidy.step = 0.01;
+			},
+			after: function(){
+				this.slidy.step = 1;
+			},
+			render: function(){
+				var color = this.color.clone();
+
+				var gc = this.alphaGridColor;
+				var bg = [
+				'linear-gradient(to ' + this.direction + ', ' + color.alpha(0).rgbaString() + ' 0%, ' + color.alpha(1).rgbaString() + ' 100%),',
+				'linear-gradient(45deg, ' + gc + ' 25%, rgba(0,0,0,0) 25%, rgba(0,0,0,0) 75%, ' + gc + ' 75%),',
+				'linear-gradient(45deg, ' + gc + ' 25%, rgba(0,0,0,0) 25%, rgba(0,0,0,0) 75%, ' + gc + ' 75%)'
+				];
+
+				var s = this.alphaGridSize;
+				this.element.style.backgroundImage = bg.join('');
+				this.element.style.backgroundSize = '100%, ' + s + 'px ' + s + 'px, ' + s + 'px ' + s + 'px';
+				this.element.style.backgroundPosition = '0 0, ' + s/2 + 'px ' + s/2 + 'px, 0 0';
+			},
+			/** transparent grid settings */
+			alphaGridColor: 'rgba(0,0,0,.4)',
+			alphaGridSize: 14,
 		}
 	},
+
 
 	/** whether to repeat */
 	repeat: true

@@ -13,7 +13,7 @@ describe('1-component pickers', function(){
 			component: 'hue',
 			change: function(){
 				// console.log('----change cb')
-				this.element.setAttribute('data-color', this.color.rgbString());
+				this.element.setAttribute('data-color', this.color.hslString());
 				this.element.style.color = this.color.rgbString();
 			}
 		});
@@ -29,7 +29,7 @@ describe('1-component pickers', function(){
 			change: function(){
 				// console.log('----change')
 				this.element.style.color = this.color.rgbString();
-				this.element.setAttribute('data-color', this.color.rgbString());
+				this.element.setAttribute('data-color', this.color.hslString());
 			}
 		});
 
@@ -37,7 +37,18 @@ describe('1-component pickers', function(){
 	});
 
 	it('brightness', function(){
+		var el = document.createElement('div');
+		// new LinearPicker(el, {
+		// 	color: color,
+		// 	component: 'brightness',
+		// 	change: function(){
+		// 		// console.log('----change')
+		// 		this.element.setAttribute('data-color', this.color.hslString());
+		// 		this.element.style.color = this.color.rgbString();
+		// 	}
+		// });
 
+		// body.appendChild(el);
 	});
 
 	it('lightness', function(){
@@ -47,7 +58,7 @@ describe('1-component pickers', function(){
 			component: 'lightness',
 			change: function(){
 				// console.log('----change')
-				this.element.setAttribute('data-color', this.color.rgbString());
+				this.element.setAttribute('data-color', this.color.hslString());
 				this.element.style.color = this.color.rgbString();
 			}
 		});
@@ -101,18 +112,50 @@ describe('1-component pickers', function(){
 	});
 
 	it('alpha', function(){
+		var el = document.createElement('div');
+		new LinearPicker(el, {
+			color: color,
+			component: 'alpha',
+			change: function(){
+				// console.log('----change')
+				this.element.setAttribute('data-color', this.color.rgbaString());
+				this.element.style.color = this.color.rgbString();
+			}
+		});
+
+		body.appendChild(el);
+	});
+
+	it.skip('value/brightness', function(){
+		var el = document.createElement('div');
+		new LinearPicker(el, {
+			color: color,
+			component: 'value',
+			change: function(){
+				// console.log('----change')
+				this.element.setAttribute('data-color', this.color.rgbString());
+				this.element.style.color = this.color.rgbString();
+			}
+		});
+
+		body.appendChild(el);
+	});
+
+	it('cyan', function(){
 
 	});
 
-	it('opacity', function(){
+	it('magenta', function(){
 
 	});
 
-	it('luma', function(){
+	it('yellow', function(){
 
 	});
 
+	it('black', function(){
 
+	});
 
 });
 
