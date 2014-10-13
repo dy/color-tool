@@ -71,11 +71,33 @@ describe('1-component pickers', function(){
 	});
 
 	it('green', function(){
+		var el = document.createElement('div');
+		new LinearPicker(el, {
+			color: color,
+			component: 'green',
+			change: function(){
+				// console.log('----change')
+				this.element.setAttribute('data-color', this.color.rgbString());
+				this.element.style.color = this.color.rgbString();
+			}
+		});
 
+		body.appendChild(el);
 	});
 
 	it('blue', function(){
+		var el = document.createElement('div');
+		new LinearPicker(el, {
+			color: color,
+			component: 'blue',
+			change: function(){
+				// console.log('----change')
+				this.element.setAttribute('data-color', this.color.rgbString());
+				this.element.style.color = this.color.rgbString();
+			}
+		});
 
+		body.appendChild(el);
 	});
 
 	it('alpha', function(){
@@ -87,7 +109,7 @@ describe('1-component pickers', function(){
 	});
 
 	it('luma', function(){
-		xxx
+
 	});
 
 
