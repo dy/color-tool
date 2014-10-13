@@ -21,7 +21,8 @@ function LinearPicker(target, options){
 	//make self a slidy
 	//goes after self init because fires first change
 	this.slidy = new Slidy(target, {
-		step: 1
+		step: 1,
+		instant: true
 	});
 
 	//call picker constructor

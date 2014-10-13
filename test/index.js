@@ -14,6 +14,7 @@ describe('1-component pickers', function(){
 			change: function(){
 				// console.log('----change cb')
 				this.element.setAttribute('data-color', this.color.rgbString());
+				this.element.style.color = this.color.rgbString();
 			}
 		});
 
@@ -27,6 +28,7 @@ describe('1-component pickers', function(){
 			component: 'saturation',
 			change: function(){
 				// console.log('----change')
+				this.element.style.color = this.color.rgbString();
 				this.element.setAttribute('data-color', this.color.rgbString());
 			}
 		});
@@ -46,6 +48,7 @@ describe('1-component pickers', function(){
 			change: function(){
 				// console.log('----change')
 				this.element.setAttribute('data-color', this.color.rgbString());
+				this.element.style.color = this.color.rgbString();
 			}
 		});
 
