@@ -12,7 +12,7 @@ describe('1-component pickers', function(){
 			color: color,
 			component: 'hue',
 			change: function(){
-				// console.log('----change')
+				// console.log('----change cb')
 				this.element.setAttribute('data-color', this.color.rgbString());
 			}
 		});
@@ -39,11 +39,31 @@ describe('1-component pickers', function(){
 	});
 
 	it('lightness', function(){
+		var el = document.createElement('div');
+		new LinearPicker(el, {
+			color: color,
+			component: 'lightness',
+			change: function(){
+				// console.log('----change')
+				this.element.setAttribute('data-color', this.color.rgbString());
+			}
+		});
 
+		body.appendChild(el);
 	});
 
 	it('red', function(){
+		var el = document.createElement('div');
+		new LinearPicker(el, {
+			color: color,
+			component: 'red',
+			change: function(){
+				// console.log('----change')
+				this.element.setAttribute('data-color', this.color.rgbString());
+			}
+		});
 
+		body.appendChild(el);
 	});
 
 	it('green', function(){

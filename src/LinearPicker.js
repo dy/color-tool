@@ -18,11 +18,10 @@ module.exports = LinearPicker;
  */
 function LinearPicker(target, options){
 
-
 	//make self a slidy
 	//goes after self init because fires first change
 	this.slidy = new Slidy(target, {
-
+		step: 1
 	});
 
 	//call picker constructor
@@ -72,6 +71,8 @@ LinearPicker.options = extend({}, Picker.options, {
 	component: {
 		init: 'hue',
 		hue: {
+			min: 0,
+			max: 360,
 			render: function(){
 				// console.log('render')
 
@@ -92,9 +93,7 @@ LinearPicker.options = extend({}, Picker.options, {
 					'hsl(360,' + s + '%,' + l + '%) 100%)'].join('');
 
 				this.element.style.background = bg;
-			},
-			min: 0,
-			max: 360
+			}
 		},
 		saturation: {
 			min: 0,
@@ -118,7 +117,24 @@ LinearPicker.options = extend({}, Picker.options, {
 		},
 		lightness: {
 			min: 0,
-			max: 100
+			max: 100,
+			render: function(){
+				// console.log('render')
+
+				//render
+				var color = this.color;
+				var s = color.saturation(),
+					h = color.hue(),
+					l = color.lightness();
+
+				//lightness
+				var bg = ['linear-gradient(to ' + this.direction + ',',
+					'hsl(' + h + ',' + s + '%,0%) 0%,',
+					'hsl(' + h + ',' + s + '%,50%) 50%,',
+					'hsl(' + h + ',' + s + '%,100%) 100%)'].join('');
+
+				this.element.style.background = bg;
+			}
 		},
 		red: {
 			min: 0,
@@ -150,7 +166,7 @@ proto.constructor = LinearPicker;
 /** Set color */
 proto.valueChanged = function(){
 	//update color value
-	this.color[this.component](this.value);
+	this.color[this.component](this.slidy.value);
 	Emitter.emit(this.color, 'change');
 };
 
@@ -158,7 +174,7 @@ proto.valueChanged = function(){
 /** Update bg */
 proto.colorChanged = function(){
 	//update self value so to correspond to the color
-	this.value = this.color[this.component]();
+	this.slidy.value = this.color[this.component]();
 
 	this.render();
 };

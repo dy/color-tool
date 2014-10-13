@@ -1,6 +1,7 @@
 var Color = require('color');
 var state = require('st8');
 var Emitter = require('Emmy');
+var type = require('mutypes');
 
 module.exports = Picker;
 
@@ -46,21 +47,19 @@ function Picker(target, options){
 	state(this, constr.options);
 
 
-	//create color
-	if (!(this.color instanceof Color)) {
-		console.log(this.color)
-		// this.color = new Color(this.color);
+	//FIXME: create color
+	if (type.isString(this.color)) {
+		this.color = new Color(this.color);
 	}
 
-	//rerender on color change
-	Emitter.on(this.color, 'change', function(e){
+	//rerender on color change - loosely calling (50 is the most appropriate interval)
+	Enot.on(this, '@color change:throttle(50)', function(e){
 		self.colorChanged.call(self, e);
 	});
 
 
 	//change color on self slidy change
 	this.element.addEventListener('change', function(e){
-		self.value = self.slidy.value;
 		self.valueChanged.call(self, e);
 		self.emit('change');
 	});
@@ -69,13 +68,6 @@ function Picker(target, options){
 
 /** Set options in descendants */
 Picker.options = {
-	/** sync value with slidy value */
-	value: {
-		changed: function(val){
-			this.slidy.value = val;
-		}
-	},
-
 	/** callbacks */
 	change: null,
 
