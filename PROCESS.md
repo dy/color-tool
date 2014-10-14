@@ -88,7 +88,16 @@
 You have to implement some exclusive feature to make use exactly this one picker. Which is that?
 	* Relative palettes (exists)
 	* Lab space (rare, interesting)
-	* Realt Palette?
+	* Real Palette? Like luma etc
+	* Multiple pickers, connected by line
+	* Inverted picking style (bg is a picker)
+	* Triangle picker
+	* Any kind of picker (versality)
+	* Circular palette pickers (in examples)
+	* Image picker
+	* Natural colors picker
+	* Pantone picker
+	*
 
 * Competitors
 	* System picker (especially osx)

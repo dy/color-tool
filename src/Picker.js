@@ -75,7 +75,7 @@ Picker.options = {
 	/** callbacks */
 	change: null,
 
-	/** parse color from the options */
+	/** Shared color object. Parsed from the options */
 	color: null
 };
 

@@ -141,22 +141,52 @@ describe('1-component pickers', function(){
 		body.appendChild(el);
 	});
 
-	it('cyan', function(){
+	it.skip('cyan', function(){
+		var el = document.createElement('div');
+		new LinearPicker(el, {
+			color: color,
+			component: 'cyan',
+			change: function(){
+				// console.log('----change')
+				this.element.setAttribute('data-color', this.color.rgbString());
+				this.element.style.color = this.color.rgbString();
+			}
+		});
+
+		body.appendChild(el);
+	});
+
+	it.skip('magenta', function(){
 
 	});
 
-	it('magenta', function(){
+	it.skip('yellow', function(){
 
 	});
 
-	it('yellow', function(){
+	it.skip('black', function(){
 
 	});
 
-	it('black', function(){
+	it.skip('whiteness', function(){
 
 	});
 
+	it.skip('blackness', function(){
+
+	});
+
+	it.skip('L', function(){
+
+	});
+
+	it.skip('a', function(){
+
+	});
+
+	it.skip('b', function(){
+
+	});
 });
 
 

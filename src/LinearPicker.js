@@ -1,10 +1,11 @@
-//TODO: refactor all specific pickers so that just to implement this interface
+//TODO: set up slidy options in a way (type)
 
 var Picker = require('Picker');
 var Slidy = require('slidy');
 var Emitter = require('Emmy');
 var css = require('mucss');
 var extend = require('extend');
+var render = require('picker-backgrounds');
 
 
 module.exports = LinearPicker;
@@ -35,8 +36,7 @@ function LinearPicker(target, options){
 
 
 LinearPicker.options = extend({}, Picker.options, {
-	/** Shared color object */
-	color: undefined,
+	//TODO: add type of picker. Type defines a shape.
 
 	/** direction to show picker */
 	direction: {
@@ -75,8 +75,6 @@ LinearPicker.options = extend({}, Picker.options, {
 			min: 0,
 			max: 360,
 			render: function(){
-				// console.log('render')
-
 				//render
 				var color = this.color;
 				var s = color.saturation(),
@@ -93,7 +91,7 @@ LinearPicker.options = extend({}, Picker.options, {
 					'hsl(300,' + s + '%,' + l + '%) 83.333%,',
 					'hsl(360,' + s + '%,' + l + '%) 100%)'].join('');
 
-				this.element.style.background = bg;
+				this.element.style.background = bg//render[this.component];
 			}
 		},
 		saturation: {
@@ -251,6 +249,27 @@ LinearPicker.options = extend({}, Picker.options, {
 			/** transparent grid settings */
 			alphaGridColor: 'rgba(0,0,0,.4)',
 			alphaGridSize: 14,
+		},
+		cyan: {
+			min: 0,
+			max: 100,
+			render: function(){
+				// console.log('render')
+
+				//render
+				var color = this.color.clone();
+
+				//lightness
+				var bg = ['linear-gradient(to ' + this.direction + ','];
+				color.cyan(0);
+				bg.push(color.rgbString() + '0%,');
+				color.cyan(127);
+				bg.push(color.rgbString() + '50%,');
+				color.cyan(255);
+				bg.push(color.rgbString() + ' 100%)');
+
+				this.element.style.background = bg.join('');
+			}
 		}
 	},
 
