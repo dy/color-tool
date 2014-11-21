@@ -57,7 +57,13 @@ CompoundPicker.options = {
 	mode: ['sl','h'],
 
 	/** Default color - shared between inner pickers */
-	color: undefined
+	color: undefined,
+
+	/** Default size of range thumbnail to render */
+	size: [37,37],
+
+	/** Use web-worker to render range */
+	worker: true
 };
 
 

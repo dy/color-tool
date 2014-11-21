@@ -1,7 +1,7 @@
 var Color = require('color');
 var state = require('st8');
 var Emitter = require('Emmy');
-var type = require('mutypes');
+var type = require('mutype');
 
 module.exports = Picker;
 

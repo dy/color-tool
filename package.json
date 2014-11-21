@@ -1,13 +1,62 @@
 {
   "name": "picky",
-  "main": "dist/picky.js",
-  "version": "0.3.0",
-  "devDependencies": {
-    "chai": "~1.9.1",
-    "mocha": "~1.20.1",
-    "extend": "~2.0.0"
+  "version": "0.0.0",
+  "description": "A pretentious color picker",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
   },
   "dependencies": {
-    "mod-constructor": "~0.3.34"
-  }
+    "chai": "~1.9.1",
+    "color": "~0.x",
+    "draggy": "*",
+    "enot": "*",
+    "each-csv": "*",
+    "emmy": "*",
+    "extend": "~2.0.0",
+    "icicle": "*",
+    "intersects": "*",
+    "lifecycle-events": "*",
+    "mucss": "*",
+    "matches-selector": "~1.x",
+    "mumath": "*",
+    "mutation-observer": "~0.x",
+    "mustring": "*",
+    "muparse": "*",
+    "st8": "*",
+    "slidy": "*",
+    "tiny-element": "~1.1.x",
+    "color-ranger": "*",
+    "mutype": "*",
+    "color-convert": "~0.5.2"
+  },
+  "devDependencies": {
+    "mocha": "~1.x",
+    "require-stub": "~1.4.1"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/dfcreative/picky.git"
+  },
+  "keywords": [
+    "color",
+    "color-picker",
+    "picker",
+    "color-range",
+    "color-space",
+    "color-scheme",
+    "rgb",
+    "hsl",
+    "lch",
+    "cmyk"
+  ],
+  "author": "dyma ywanov",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dfcreative/picky/issues"
+  },
+  "homepage": "https://github.com/dfcreative/picky"
 }
