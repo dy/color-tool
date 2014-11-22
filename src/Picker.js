@@ -2,6 +2,8 @@ var Color = require('color');
 var state = require('st8');
 var Emitter = require('Emmy');
 var type = require('mutype');
+var parse = require('muparse');
+var Enot = require('Enot');
 
 module.exports = Picker;
 
@@ -55,7 +57,7 @@ function Picker(target, options){
 	//rerender on color change - loosely calling
 	//50 is the most appropriate interval for bg
 	//10 is the interval for picker movement
-	Enot.on(this, '@color change:throttle(20)', function(e){
+	Enot.on(this, '@color change:throttle(15)', function(e){
 		self.colorChanged.call(self, e);
 	});
 

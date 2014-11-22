@@ -1,5 +1,5 @@
 var Color = require('color');
-var LinearPicker = require('LinearPicker');
+var LinearPicker = require('../src/LinearPicker');
 
 var body = document.body;
 
