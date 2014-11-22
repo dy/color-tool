@@ -10,7 +10,7 @@ describe('1-component pickers', function(){
 		var el = document.createElement('div');
 		new LinearPicker(el, {
 			color: color,
-			component: 'hue',
+			channel: 'hue',
 			change: function(){
 				// console.log('----change cb')
 				this.element.setAttribute('data-color', this.color.hslString());
@@ -25,7 +25,7 @@ describe('1-component pickers', function(){
 		var el = document.createElement('div');
 		new LinearPicker(el, {
 			color: color,
-			component: 'saturation',
+			channel: 'saturation',
 			change: function(){
 				// console.log('----change')
 				this.element.style.color = this.color.rgbString();
@@ -38,24 +38,24 @@ describe('1-component pickers', function(){
 
 	it('brightness', function(){
 		var el = document.createElement('div');
-		// new LinearPicker(el, {
-		// 	color: color,
-		// 	component: 'brightness',
-		// 	change: function(){
-		// 		// console.log('----change')
-		// 		this.element.setAttribute('data-color', this.color.hslString());
-		// 		this.element.style.color = this.color.rgbString();
-		// 	}
-		// });
+		new LinearPicker(el, {
+			color: color,
+			channel: 'value',
+			change: function(){
+				// console.log('----change')
+				this.element.setAttribute('data-color', this.color.hslString());
+				this.element.style.color = this.color.rgbString();
+			}
+		});
 
-		// body.appendChild(el);
+		body.appendChild(el);
 	});
 
 	it('lightness', function(){
 		var el = document.createElement('div');
 		new LinearPicker(el, {
 			color: color,
-			component: 'lightness',
+			channel: 'lightness',
 			change: function(){
 				// console.log('----change')
 				this.element.setAttribute('data-color', this.color.hslString());
@@ -70,7 +70,7 @@ describe('1-component pickers', function(){
 		var el = document.createElement('div');
 		new LinearPicker(el, {
 			color: color,
-			component: 'red',
+			channel: 'red',
 			change: function(){
 				// console.log('----change')
 				this.element.setAttribute('data-color', this.color.rgbString());
@@ -85,7 +85,7 @@ describe('1-component pickers', function(){
 		var el = document.createElement('div');
 		new LinearPicker(el, {
 			color: color,
-			component: 'green',
+			channel: 'green',
 			change: function(){
 				// console.log('----change')
 				this.element.setAttribute('data-color', this.color.rgbString());
@@ -100,7 +100,7 @@ describe('1-component pickers', function(){
 		var el = document.createElement('div');
 		new LinearPicker(el, {
 			color: color,
-			component: 'blue',
+			channel: 'blue',
 			change: function(){
 				// console.log('----change')
 				this.element.setAttribute('data-color', this.color.rgbString());
@@ -111,11 +111,11 @@ describe('1-component pickers', function(){
 		body.appendChild(el);
 	});
 
-	it('alpha', function(){
+	it.skip('alpha', function(){
 		var el = document.createElement('div');
 		new LinearPicker(el, {
 			color: color,
-			component: 'alpha',
+			channel: 'alpha',
 			change: function(){
 				// console.log('----change')
 				this.element.setAttribute('data-color', this.color.rgbaString());
@@ -130,7 +130,7 @@ describe('1-component pickers', function(){
 		var el = document.createElement('div');
 		new LinearPicker(el, {
 			color: color,
-			component: 'value',
+			channel: 'value',
 			change: function(){
 				// console.log('----change')
 				this.element.setAttribute('data-color', this.color.rgbString());
@@ -145,7 +145,7 @@ describe('1-component pickers', function(){
 		var el = document.createElement('div');
 		new LinearPicker(el, {
 			color: color,
-			component: 'cyan',
+			channel: 'cyan',
 			change: function(){
 				// console.log('----change')
 				this.element.setAttribute('data-color', this.color.rgbString());

@@ -60,6 +60,7 @@ function Picker(target, options){
 	});
 
 
+
 	//change color on self slidy change
 	this.element.addEventListener('change', function(e){
 		// console.group('change')

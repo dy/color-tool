@@ -6,6 +6,9 @@ var LinearPicker = require('src/LinearPicker');
 module.exports = CompoundPicker;
 
 
+//TODO: start hue picker from less popular picker - like, green. Red is too frequent.
+
+
 /**
  * Compound picker.
  * It’s found more useful to be the main module rather than abstract Picker.
@@ -57,13 +60,7 @@ CompoundPicker.options = {
 	mode: ['sl','h'],
 
 	/** Default color - shared between inner pickers */
-	color: undefined,
-
-	/** Default size of range thumbnail to render */
-	size: [37,37],
-
-	/** Use web-worker to render range */
-	worker: true
+	color: undefined
 };
 
 
