@@ -11,7 +11,7 @@ describe('1-component pickers', function(){
 		new Picker(el, {
 			color: color,
 			space: 'hsl',
-			channels: ['hue'],
+			channel: ['hue'],
 			change: function(){
 				this.element.setAttribute('data-color', this.color.hslString());
 				this.element.style.color = this.color.rgbString();
@@ -25,6 +25,7 @@ describe('1-component pickers', function(){
 		var el = document.createElement('div');
 		new Picker(el, {
 			color: color,
+			space: 'hsl',
 			channel: 'saturation',
 			change: function(){
 				// console.log('----change')
@@ -40,6 +41,7 @@ describe('1-component pickers', function(){
 		var el = document.createElement('div');
 		new Picker(el, {
 			color: color,
+			space: 'hsv',
 			channel: 'value',
 			change: function(){
 				// console.log('----change')
@@ -55,6 +57,7 @@ describe('1-component pickers', function(){
 		var el = document.createElement('div');
 		new Picker(el, {
 			color: color,
+			space: 'hsl',
 			channel: 'lightness',
 			change: function(){
 				// console.log('----change')

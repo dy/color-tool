@@ -13,6 +13,8 @@ var throttle = require('emmy/throttle');
 var getUid = require('get-uid');
 var spaces = require('color-space');
 var Slidy = require('slidy');
+var isArray = require('is-array');
+var isNumber = require('is-number');
 
 
 module.exports = Picker;
@@ -45,7 +47,7 @@ if (isWorkerAvailable) {
  * This is a main picker class.
  * It provides an abstract interface for any color picker.
  */
-function Picker(element, options){
+function Picker (element, options) {
 	var self = this;
 
 	this.element = element;
@@ -130,7 +132,7 @@ proto.space = 'rgb';
 proto.channel = {
 	init: 'hue',
 	hue: {
-		before: function(){
+		before: function () {
 			this.slidy.min = 0;
 			this.slidy.max = 360;
 			this.slidy.repeat = true;
@@ -141,7 +143,7 @@ proto.channel = {
 		}
 	},
 	saturation: {
-		before: function(){
+		before: function () {
 			this.slidy.min = 0;
 			this.slidy.max = 100;
 			this.slidy.repeat = false;
@@ -152,7 +154,7 @@ proto.channel = {
 		}
 	},
 	lightness: {
-		before: function(){
+		before: function () {
 			this.slidy.min = 0;
 			this.slidy.max = 100;
 			this.slidy.repeat = false;
@@ -163,7 +165,7 @@ proto.channel = {
 		}
 	},
 	'value, brightness': {
-		before: function(){
+		before: function () {
 			this.slidy.min = 0;
 			this.slidy.max = 100;
 			this.slidy.repeat = false;
@@ -174,7 +176,7 @@ proto.channel = {
 		}
 	},
 	red: {
-		before: function(){
+		before: function () {
 			this.slidy.min = 0;
 			this.slidy.max = 255;
 			this.slidy.repeat = false;
@@ -185,7 +187,7 @@ proto.channel = {
 		}
 	},
 	green: {
-		before: function(){
+		before: function () {
 			this.slidy.min = 0;
 			this.slidy.max = 255;
 			this.slidy.repeat = false;
@@ -196,7 +198,7 @@ proto.channel = {
 		}
 	},
 	blue: {
-		before: function(){
+		before: function () {
 			this.slidy.min = 0;
 			this.slidy.max = 255;
 			this.slidy.repeat = false;
@@ -208,17 +210,17 @@ proto.channel = {
 	},
 	alpha: {
 		max: 1,
-		before: function(){
+		before: function () {
 			this.slidy.step = 0.01;
 		},
-		after: function(){
+		after: function () {
 			this.slidy.step = 1;
 		},
 		/** transparent grid settings */
 		alphaGridColor: 'rgba(0,0,0,.4)',
 		alphaGridSize: 14,
 	},
-	cyan: function(){
+	cyan: function () {
 		this.slidy.min = 0;
 		this.slidy.max = 100;
 		this.step = 1;
@@ -230,16 +232,37 @@ proto.channel = {
  * Render picker background
  * according to the current color value
  */
-proto.update = function(){
+proto.update = function () {
 	var self = this;
 
 	var imgData = ctx.getImageData(0, 0, cnv.width, cnv.height);
 	var space = spaces[this.space];
+
+	//form channels
+	var channels = self.channel;
+	if (!isArray(self.channel)) {
+		channels = [self.channel];
+	}
+	channels = channels.map(function (channel) {
+		if (isNumber(channel)) return channel;
+		var idx = space.channel.indexOf(channel);
+		if (idx < 0) throw Error('Space ' + self.space + ' has no channel ' + channel);
+		return idx;
+	});
+
+	//form mins, maxes
+	var mins = [], maxes = [];
+	channels.forEach(function (chNum, i) {
+		mins[i] = space.min[chNum];
+		maxes[i] = space.max[chNum];
+	});
+
+	//form options
 	var opts = {
 		space: this.space,
-		channel: [0,1],
-		max: space.max.slice(0,2),
-		min: space.min.slice(0,2),
+		channel: channels,
+		max: mins,
+		min: maxes,
 	};
 
 	//render range for a new color value in worker
@@ -268,31 +291,4 @@ proto.update = function(){
 proto.renderData = function (imgData) {
 	ctx.putImageData(imgData, 0, 0);
 	this.element.style.backgroundImage =  'url(' + cnv.toDataURL() + ')';
-};
-
-
-/** Set color */
-proto.valueChanged = function(){
-	//update color value
-	//FIXME: color change here affects in some way other pickers
-	this.color[this.channel](this.slidy.value);
-	// console.log(this.channel);
-	//TODO: make change event color-dependent. User should not emit color change manually.
-	emit(this.color, 'change', {channel: this.channel});
-};
-
-
-/** Update bg */
-proto.colorChanged = function(e){
-	//TODO: make this muting picker-independent. User should not implement muting in his own pickers
-	if (e.detail && e.detail.channel !== this.channel){
-		this.slidy.mute = true;
-	}
-
-	//update self value so to correspond to the color
-	this.slidy.value = this.color[this.channel]();
-
-	this.slidy.mute = false;
-
-	this.render();
 };
