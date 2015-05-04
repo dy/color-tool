@@ -1,40 +1,26 @@
 {
   "name": "picky",
   "version": "0.0.1",
-  "description": "A pretentious color picker",
+  "description": "Color picker component",
   "main": "index.js",
   "directories": {
     "test": "test"
   },
   "dependencies": {
-    "chai": "~1.9.1",
-    "color": "~0.x",
-    "draggy": "*",
-    "enot": "*",
-    "each-csv": "*",
-    "emmy": "*",
-    "extend": "~2.0.0",
-    "icicle": "*",
-    "intersects": "*",
-    "lifecycle-events": "*",
-    "mucss": "*",
-    "matches-selector": "~1.x",
-    "mumath": "*",
-    "mutation-observer": "~0.x",
-    "mustring": "*",
-    "muparse": "*",
-    "st8": "*",
-    "slidy": "*",
-    "tiny-element": "~1.1.x",
-    "color-ranger": "*",
-    "mutype": "*",
-    "color-convert": "~0.5.2"
+    "color": "^0.8.0",
+    "color-ranger": "^4.0.3",
+    "color-space": "^1.1.2",
+    "emmy": "^5.2.3",
+    "get-uid": "^1.0.1",
+    "slidy": "^0.2.5",
+    "xtend": "^4.0.0"
   },
   "devDependencies": {
-    "mocha": "~1.x",
-    "require-stub": "~1.4.1"
+    "mocha": "^1.x",
+    "chai": "^1.10.0"
   },
   "scripts": {
+    "watch": "watchify -r ./index.js:../ -r color -d -o ./test/bundle.js",
     "test": "mocha"
   },
   "repository": {
@@ -53,7 +39,7 @@
     "lch",
     "cmyk"
   ],
-  "author": "dyma ywanov",
+  "author": "Deema Ywanov <dfcreative@gmail.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/dfcreative/picky/issues"

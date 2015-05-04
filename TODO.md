@@ -1,3 +1,6 @@
+
+
+
 * fix github bugs
 * make tests public
 
@@ -11,8 +14,24 @@
 * Fulfill readme with technical badges
 
 
+* alphas in ranges
+* circular ranges
+* multicolors
+* IE, safari
+* displace scales
+* paint "good" range rect
+* paint grid
+* webcomponentify
+* Transfer delta-stream
+* It is duplex-stream btw
+* Able to be piped
 
---------------other things
+
+* keep hue value untouched on changing green controller (is sat===0 don’t change hue)
+* start hue picker from less popular picker - like, green. Red is too frequent.
+
+
+
 
 * Implement test page
 	* predefined areas
@@ -55,9 +74,7 @@
 
 * find a way to convert value from hex, for ex, to rgba, in input field
 
-MINIMAL:
 
-* kbd parse & change
 + targets overlapping
 * resize
 * color stack
@@ -66,3 +83,37 @@ MINIMAL:
 * set transparency in accordance with format, not separate property
 
 * [type=color]
+
+
+
+### Lite [demo]()
+
+A widespread over the web tiny hsl picker with no options (2kb).
+[default hsl picker]
+
+### Artist [demo]()
+
+[triangle + circle]
+
+### Channels [demo]()
+
+Common color spaces channels mixer.
+
+### Palettes [demo]()
+
+Word-like palettes of common colors picker
+
+### Photoshop
+
+Full photoshop-compliant color picker
+
+### OSX picker
+
+OSX crossplatform picker polyfill
+
+### Megapicker
+
+All-in-one color space picker. You can study color spaces with that tool.
+
+
+### [Add your picker]()

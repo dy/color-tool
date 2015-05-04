@@ -1,11 +1,11 @@
 <html>
 <head>
 	<meta charset="utf-8">
-	<title>Slidy tests</title>
+	<title>Picky tests</title>
 	<link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
 
 	<style>
-		.picker {
+		.picky {
 			position: relative;
 			width: 200px;
 			height: 30px;
@@ -15,7 +15,7 @@
 			background-size: cover;
 		}
 
-		.picker:after{
+		.picky:after{
 			content: attr(data-color);
 			position: absolute;
 			top: 0;
@@ -26,7 +26,7 @@
 			font-family: sans-serif;
 		}
 
-		.picker > .picky-thumb{
+		.picky > .picky-picker{
 			position: absolute;
 			top: -9px;
 			width: 0px;
@@ -46,17 +46,10 @@
 <body>
 	<div id="mocha"></div>
 
-	<!--<script src="../node_modules/jquery/dist/jquery.min.js"></script>-->
-
 	<script src="../node_modules/mocha/mocha.js"></script>
 	<script src="../node_modules/chai/chai.js"></script>
 
-	<!--[if IE 9]>
-	<script src="../src/polyfill.js"></script>
-	<![endif]-->
-
-	<!-- dev -->
-	<script src="../node_modules/require-stub/index.js"></script>
+	<script src="bundle.js"></script>
 
 	<script>
 		mocha.setup('bdd');

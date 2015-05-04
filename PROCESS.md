@@ -18,11 +18,18 @@
 * Color glue
 * Gay
 * Fairy
-* ✔ Picky
+* ✘ Picky
 	* Associates with color-picker
 	* Short
 	* Other sense (haughty)
 	* ✘ picky mode
+	- too unclear
+	- doesn’t start with color
+* ✔ color-pickers
+	+ generic name
+	+ starts with color
+	+ not taken npm-name
+	+ reflects a lot of color-picker use-cases
 
 ## Notes
 * Source/Target concept.
