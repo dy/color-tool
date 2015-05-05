@@ -94,6 +94,9 @@ function Picker (element, options) {
 		});
 	}
 
+	//bind options change listener
+	on(self, 'change', self.change);
+
 	//rerender on color change - loosely calling
 	//50 is the most appropriate interval for bg
 	//10 is the interval for picker movement
@@ -102,10 +105,9 @@ function Picker (element, options) {
 	// });
 
 	//change color on self slidy change
-	// on(this.element, 'change', function(e){
-	// 	self.valueChanged.call(self, e);
-	// 	self.emit('change');
-	// });
+	on(this.slidy, 'change', function (e) {
+		self.emit('change');
+	});
 
 
 	//force update
@@ -128,104 +130,8 @@ proto.worker = true;
 proto.space = 'rgb';
 
 
-/** Color component to pick */
-proto.channel = {
-	init: 'hue',
-	hue: {
-		before: function () {
-			this.slidy.min = 0;
-			this.slidy.max = 360;
-			this.slidy.repeat = true;
-
-			this.space = 'hsl';
-			this.cIdx = [0];
-			this.cMax = [360];
-		}
-	},
-	saturation: {
-		before: function () {
-			this.slidy.min = 0;
-			this.slidy.max = 100;
-			this.slidy.repeat = false;
-
-			this.space = 'hsl';
-			this.cIdx = [1];
-			this.cMax = [100];
-		}
-	},
-	lightness: {
-		before: function () {
-			this.slidy.min = 0;
-			this.slidy.max = 100;
-			this.slidy.repeat = false;
-
-			this.space = 'hsl';
-			this.cIdx = [2];
-			this.cMax = [100];
-		}
-	},
-	'value, brightness': {
-		before: function () {
-			this.slidy.min = 0;
-			this.slidy.max = 100;
-			this.slidy.repeat = false;
-
-			this.space = 'hsv';
-			this.cIdx = [2];
-			this.cMax = [100];
-		}
-	},
-	red: {
-		before: function () {
-			this.slidy.min = 0;
-			this.slidy.max = 255;
-			this.slidy.repeat = false;
-
-			this.space = 'rgb';
-			this.cIdx = [0];
-			this.cMax = [255];
-		}
-	},
-	green: {
-		before: function () {
-			this.slidy.min = 0;
-			this.slidy.max = 255;
-			this.slidy.repeat = false;
-
-			this.space = 'rgb';
-			this.cIdx = [1];
-			this.cMax = [255];
-		}
-	},
-	blue: {
-		before: function () {
-			this.slidy.min = 0;
-			this.slidy.max = 255;
-			this.slidy.repeat = false;
-
-			this.space = 'rgb';
-			this.cIdx = [2];
-			this.cMax = [255];
-		}
-	},
-	alpha: {
-		max: 1,
-		before: function () {
-			this.slidy.step = 0.01;
-		},
-		after: function () {
-			this.slidy.step = 1;
-		},
-		/** transparent grid settings */
-		alphaGridColor: 'rgba(0,0,0,.4)',
-		alphaGridSize: 14,
-	},
-	cyan: function () {
-		this.slidy.min = 0;
-		this.slidy.max = 100;
-		this.step = 1;
-	}
-};
+/** Default channel */
+proto.channel = 'red';
 
 
 /**

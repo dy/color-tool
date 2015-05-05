@@ -3,6 +3,7 @@
 	<meta charset="utf-8">
 	<title>Picky tests</title>
 	<link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
+	<link rel="stylesheet" type="text/css" href="../index.css"/>
 
 	<style>
 		.picky {
@@ -11,10 +12,7 @@
 			height: 30px;
 			outline: 1px solid #f2f2f2;
 			margin: 50px;
-			background-repeat: no-repeat;
-			background-size: cover;
 		}
-
 		.picky:after{
 			content: attr(data-color);
 			position: absolute;
@@ -25,8 +23,7 @@
 			line-height: 30px;
 			font-family: sans-serif;
 		}
-
-		.picky > .picky-picker{
+		.picky-picker {
 			position: absolute;
 			top: -9px;
 			width: 0px;
@@ -37,11 +34,19 @@
 			border-bottom: none;
 			/*border-radius: 10px;*/
 			/*box-shadow: inset 0 0 1px 1px rgba(240,250,255,.5), 0 0 1px 1px rgba(0,10,20,.25);*/
-			/*position: relative;*/
 		}
-
+		.picky-rect {
+			height: 200px;
+		}
+		.picky-rect .picky-picker{
+			border: 0;
+			top: 0;
+			height: 20px;
+			width: 20px;
+			border-radius: 20px;
+			box-shadow: 0 1px 3px black;
+		}
 	</style>
-	<style type="text/css"></style>
 </head>
 <body>
 	<div id="mocha"></div>

@@ -2,9 +2,9 @@ var Color = require('color');
 var Picker = require('../');
 
 var body = document.body;
+var color = new Color('green');
 
 describe('1-component pickers', function(){
-	var color = new Color('green');
 
 	it('hue', function(){
 		var el = document.createElement('div');
@@ -144,10 +144,11 @@ describe('1-component pickers', function(){
 		body.appendChild(el);
 	});
 
-	it.skip('cyan', function(){
+	it('cyan', function(){
 		var el = document.createElement('div');
 		new Picker(el, {
 			color: color,
+			space: 'cmyk',
 			channel: 'cyan',
 			change: function(){
 				// console.log('----change')
@@ -195,7 +196,19 @@ describe('1-component pickers', function(){
 
 describe('2-component pickers', function(){
 	it('HL', function(){
+		var el = document.createElement('div');
+		new Picker(el, {
+			color: color,
+			space: 'hsl',
+			channel: ['hue', 'saturation'],
+			change: function(){
+				this.element.setAttribute('data-color', this.color.hslString());
+				this.element.style.color = this.color.rgbString();
+			}
+		});
+		el.classList.add('picky-rect');
 
+		body.appendChild(el);
 	});
 
 	it('SL', function(){

@@ -25,6 +25,7 @@
     "watch": "watchify -r ./index.js:../ -r color -d -o ./test/bundle.js",
     "test": "mocha"
   },
+  "style": "index.css",
   "repository": {
     "type": "git",
     "url": "git://github.com/dfcreative/picky.git"
