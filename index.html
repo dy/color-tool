@@ -6,14 +6,14 @@
 
 <title>Picky - the brilliant color picker</title>
 
-<link rel="stylesheet" href="css/normalize.css">
-<link rel="stylesheet" href="css/normalize-opentype.css">
+<link rel="stylesheet" href="./bundle.css">
+
 <style>
 * {
 	box-sizing: border-box;
 }
-#demo{
-	background: #444;
+.section-demo{
+	background: rgba(0,0,0,.1);
 	height: 100vh;
 }
 section {
@@ -36,8 +36,8 @@ sup:before, sup:after{
 
 
 <!-- 1. Demo -->
-<section id="demo">
-	<div class="demo-picker" data-picky="" data-mode="hl,s" data-info-tooltip=""></div>
+<section id="demo" class="section-demo">
+	<div class="section-demo-picker"></div>
 </section>
 
 
@@ -51,10 +51,7 @@ sup:before, sup:after{
 	</header>
 
 	<h4>1. Include <em><code data-tooltip="" title="5.78 kb">mod.js</code></em></h4>
-	<p>
-		</p><pre id="include-mod">			<script src="link to mod.js CDN"></script>
-		</pre>
-		<div data-coppy="" data-for="#include-mod"></div>
+
 
 		<aside>
 			Mod is a base class for organizing picky.
@@ -63,9 +60,6 @@ sup:before, sup:after{
 	<p></p>
 
 	<h4>2. Include <em><code data-tooltip="" title="10 kb">picky.js</code></em></h4>
-	<p>
-		</p><pre id="include-picky">			<script src="link to mod.js CDN"></script>
-		</pre>
 		<button data-copy="" data-for="#include-picky"><i class="icon-copy"></i></button>
 	<p></p>
 </section>
@@ -170,3 +164,5 @@ sup:before, sup:after{
 		<a href="mailto:dfcreative@gmail.com"><i class="icon-mail"></i></a>
 	</footer>
 </section>
+
+<script type="text/javascript" src="./bundle.js"></script>
