@@ -1,6 +1,6 @@
 {
   "name": "picky",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Color picker component",
   "main": "index.js",
   "directories": {
