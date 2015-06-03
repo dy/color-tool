@@ -1,21 +1,21 @@
 {
   "name": "color-picky",
   "version": "0.0.2",
-  "description": "Color picker component",
+  "description": "Color picker",
   "main": "index.js",
   "directories": {
     "test": "test"
   },
   "dependencies": {
-    "color": "^0.8.0",
-    "color-ranger": "^4.0.3",
-    "color-space": "^1.1.2",
-    "emmy": "^5.2.3",
-    "get-uid": "^1.0.1",
-    "mucss": "^0.6.4",
-    "mutype": "^0.3.9",
-    "slidy": "^0.5.8",
-    "xtend": "^4.0.0"
+    "color": "^0.8",
+    "color-ranger": "^4.0",
+    "color-space": "^1.1",
+    "emmy": "^5.2",
+    "get-uid": "^1.0",
+    "mucss": "^0.6",
+    "mutype": "^0.3",
+    "slidy": "^0.5",
+    "xtend": "^4.0"
   },
   "devDependencies": {
     "chai": "^1.10.0",
