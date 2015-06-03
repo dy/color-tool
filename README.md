@@ -12,7 +12,7 @@ Color picker component.
 
 ## Use
 
-`$ npm install picky`
+`$ npm install color-picky`
 
 ```js
 	var Picky = require('picky');
