@@ -9,6 +9,7 @@ var getWorker = require('color-ranger/worker');
 var renderRange = require('color-ranger');
 var extend = require('xtend/mutable');
 var on = require('emmy/on');
+var emit = require('emmy/emit');
 var throttle = require('emmy/throttle');
 var getUid = require('get-uid');
 var spaces = require('color-space');
@@ -95,28 +96,16 @@ function Picky (target, options) {
 		return space.max[idx];
 	});
 
-	//create color instance
-	self.color = new Color(self.color);
-	var values = self.color[self.space + 'Array']();
-
 	//make self a slidy
 	self.slidy = new Slidy(target, {
 		pickerClass: 'picky-picker',
 		point: true,
 		min: self._min,
-		max: self._max,
-
-		//set initial value as the color
-		value: self._channels.map(function (idx) {
-			return values[idx];
-		})
+		max: self._max
 	});
 
 	//enable events
 	self.enable();
-
-	//force update
-	self.update();
 }
 
 
@@ -127,9 +116,19 @@ var proto = Picky.prototype = Object.create(Emitter.prototype);
 proto.enable = function () {
 	var self = this;
 
-	//emit self change
-	self.slidy.on('change', function (value) {
-		self.emit('change', self.color);
+	//update color on self user input
+	self.slidy.on('input', function (value) {
+		var values = self.color[self.space + 'Array']();
+
+		self._channels.forEach(function (idx, i) {
+			values[idx] = value[i];
+		});
+
+		//set updated color
+		self.color[self.space](values);
+
+		//trigger change for color
+		emit(self.color, 'change');
 	});
 
 	//listen to bg update events for the specifically this picker
@@ -143,12 +142,25 @@ proto.enable = function () {
 	on(self, 'change', self.change);
 
 	//rerender on color change - loosely calling
-	//50 is the most appropriate interval for bg
-	//10 is the interval for picker movement
+	//50 is subjectively unnoticed interval for bg rendering
 	throttle(self.color, 'change', 50, function (e) {
-		self.update();
+		self.updateBackground();
+	});
+	//10 is subjectively unnoticed interval for picker movement
+	throttle(self.color, 'change', 10, function (e) {
+		self.updatePosition();
 	});
 
+	//for the rest color change events just redirect callback
+	on(self.color, 'change', function () {
+		self.emit('change', self.color);
+	});
+
+	//update position, bg etc
+	self.update();
+
+	//emit first change, as if changed from undefined to anything
+	self.emit('change', self.color);
 };
 
 
@@ -169,10 +181,40 @@ proto.channel = 'red';
 
 
 /**
+ * Update bg & position
+ */
+proto.update = function () {
+	this.updateBackground()
+		.updatePosition();
+
+	return this;
+};
+
+
+/**
+ * Update picker position
+ * according to the current color value
+ */
+proto.updatePosition = function () {
+	var self = this;
+
+	var cValues = self.color[self.space + 'Array']()
+
+	var value = self._channels.map(function (idx) {
+		return cValues[idx];
+	});
+
+	self.slidy.value = value;
+
+	return self;
+};
+
+
+/**
  * Render picker background
  * according to the current color value
  */
-proto.update = function () {
+proto.updateBackground = function () {
 	var self = this;
 
 	var imgData = ctx.getImageData(0, 0, cnv.width, cnv.height);
@@ -188,12 +230,12 @@ proto.update = function () {
 
 	//render range for a new color value in worker
 	if (isWorkerAvailable && this.worker && false) {
+		//response is handled by `message` event
 		WORKER.postMessage(extend(opts, {
 			rgb: this.color.rgbArray(),
 			data: imgData.data,
 			id: this.id
 		}));
-		//response is handled by `message` event
 	}
 
 	//render single-flow
@@ -205,6 +247,8 @@ proto.update = function () {
 		);
 		this.renderData(imgData);
 	}
+
+	return self;
 };
 
 
@@ -212,4 +256,5 @@ proto.update = function () {
 proto.renderData = function (imgData) {
 	ctx.putImageData(imgData, 0, 0);
 	this.element.style.backgroundImage =  'url(' + cnv.toDataURL() + ')';
+	return this;
 };

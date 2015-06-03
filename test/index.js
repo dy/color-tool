@@ -12,7 +12,7 @@ describe('1-component pickers', function(){
 			color: color,
 			space: 'hsl',
 			channel: ['hue'],
-			change: function(){
+			change: function () {
 				this.element.setAttribute('data-color', this.color.hslString());
 				this.element.style.color = this.color.rgbString();
 			}
