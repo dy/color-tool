@@ -1,6 +1,6 @@
 {
   "name": "color-picky",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Color picker",
   "main": "index.js",
   "directories": {
