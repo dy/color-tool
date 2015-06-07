@@ -97,11 +97,20 @@ function Picky (target, options) {
 	});
 
 	//make self a slidy
+	//detect orientation based on a number of values passed
+	var orientation = self.orientation || isArray(self.channel) && self.channel.length > 1 && 'cartesian';
+	//detect repeat based on
+	var repeat = false;
+	if (space.channel[self._channels[0]] === 'hue') repeat = 'x';
+	else if (space.channel[self._channels[1]] === 'hue') repeat = 'y';
+
 	self.slidy = new Slidy(target, {
 		pickerClass: 'picky-picker',
 		point: true,
 		min: self._min,
-		max: self._max
+		max: self._max,
+		orientation: orientation,
+		repeat: repeat
 	});
 
 	//enable events
@@ -139,7 +148,9 @@ proto.enable = function () {
 	}
 
 	//bind options change listener
-	on(self, 'change', self.change);
+	if (self.change) {
+		on(self, 'change', self.change);
+	}
 
 	//rerender on color change - loosely calling
 	//50 is subjectively unnoticed interval for bg rendering
@@ -229,7 +240,7 @@ proto.updateBackground = function () {
 	};
 
 	//render range for a new color value in worker
-	if (isWorkerAvailable && this.worker && false) {
+	if (isWorkerAvailable && this.worker) {
 		//response is handled by `message` event
 		WORKER.postMessage(extend(opts, {
 			rgb: this.color.rgbArray(),

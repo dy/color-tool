@@ -194,6 +194,7 @@ describe('1-component pickers', function(){
 });
 
 
+
 describe('2-component pickers', function(){
 	it('HL', function(){
 		var el = document.createElement('div');
@@ -212,11 +213,35 @@ describe('2-component pickers', function(){
 	});
 
 	it('SL', function(){
+		var el = document.createElement('div');
+		new Picker(el, {
+			color: color,
+			space: 'hsl',
+			channel: ['saturation', 'lightness'],
+			change: function(){
+				this.element.setAttribute('data-color', this.color.hslString());
+				this.element.style.color = this.color.rgbString();
+			}
+		});
+		el.classList.add('picky-rect');
 
+		body.appendChild(el);
 	});
 
 	it('HS', function(){
+		var el = document.createElement('div');
+		new Picker(el, {
+			color: color,
+			space: 'hsl',
+			channel: ['hue', 'saturation'],
+			change: function(){
+				this.element.setAttribute('data-color', this.color.hslString());
+				this.element.style.color = this.color.rgbString();
+			}
+		});
+		el.classList.add('picky-rect');
 
+		body.appendChild(el);
 	});
 
 	it('other', function(){

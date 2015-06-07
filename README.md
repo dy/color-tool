@@ -41,4 +41,4 @@ Color picker component.
 
 
 
-[![NPM](https://nodei.co/npm/slidy.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/slidy/)
+[![NPM](https://nodei.co/npm/color-picky.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/color-picky/)

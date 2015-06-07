@@ -22,8 +22,8 @@
     "mocha": "^2.2.5"
   },
   "scripts": {
-    "watch": "watchify -r ./index.js:../ -r color -d -o ./test/bundle.js",
-    "build": "browserify ./index.js -s Picky | ccjs - > picky.js",
+    "watch": "watchify -r ./index.js:../ -r color -r color-string -d -o ./test/bundle.js",
+    "build": "browserify ./index.js -s Picky | ccjs - --language_in=ECMASCRIPT5 > picky.js",
     "test": "mocha"
   },
   "style": "index.css",
