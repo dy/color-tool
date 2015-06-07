@@ -32,12 +32,45 @@ sup{
 sup:before, sup:after{
 	content: ' ';
 }
+
+.section-demo-picker{
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 4rem;
+}
+.section-demo-picker-s{
+	position: absolute;
+	left: 0;
+	right: 0;
+	height: 4rem;
+	bottom: 0;
+}
+
+
+.picky {
+	overflow: hidden;
+}
+
+.picky-picker {
+	color: inherit;
+	position: absolute;
+	width: 2rem;
+	height: 2rem;
+	border: 0;
+	background: currentcolor;
+	border-radius: 2rem;
+	outline: none;
+	box-shadow: 0 1px 5px rgba(0,10,40,.2), 0 -1px 5px rgba(40,10,0,.2);
+}
 </style>
 
 
 <!-- 1. Demo -->
 <section id="demo" class="section-demo">
 	<div class="section-demo-picker"></div>
+	<div class="section-demo-picker-s"></div>
 </section>
 
 
@@ -50,16 +83,7 @@ sup:before, sup:after{
 		<p>Brilliant color picker</p>
 	</header>
 
-	<h4>1. Include <em><code data-tooltip="" title="5.78 kb">mod.js</code></em></h4>
-
-
-		<aside>
-			Mod is a base class for organizing picky.
-			There’re also a lot of other components using mod, if you’re interesting − <a href="link to mod components">have a look</a>.
-		</aside>
-	<p></p>
-
-	<h4>2. Include <em><code data-tooltip="" title="10 kb">picky.js</code></em></h4>
+	<h4>1. Include <em><code data-tooltip="" title="10 kb">picky.js</code></em></h4>
 		<button data-copy="" data-for="#include-picky"><i class="icon-copy"></i></button>
 	<p></p>
 </section>

@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "build": "npm run build-js & npm run build-css",
-    "build-js": "browserify ./index.js -r color-picky -r queried | ccjs - --language_in=ECMASCRIPT5 > bundle.js",
+    "build-js": "browserify ./index.js -r color-picky -r queried -r color | ccjs - --language_in=ECMASCRIPT5 > bundle.js",
     "build-css": "postcss -u postcss-import -u autoprefixer -u cssnano index.css -o bundle.css",
-    "watch": "watchify ./index.js -r color-picky -r queried -d -o bundle.js"
+    "watch": "watchify ./index.js -r color-picky -r queried -r color -d -o bundle.js"
   },
   "repository": {
     "type": "git",
@@ -20,8 +20,10 @@
   },
   "homepage": "https://github.com/dfcreative/picky",
   "dependencies": {
-    "color-picky": "0.0.2",
+    "color": "^0.8.0",
+    "color-picky": ">0.0.2",
     "normalize.css": "^3.0.3",
+    "picky": "^0.1.0",
     "queried": "^1.4.1"
   },
   "devDependencies": {
