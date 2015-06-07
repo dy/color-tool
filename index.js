@@ -7,7 +7,7 @@ var doc = document, loc = doc.location, win = window;
 
 
 /** Get initial color as url param */
-var cstr = loc.href.slice(loc.origin.length + 1);
+var cstr = loc.href.split('/').slice(-1)[0];
 var color = Color(cstr || 'red');
 
 
