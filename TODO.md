@@ -1,7 +1,13 @@
+* make color-parse handle adobe's
+* supporrt different color libs
 
+* fix for iphone
+* loose movement
+* proper default picker style
+* control of slidy params - wheel, sniper etc
+* update picker color
+* make proper change callback - only when changed
 
-
-* fix github bugs
 * make tests public
 
 * write ideal pickers code - photoshop.html

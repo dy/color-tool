@@ -7,8 +7,7 @@
     "test": "test"
   },
   "dependencies": {
-    "color": "^0.8",
-    "color-ranger": "^4.0",
+    "color-ranger": "^4.0.6",
     "color-space": "^1.1",
     "emmy": "^5.2",
     "get-uid": "^1.0",
@@ -19,10 +18,12 @@
   },
   "devDependencies": {
     "chai": "^1.10.0",
+    "color": "^0.8.0",
+    "color2": "^0.8.0",
     "mocha": "^2.2.5"
   },
   "scripts": {
-    "watch": "watchify -r ./index.js:../ -r color -r color-string -d -o ./test/bundle.js",
+    "watch": "watchify -r ./index.js:../ -r color2:color -r color-string -d -o ./test/bundle.js",
     "build": "browserify ./index.js -s Picky | ccjs - --language_in=ECMASCRIPT5 > picky.js",
     "test": "mocha"
   },

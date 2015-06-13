@@ -1,6 +1,8 @@
+@import "slidy";
+
 .picky {
 	background-repeat: no-repeat;
-	background-size: cover;
+	background-size: 100% 100%;
 }
 .picky-picker{
 
@@ -8,3 +10,5 @@
 .picky-rect {
 	height: 200px;
 }
+
+/** TODO: correct default picker style; */

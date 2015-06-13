@@ -3,7 +3,8 @@
  * @module  picky
  */
 
-var Color = require('color');
+//TODO: make loose movement
+
 var Emitter = require('events');
 var getWorker = require('color-ranger/worker');
 var renderRange = require('color-ranger');
@@ -143,7 +144,9 @@ proto.enable = function () {
 	//listen to bg update events for the specifically this picker
 	if (isWorkerAvailable && self.worker) {
 		on(WORKER, 'message', function (e) {
-			if (e.data.id === self.id) self.renderData(e.data.data);
+			var imgData = ctx.getImageData(0, 0, cnv.width, cnv.height);
+			imgData.data.set(e.data.data);
+			if (e.data.id === self.id) self.renderData(imgData);
 		});
 	}
 
@@ -176,7 +179,7 @@ proto.enable = function () {
 
 
 /** Basic initial color for pickers */
-proto.color = new Color();
+proto.color;
 
 
 /** Use web-worker to render range */
