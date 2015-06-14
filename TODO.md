@@ -1,9 +1,6 @@
 * fix for iphone
-* loose movement
 * proper default picker style
 * control of slidy params - wheel, sniper etc
-* update picker color
-* make proper change callback - only when changed
 
 * make tests public
 
