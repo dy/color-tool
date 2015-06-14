@@ -194,7 +194,6 @@ describe('1-component pickers', function(){
 });
 
 
-
 describe('2-component pickers', function(){
 	it('HL', function(){
 		var el = document.createElement('div');
@@ -249,6 +248,7 @@ describe('2-component pickers', function(){
 	});
 });
 
+
 describe('Special pickers', function(){
 	it('input', function(){
 
@@ -264,16 +264,21 @@ describe('Special pickers', function(){
 });
 
 
+describe('Cases', function () {
+	it('Fullscreen', function () {
+		var el = document.createElement('div');
+		new Picker(el, {
+			color: color,
+			space: 'hsl',
+			channel: ['saturation'],
+			step: 10,
+			change: function () {
+				this.element.setAttribute('data-color', this.color.hslString());
+				this.element.style.color = this.color.rgbString();
+			}
+		});
+		el.classList.add('picky-fullscreen');
 
-describe('Picky tests', function(){
-	it('Simple case', function(){
-		var a = document.createElement('div');
-
-		a.innerHTML = '<div data-picker></div>';
-	});
-
-	it.skip('Pipes', function(){
-		var a = Picky();
-		a.pipe(writableLikeAnInputOrEtc);
+		body.appendChild(el);
 	});
 });

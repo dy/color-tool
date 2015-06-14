@@ -21,6 +21,8 @@ var isNumber = require('mutype/is-number');
 module.exports = Picky;
 
 
+var doc = document, win = window;
+
 
 /** Virtual canvas for painting color ranges */
 var cnv = document.createElement('canvas');
@@ -29,7 +31,6 @@ var ctx = cnv.getContext('2d');
 /** 37 is a good balance between performance/quality. You can set 101 or 13 though. */
 cnv.width = 37;
 cnv.height = 37;
-
 
 
 /**
@@ -99,19 +100,21 @@ function Picky (target, options) {
 
 	//make self a slidy
 	//detect orientation based on a number of values passed
-	var orientation = self.orientation || isArray(self.channel) && self.channel.length > 1 && 'cartesian';
-	//detect repeat based on
-	var repeat = false;
-	if (space.channel[self._channels[0]] === 'hue') repeat = 'x';
-	else if (space.channel[self._channels[1]] === 'hue') repeat = 'y';
+	self.orientation = isArray(self.channel) && self.channel.length > 1 && 'cartesian';
+
+	//detect repeat based on channel
+	self.repeat = false;
+	if (space.channel[self._channels[0]] === 'hue') self.repeat = 'x';
+	else if (space.channel[self._channels[1]] === 'hue') self.repeat = 'y';
 
 	self.slidy = new Slidy(target, {
 		pickerClass: 'picky-picker',
 		point: true,
 		min: self._min,
 		max: self._max,
-		orientation: orientation,
-		repeat: repeat
+		orientation: self.orientation,
+		repeat: self.repeat,
+		step: self.step
 	});
 
 	//enable events
@@ -127,7 +130,7 @@ proto.enable = function () {
 	var self = this;
 
 	//update color on self user input
-	self.slidy.on('input', function (value) {
+	on(self.slidy, 'input', function (value) {
 		var values = self.color[self.space + 'Array']();
 
 		self._channels.forEach(function (idx, i) {
@@ -162,6 +165,9 @@ proto.enable = function () {
 	});
 	//10 is subjectively unnoticed interval for picker movement
 	throttle(self.color, 'change', 10, function (e) {
+		//ignore active slidy
+		if (self.element.contains(doc.activeElement)) return;
+
 		self.updatePosition();
 	});
 
@@ -179,7 +185,7 @@ proto.enable = function () {
 
 
 /** Basic initial color for pickers */
-proto.color;
+proto.color = null;
 
 
 /** Use web-worker to render range */
@@ -192,6 +198,10 @@ proto.space = 'rgb';
 
 /** Default channel */
 proto.channel = 'red';
+
+
+/** Slidy default options */
+proto.step = 1;
 
 
 /**
@@ -212,7 +222,7 @@ proto.update = function () {
 proto.updatePosition = function () {
 	var self = this;
 
-	var cValues = self.color[self.space + 'Array']()
+	var cValues = self.color[self.space + 'Array']();
 
 	var value = self._channels.map(function (idx) {
 		return cValues[idx];
