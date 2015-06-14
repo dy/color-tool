@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "build": "npm run build-js & npm run build-css",
-    "build-js": "browserify ./index.js -r color-picky -r queried -r color | ccjs - --language_in=ECMASCRIPT5 > bundle.js",
+    "build-js": "browserify ./index.js -r color-picky -r queried -r color2:color | ccjs - --language_in=ECMASCRIPT5 > bundle.js",
     "build-css": "postcss -u postcss-import -u autoprefixer -u cssnano index.css -o bundle.css",
-    "watch": "watchify ./index.js -r color-picky -r queried -r color -d -o bundle.js"
+    "watch": "watchify ./index.js -r color-picky -r queried -r color2:color -d -o bundle.js"
   },
   "repository": {
     "type": "git",
@@ -22,6 +22,7 @@
   "dependencies": {
     "color": "^0.8.0",
     "color-picky": ">0.0.2",
+    "color2": "^1.0.6",
     "normalize.css": "^3.0.3",
     "picky": "^0.1.0",
     "queried": "^1.4.1"

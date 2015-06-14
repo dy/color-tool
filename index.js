@@ -17,7 +17,6 @@ var demoPickerEl = q('.section-demo-picker');
 var demoPicker = new Picker(demoPickerEl, {
 	space: 'hsl',
 	channel: ['hue', 'lightness'],
-	worker: false,
 	color: color,
 	change: function () {
 		//update picker color
@@ -35,7 +34,6 @@ var demoPickerEl = q('.section-demo-picker-s');
 var demoPicker = new Picker(demoPickerEl, {
 	space: 'hsl',
 	channel: ['saturation'],
-	worker: false,
 	color: color,
 	change: function () {
 		//update picker color
