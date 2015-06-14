@@ -1,6 +1,3 @@
-* make color-parse handle adobe's
-* supporrt different color libs
-
 * fix for iphone
 * loose movement
 * proper default picker style
