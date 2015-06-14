@@ -6,7 +6,6 @@
 //TODO: make loose movement
 
 var Emitter = require('events');
-var getWorker = require('color-ranger/worker');
 var renderRange = require('color-ranger');
 var extend = require('xtend/mutable');
 var on = require('emmy/on');
@@ -31,15 +30,16 @@ var ctx = cnv.getContext('2d');
 cnv.width = 37;
 cnv.height = 37;
 
-var isWorkerAvailable = typeof Worker !== 'undefined';
 
 
 /**
  * Create a web-worker
  * @link see references in color-ranger tests
  */
+var isWorkerAvailable = !!window.Worker;
 if (isWorkerAvailable) {
-	var WORKER = getWorker(spaces);
+	var work = require('webworkify');
+	var worker = work(require('color-ranger/worker'));
 }
 
 
@@ -143,7 +143,7 @@ proto.enable = function () {
 
 	//listen to bg update events for the specifically this picker
 	if (isWorkerAvailable && self.worker) {
-		on(WORKER, 'message', function (e) {
+		on(worker, 'message', function (e) {
 			var imgData = ctx.getImageData(0, 0, cnv.width, cnv.height);
 			imgData.data.set(e.data.data);
 			if (e.data.id === self.id) self.renderData(imgData);
@@ -245,8 +245,9 @@ proto.updateBackground = function () {
 	//render range for a new color value in worker
 	if (isWorkerAvailable && this.worker) {
 		//response is handled by `message` event
-		WORKER.postMessage(extend(opts, {
-			rgb: this.color.rgbArray(),
+		worker.postMessage(extend(opts, {
+			color: this.color.hslArray(),
+			sourceSpace: 'hsl',
 			data: imgData.data,
 			id: this.id
 		}));

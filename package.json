@@ -7,13 +7,14 @@
     "test": "test"
   },
   "dependencies": {
-    "color-ranger": "^4.0.6",
+    "color-ranger": "^5.0",
     "color-space": "^1.1",
     "emmy": "^5.2",
     "get-uid": "^1.0",
     "mucss": "^0.6",
     "mutype": "^0.3",
     "slidy": "^0.5",
+    "webworkify": "^1.0.2",
     "xtend": "^4.0"
   },
   "devDependencies": {
