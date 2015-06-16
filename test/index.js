@@ -15,6 +15,7 @@ describe('1-component pickers', function(){
 			change: function () {
 				this.element.setAttribute('data-color', this.color.hslString());
 				this.element.style.color = this.color.rgbString();
+				this.element.firstChild.style.color = this.color.rgbString();
 			}
 		});
 
@@ -30,6 +31,7 @@ describe('1-component pickers', function(){
 			change: function(){
 				// console.log('----change')
 				this.element.style.color = this.color.rgbString();
+				this.element.firstChild.style.color = this.color.rgbString();
 				this.element.setAttribute('data-color', this.color.hslString());
 			}
 		});
@@ -47,6 +49,7 @@ describe('1-component pickers', function(){
 				// console.log('----change')
 				this.element.setAttribute('data-color', this.color.hslString());
 				this.element.style.color = this.color.rgbString();
+				this.element.firstChild.style.color = this.color.rgbString();
 			}
 		});
 
@@ -63,6 +66,7 @@ describe('1-component pickers', function(){
 				// console.log('----change')
 				this.element.setAttribute('data-color', this.color.hslString());
 				this.element.style.color = this.color.rgbString();
+				this.element.firstChild.style.color = this.color.rgbString();
 			}
 		});
 
@@ -78,6 +82,7 @@ describe('1-component pickers', function(){
 				// console.log('----change')
 				this.element.setAttribute('data-color', this.color.rgbString());
 				this.element.style.color = this.color.rgbString();
+				this.element.firstChild.style.color = this.color.rgbString();
 			}
 		});
 
@@ -93,6 +98,7 @@ describe('1-component pickers', function(){
 				// console.log('----change')
 				this.element.setAttribute('data-color', this.color.rgbString());
 				this.element.style.color = this.color.rgbString();
+				this.element.firstChild.style.color = this.color.rgbString();
 			}
 		});
 
@@ -108,6 +114,7 @@ describe('1-component pickers', function(){
 				// console.log('----change')
 				this.element.setAttribute('data-color', this.color.rgbString());
 				this.element.style.color = this.color.rgbString();
+				this.element.firstChild.style.color = this.color.rgbString();
 			}
 		});
 
@@ -123,6 +130,7 @@ describe('1-component pickers', function(){
 				// console.log('----change')
 				this.element.setAttribute('data-color', this.color.rgbaString());
 				this.element.style.color = this.color.rgbString();
+				this.element.firstChild.style.color = this.color.rgbString();
 			}
 		});
 
@@ -138,6 +146,7 @@ describe('1-component pickers', function(){
 				// console.log('----change')
 				this.element.setAttribute('data-color', this.color.rgbString());
 				this.element.style.color = this.color.rgbString();
+				this.element.firstChild.style.color = this.color.rgbString();
 			}
 		});
 
@@ -154,6 +163,7 @@ describe('1-component pickers', function(){
 				// console.log('----change')
 				this.element.setAttribute('data-color', this.color.rgbString());
 				this.element.style.color = this.color.rgbString();
+				this.element.firstChild.style.color = this.color.rgbString();
 			}
 		});
 
@@ -204,6 +214,7 @@ describe('2-component pickers', function(){
 			change: function(){
 				this.element.setAttribute('data-color', this.color.hslString());
 				this.element.style.color = this.color.rgbString();
+				this.element.firstChild.style.color = this.color.rgbString();
 			}
 		});
 		el.classList.add('picky-rect');
@@ -220,6 +231,7 @@ describe('2-component pickers', function(){
 			change: function(){
 				this.element.setAttribute('data-color', this.color.hslString());
 				this.element.style.color = this.color.rgbString();
+				this.element.firstChild.style.color = this.color.rgbString();
 			}
 		});
 		el.classList.add('picky-rect');
@@ -236,6 +248,7 @@ describe('2-component pickers', function(){
 			change: function(){
 				this.element.setAttribute('data-color', this.color.hslString());
 				this.element.style.color = this.color.rgbString();
+				this.element.firstChild.style.color = this.color.rgbString();
 			}
 		});
 		el.classList.add('picky-rect');
@@ -275,6 +288,7 @@ describe('Cases', function () {
 			change: function () {
 				this.element.setAttribute('data-color', this.color.hslString());
 				this.element.style.color = this.color.rgbString();
+				this.element.firstChild.style.color = this.color.rgbString();
 			}
 		});
 		el.classList.add('picky-fullscreen');

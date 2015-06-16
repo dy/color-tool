@@ -16,21 +16,13 @@ var spaces = require('color-space');
 var Slidy = require('slidy');
 var isArray = require('mutype/is-array');
 var isNumber = require('mutype/is-number');
+// var browser = require('detect-browser');
 
 
 module.exports = Picky;
 
 
 var doc = document, win = window;
-
-
-/** Virtual canvas for painting color ranges */
-var cnv = document.createElement('canvas');
-var ctx = cnv.getContext('2d');
-
-/** 37 is a good balance between performance/quality. You can set 101 or 13 though. */
-cnv.width = 37;
-cnv.height = 37;
 
 
 /**
@@ -79,6 +71,15 @@ function Picky (target, options) {
 
 	//generate uid for worker
 	self.id = getUid();
+
+	// Virtual canvas for painting color ranges
+	self.cnv = doc.createElement('canvas');
+	self.cnv.className = 'picky-bg';
+	self.cnv.width = self.canvasWidth;
+	self.cnv.height = self.canvasHeight;
+	self.ctx = self.cnv.getContext('2d');
+
+	self.element.appendChild(self.cnv);
 
 	//save channel indexes
 	var space = spaces[self.space];
@@ -147,8 +148,7 @@ proto.enable = function () {
 	//listen to bg update events for the specifically this picker
 	if (isWorkerAvailable && self.worker) {
 		on(worker, 'message', function (e) {
-			var imgData = ctx.getImageData(0, 0, cnv.width, cnv.height);
-			imgData.data.set(e.data.data);
+			var imgData = new ImageData(e.data.data, self.canvasWidth, self.canvasHeight);
 			if (e.data.id === self.id) self.renderData(imgData);
 		});
 	}
@@ -163,6 +163,7 @@ proto.enable = function () {
 	throttle(self.color, 'change', 50, function (e) {
 		self.updateBackground();
 	});
+
 	//10 is subjectively unnoticed interval for picker movement
 	throttle(self.color, 'change', 10, function (e) {
 		//ignore active slidy
@@ -199,6 +200,9 @@ proto.space = 'rgb';
 /** Default channel */
 proto.channel = 'red';
 
+/** 37 is a good balance between performance/quality. You can set 101 or 13 though. */
+proto.canvasHeight = 37;
+proto.canvasWidth = 37;
 
 /** Slidy default options */
 proto.step = 1;
@@ -241,7 +245,7 @@ proto.updatePosition = function () {
 proto.updateBackground = function () {
 	var self = this;
 
-	var imgData = ctx.getImageData(0, 0, cnv.width, cnv.height);
+	var imgData = self.ctx.getImageData(0, 0, self.canvasWidth, self.canvasHeight);
 	var space = spaces[self.space];
 
 	//form options
@@ -279,7 +283,20 @@ proto.updateBackground = function () {
 
 /** Just show image data passed in self */
 proto.renderData = function (imgData) {
-	ctx.putImageData(imgData, 0, 0);
-	this.element.style.backgroundImage =  'url(' + cnv.toDataURL() + ')';
-	return this;
+	var self = this;
+
+	self.ctx.putImageData(imgData, 0, 0);
+
+	//iphone/firefox flickers on rerender, so it needs fake rendering layer first
+	// self.bgElement.style.backgroundImage = 'url(' + cnv.toDataURL() + ')';
+
+	//and then update main background in background
+	// if (BG_LAYER && !self._renderBgTo) {
+	// 	self._renderBgTo = setTimeout(function () {
+	// 		self.element.style.backgroundImage = self.bgElement.style.backgroundImage;
+	// 		self._renderBgTo = null;
+	// 	}, 50);
+	// }
+
+	return self;
 };

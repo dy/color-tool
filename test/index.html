@@ -2,6 +2,9 @@
 <head>
 	<meta charset="utf-8">
 	<title>Picky tests</title>
+
+	<script src="https://cdn.polyfill.io/v1/polyfill.js?features=default,WeakMap,WeakSet,Node.prototype.contains"></script>
+
 	<link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
 	<link rel="stylesheet" type="text/css" href="../index.css"/>
 
@@ -10,7 +13,7 @@
 			position: relative;
 			width: 200px;
 			height: 30px;
-			outline: 1px solid #f2f2f2;
+			/*outline: 1px solid #f2f2f2;*/
 			margin: 50px;
 		}
 		.picky:after{
@@ -69,7 +72,6 @@
 		assert = chai.assert;
 	</script>
 
-	<script src="testHelpers.js"></script>
 	<script src="index.js"></script>
 
 	<script>

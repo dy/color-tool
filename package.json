@@ -9,6 +9,7 @@
   "dependencies": {
     "color-ranger": "^5.0",
     "color-space": "^1.1",
+    "detect-browser": "^1.1.1",
     "emmy": "^5.2",
     "get-uid": "^1.0",
     "mucss": "^0.6",
