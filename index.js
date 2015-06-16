@@ -18,10 +18,10 @@ var demoPicker = new Picker(demoPickerEl, {
 	space: 'hsl',
 	channel: ['hue', 'lightness'],
 	color: color,
-	change: function () {
+	change: function (v) {
 		//update picker color
 		this.element.style.color = this.color.rgbString();
-		this.element.firstChild.style.backgroundColor = this.color.rgbString();
+		this.element.lastChild.style.backgroundColor = this.color.rgbString();
 
 		//update document location
 		var cstr = this.color.hexString()//.replace(/\s/g, '');
@@ -38,7 +38,7 @@ var demoPicker = new Picker(demoPickerEl, {
 	change: function () {
 		//update picker color
 		this.element.style.color = this.color.rgbString();
-		this.element.firstChild.style.backgroundColor = this.color.rgbString();
+		this.element.lastChild.style.backgroundColor = this.color.rgbString();
 
 		//update document location
 		var cstr = this.color.hexString()//.replace(/\s/g, '');
