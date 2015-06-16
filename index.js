@@ -232,7 +232,10 @@ proto.updatePosition = function () {
 		return cValues[idx];
 	});
 
-	self.slidy.value = value;
+	//NOTE: beware, iOS crashes on getting value this way:
+	// self.slidy.value = value;
+
+	self.slidy.getActivePicker().value = value;
 
 	return self;
 };
