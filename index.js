@@ -287,16 +287,5 @@ proto.renderData = function (imgData) {
 
 	self.ctx.putImageData(imgData, 0, 0);
 
-	//iphone/firefox flickers on rerender, so it needs fake rendering layer first
-	// self.bgElement.style.backgroundImage = 'url(' + cnv.toDataURL() + ')';
-
-	//and then update main background in background
-	// if (BG_LAYER && !self._renderBgTo) {
-	// 	self._renderBgTo = setTimeout(function () {
-	// 		self.element.style.backgroundImage = self.bgElement.style.backgroundImage;
-	// 		self._renderBgTo = null;
-	// 	}, 50);
-	// }
-
 	return self;
 };
