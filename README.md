@@ -1,5 +1,3 @@
-# Picky
-
 Multipurpose color picker component.
 
 [![alt](https://travis-ci.org/dfcreative/color-tool.svg?branch=master)](https://travis-ci.org/dfcreative/color-tool)
