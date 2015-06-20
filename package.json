@@ -13,14 +13,14 @@
     "get-uid": "^1.0.1",
     "mutype": "^0.3.9",
     "slidy": "^0.5.19",
+    "webworkify": "^1.0.2",
     "xtend": "^4.0.0"
   },
   "devDependencies": {
     "chai": "^1.10.0",
     "color": "^0.8.0",
     "color2": "^1.0.0",
-    "mocha": "^2.2.5",
-    "webworkify": "^1.0.2"
+    "mocha": "^2.2.5"
   },
   "scripts": {
     "build": "browserify -r ./index.js:../ -r color2:color -r color-string -d > ./test/bundle.js",
