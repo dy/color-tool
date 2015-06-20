@@ -1,6 +1,6 @@
 {
   "name": "color-tool",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Multipurpose color picker component",
   "main": "index.js",
   "directories": {
