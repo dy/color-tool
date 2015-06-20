@@ -1,4 +1,3 @@
-* fix for iphone
 * proper default picker style
 * control of slidy params - wheel, sniper etc
 

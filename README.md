@@ -1,26 +1,25 @@
-<img src="https://raw.githubusercontent.com/dfcreative/picky/design/logo.png" alt="picky.js"/>
-
-[logo - grid of pickers/space ranges]
-
 # Picky
 
-Color picker component.
+Multipurpose color picker component.
 
-[badges]
+[![alt](https://travis-ci.org/dfcreative/color-tool.svg?branch=master)](https://travis-ci.org/dfcreative/color-tool)
+[![alt](https://codeclimate.com/github/dfcreative/color-tool/badges/gpa.svg)](https://codeclimate.com/github/dfcreative/color-tool)
+[![alt](https://david-dm.org/dfcreative/color-tool.svg)](https://david-dm.org/dfcreative/color-tool)
+[![unstable](http://badges.github.io/stability-badges/dist/unstable.svg)](http://github.com/badges/stability-badges)
 
-[DEMO page (use case of web color-picker)]
+**[Demo](https://dfcreative.github.io/picky)**
 
 ## Use
 
-`$ npm install color-picky`
+[![NPM](https://nodei.co/npm/color-tool.png?mini=true)](https://nodei.co/npm/color-tool/)
 
 ```js
-	var Picky = require('picky');
-	var Color = require('color');
+	var ColorPicker = require('color-tool');
+	var Color = require('color2');
 
 	var c = new Color('red');
 
-	var picker = new Picky({
+	var picker = new ColorPicker({
 		color: color,
 		space: 'rgb',
 		channel: ['red']
@@ -34,11 +33,6 @@ Color picker component.
 | Name | Description |
 |---|---|
 | color | Color instance to use as a model. |
-| space | Color space to render. |
-| channel | Color channel or channels to render in color space. Whether string or array. |
+| space | Color space to render. See [list of available spaces](http://github.com/dfcreative/color-space). |
+| channel | Color channel(s) to render in color space. Whether string or array. |
 | type | Type of color picker to set up: `horizontal`, `vertical`, `rectangular`, `radial`, `polar` or other. |
-
-
-
-
-[![NPM](https://nodei.co/npm/color-picky.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/color-picky/)

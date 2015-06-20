@@ -1,32 +1,27 @@
 {
-  "name": "color-picky",
-  "version": "0.0.7",
-  "description": "Color picker",
+  "name": "color-tool",
+  "version": "1.0.0",
+  "description": "Multipurpose color picker component",
   "main": "index.js",
   "directories": {
     "test": "test"
   },
   "dependencies": {
-    "color-ranger": "^5.0",
-    "color-space": "^1.1",
-    "detect-browser": "^1.1.1",
-    "emmy": "^5.2",
-    "get-uid": "^1.0",
-    "mucss": "^0.6",
-    "mutype": "^0.3",
-    "slidy": "^0.5.15",
-    "webworkify": "^1.0.2",
-    "xtend": "^4.0"
+    "color-ranger": "^5.0.0",
+    "emmy": "^5.2.8",
+    "get-uid": "^1.0.1",
+    "slidy": "^0.5.19",
+    "xtend": "^4.0.0"
   },
   "devDependencies": {
     "chai": "^1.10.0",
     "color": "^0.8.0",
     "color2": "^1.0.0",
-    "mocha": "^2.2.5"
+    "mocha": "^2.2.5",
+    "webworkify": "^1.0.2"
   },
   "scripts": {
-    "watch": "watchify -r ./index.js:../ -r color2:color -r color-string -d -o ./test/bundle.js",
-    "build": "browserify ./index.js -s Picky | ccjs - --language_in=ECMASCRIPT5 > picky.js",
+    "build": "browserify -r ./index.js:../ -r color2:color -r color-string -d > ./test/bundle.js",
     "test": "mocha"
   },
   "style": "index.css",
@@ -36,6 +31,9 @@
   },
   "keywords": [
     "color",
+    "color tool",
+    "color chooser",
+    "color scheme",
     "color-picker",
     "picker",
     "color-range",
@@ -44,7 +42,8 @@
     "rgb",
     "hsl",
     "lch",
-    "cmyk"
+    "cmyk",
+    "lab"
   ],
   "author": "Deema Ywanov <dfcreative@gmail.com>",
   "license": "MIT",

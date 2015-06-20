@@ -1,4 +1,6 @@
 ## Name ideas
+* colorpicker
+* color-picker2
 * Cpicker
 * Colorizer
 * Разноцвет
@@ -30,6 +32,10 @@
 	+ starts with color
 	+ not taken npm-name
 	+ reflects a lot of color-picker use-cases
+* color-tool
+	+ wiky article
+	+ starts with color
+	+ more generic than picker
 
 ## Notes
 * Source/Target concept.
