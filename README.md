@@ -5,7 +5,7 @@ Multipurpose color picker component.
 [![alt](https://david-dm.org/dfcreative/color-tool.svg)](https://david-dm.org/dfcreative/color-tool)
 [![unstable](http://badges.github.io/stability-badges/dist/unstable.svg)](http://github.com/badges/stability-badges)
 
-**[Demo](https://dfcreative.github.io/picky)**
+**[Demo](https://dfcreative.github.io/color-tool)**
 
 ## Use
 

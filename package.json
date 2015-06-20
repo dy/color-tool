@@ -27,7 +27,7 @@
   "style": "index.css",
   "repository": {
     "type": "git",
-    "url": "git://github.com/dfcreative/picky.git"
+    "url": "git://github.com/dfcreative/color-tool.git"
   },
   "keywords": [
     "color",
@@ -48,7 +48,7 @@
   "author": "Deema Ywanov <dfcreative@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/dfcreative/picky/issues"
+    "url": "https://github.com/dfcreative/color-tool/issues"
   },
-  "homepage": "https://github.com/dfcreative/picky"
+  "homepage": "https://github.com/dfcreative/color-tool"
 }
