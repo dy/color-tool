@@ -8,8 +8,10 @@
   },
   "dependencies": {
     "color-ranger": "^5.0.0",
+    "color-space": "^1.3.1",
     "emmy": "^5.2.8",
     "get-uid": "^1.0.1",
+    "mutype": "^0.3.9",
     "slidy": "^0.5.19",
     "xtend": "^4.0.0"
   },

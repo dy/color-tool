@@ -1,11 +1,10 @@
-Multipurpose color picker component.
+Multipurpose color picker component. **[Demo](https://dfcreative.github.io/color-tool)**.
 
 [![alt](https://travis-ci.org/dfcreative/color-tool.svg?branch=master)](https://travis-ci.org/dfcreative/color-tool)
 [![alt](https://codeclimate.com/github/dfcreative/color-tool/badges/gpa.svg)](https://codeclimate.com/github/dfcreative/color-tool)
 [![alt](https://david-dm.org/dfcreative/color-tool.svg)](https://david-dm.org/dfcreative/color-tool)
 [![unstable](http://badges.github.io/stability-badges/dist/unstable.svg)](http://github.com/badges/stability-badges)
 
-**[Demo](https://dfcreative.github.io/color-tool)**
 
 ## Use
 

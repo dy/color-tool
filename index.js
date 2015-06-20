@@ -1,9 +1,7 @@
 /**
- * Picky - color picker component
+ * Picker - color picker component
  * @module  picky
  */
-
-//TODO: make loose movement
 
 var Emitter = require('events');
 var renderRange = require('color-ranger');
@@ -19,7 +17,7 @@ var isNumber = require('mutype/is-number');
 // var browser = require('detect-browser');
 
 
-module.exports = Picky;
+module.exports = Picker;
 
 
 var doc = document, win = window;
@@ -29,7 +27,7 @@ var doc = document, win = window;
  * Create a web-worker
  * @link see references in color-ranger tests
  */
-var isWorkerAvailable = !!window.Worker;
+var isWorkerAvailable = !!win.Worker;
 if (isWorkerAvailable) {
 	var work = require('webworkify');
 	var worker = work(require('color-ranger/worker'));
@@ -42,11 +40,11 @@ if (isWorkerAvailable) {
  * This is a main picker class.
  * It provides an abstract interface for any color picker.
  */
-function Picky (target, options) {
+function Picker (target, options) {
 	var self = this;
 
 	//force constructor
-	if (!(self instanceof Picky)) return new Picky(target, options);
+	if (!(self instanceof Picker)) return new Picker(target, options);
 
 	//ensure target & options
 	if (!options) {
@@ -123,7 +121,7 @@ function Picky (target, options) {
 }
 
 
-var proto = Picky.prototype = Object.create(Emitter.prototype);
+var proto = Picker.prototype = Object.create(Emitter.prototype);
 
 
 /** Enable interactions */
