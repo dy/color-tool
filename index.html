@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#6D5DFB">
+  <meta name="description" content="A fast, private, fullscreen color picker and image palette analyzer.">
+  <title>Color Tool — pick, compare, analyze</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <main class="app" id="app">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Color Tool home"><span class="brand-mark"></span>Color Tool</a>
+      <nav class="tabs" aria-label="Workspace">
+        <button class="tab is-active" data-view="picker">Picker</button>
+        <button class="tab" data-view="palette">Palette</button>
+        <button class="tab" data-view="image">Image</button>
+      </nav>
+      <button class="icon-button" id="themeButton" aria-label="Toggle light and dark theme" title="Toggle theme">◐</button>
+    </header>
+
+    <section class="view picker-view is-active" id="pickerView" aria-labelledby="pickerTitle">
+      <div class="color-stage" id="colorStage">
+        <div class="stage-copy">
+          <p class="eyebrow">Current color</p>
+          <button class="hero-hex" id="heroHex" title="Copy color">#6D5DFB</button>
+          <p id="contrastLabel">Ink contrast 5.07:1 · AA</p>
+        </div>
+        <div class="stage-actions">
+          <button class="soft-button" id="randomButton">Surprise me <kbd>R</kbd></button>
+          <button class="primary-button" id="addButton">Add to palette <kbd>↵</kbd></button>
+        </div>
+      </div>
+
+      <div class="workbench">
+        <section class="panel controls-panel">
+          <div class="section-heading">
+            <div><p class="eyebrow">Explore</p><h1 id="pickerTitle">A color, precisely.</h1></div>
+            <div class="segmented" aria-label="Picker mode">
+              <button class="is-active" data-picker-mode="field">Field</button><button data-picker-mode="sliders">Sliders</button>
+            </div>
+          </div>
+          <div class="field-picker" id="fieldPicker" tabindex="0" role="slider" aria-label="Saturation and lightness" aria-valuemin="0" aria-valuemax="100">
+            <span class="picker-cursor" id="pickerCursor"></span>
+          </div>
+          <label class="range-row hue-row"><span>Hue</span><input id="hueRange" type="range" min="0" max="360" value="248"><output id="hueOutput">248°</output></label>
+          <div class="rgb-sliders" id="rgbSliders" hidden></div>
+          <div class="quantize-row">
+            <div><strong>Quantize</strong><span>Reduce channels to deliberate steps</span></div>
+            <label><input id="quantizeToggle" type="checkbox" role="switch"><span class="switch"></span></label>
+            <select id="quantizeLevels" aria-label="Quantization levels"><option>4</option><option selected>8</option><option>16</option><option>32</option></select>
+          </div>
+        </section>
+
+        <aside class="panel values-panel">
+          <div class="section-heading compact"><div><p class="eyebrow">Translate</p><h2>Color spaces</h2></div><button class="text-button" id="copyAll">Copy all</button></div>
+          <div class="hex-entry"><span>#</span><input id="hexInput" value="6D5DFB" maxlength="6" spellcheck="false" aria-label="Hex color"></div>
+          <div class="space-list" id="spaceList"></div>
+          <p class="privacy-note">Everything runs locally in your browser.</p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="view palette-view" id="paletteView" aria-labelledby="paletteTitle">
+      <div class="page-heading"><div><p class="eyebrow">Build a system</p><h1 id="paletteTitle">Your working palette.</h1><p>Collect colors, compare contrast, and export clean tokens.</p></div><button class="primary-button" id="exportButton">Export CSS</button></div>
+      <div class="palette-grid" id="paletteGrid"></div>
+      <div class="empty-state" id="paletteEmpty"><span>＋</span><h2>No colors yet</h2><p>Add a color from the picker, or start with a balanced example.</p><button class="soft-button" id="starterButton">Create starter palette</button></div>
+    </section>
+
+    <section class="view image-view" id="imageView" aria-labelledby="imageTitle">
+      <div class="page-heading"><div><p class="eyebrow">Private image analysis</p><h1 id="imageTitle">Find the colors that matter.</h1><p>Drop an image to extract its dominant palette. Files never leave your device.</p></div></div>
+      <label class="dropzone" id="dropzone"><input id="imageInput" type="file" accept="image/*"><span class="upload-icon">↥</span><strong>Drop an image here</strong><small>or click to choose · PNG, JPG, WebP</small></label>
+      <div class="analysis" id="analysis" hidden>
+        <div class="image-preview-wrap"><img id="imagePreview" alt="Uploaded image preview"><div id="imageMeta"></div></div>
+        <div class="analysis-results"><div class="section-heading compact"><div><p class="eyebrow">Distribution</p><h2>Dominant colors</h2></div><select id="colorCount"><option>5</option><option selected>8</option><option>12</option><option>16</option></select></div><div id="dominantColors"></div></div>
+      </div>
+    </section>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="lib/color.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
